@@ -1,0 +1,629 @@
+<chapter xml:id="ana">
+  <!-- Ch04 -->
+    <title>Analogue Programming</title>
+
+    <para>
+      Now that you&#39;ve gotten the feel for how programming happens
+      on the computer, it&#39;s time to stop and consider how projects
+      get from concept to code. In the previous chapters, this book
+      has dictated what you programmed, and you each time you have
+      ended up with exactly what the book proscribed. In the real
+      world, though, you have to plan what you&#39;re going to program
+      before you sit down to write code. If you fail to do that, you
+      generally end up with a game that&#39;s so poorly coded that you
+      have to throw it out and start from scratch or else that
+      runs slowly and inefficiently. Planning reduces your time
+      fumbling around with code and increases the time you get to
+      spend on successful programming, graphics, sound, and other
+      non-essential additions to your game.
+    </para>
+
+    <para>
+      The good news is that the planning process is still
+      programming, only instead of writing code, you&#39;re using
+      logic and mental equations to program with pen and paper.
+      Any good system can be implemented on paper, so don&#39;t fool
+      yourself into thinking that computers are unique. It&#39;s just
+      as important to understand program and game design in the
+      physical world as it is to understand how those concepts get
+      translated into digital bytes.  
+    </para>
+
+    <section xml:id="ana-theory">
+      <info>
+	<title>Game theory</title>
+      </info>
+
+    <para>
+      What is a game? Most of us play games in some form, but few of
+      us stop to consider what makes a game feel like a game. You have
+      now programmed at least two games, and if you think about what
+      you have learned, you will likely detect a few common elements
+      not only in what you have made but also in other games you may
+      have played. 
+    </para>
+
+    <para>
+      You might think, at first, that a game requires
+      competition. While some games do require players to compete
+      against one another, other games require them to work together
+      to defeat a common threat. In some games, a player is just
+      trying to beat his or her own best score. So in broad terms, a
+      game requires a <emphasis>win condition</emphasis>.
+    </para>
+
+    <para>
+      Once a win condition is declared, it&#39;s natural to add in
+      obstacles that block players from making the win condition
+      true. In some games, the obstacles are other players or a
+      computer playing the part of other players. In other games, the
+      obstacles are forces of nature, physics, or time itself.
+    </para>
+
+    <para>
+      Since most games are intended to be played more than once,
+      the obstacles also must change from play to play. Games that
+      don&#39;t change are predictable and eventually cease to
+      challenge the player, which is usually considered the thing that
+      makes games fun. 
+    </para>
+
+    <para>
+      In fact, if you think about the most enduring games, there are ones
+      that are never the same, like chess, poker, and Dungeons &#38;
+      Dragons, and those that have had their challenges completely redefined,
+      as speedrunners have done for Super Mario Bros. and other
+      relatively stagnate games.    
+    </para>
+
+    <para>
+      You have already learned about randomness in the previous two
+      games you have made, so creating obstacles that change with each
+      play-through is familiar to you.
+    </para>
+    
+    <para>
+      The next game you program with this book will be a fantasy card
+      game inspired by games like <productname>Magic&#58; The
+      Gathering</productname>, <productname>Hearthstone</productname>,
+      <productname>Pathfinder Adventure Card Game</productname>, and
+      other trading card games. It will teach you concepts necessary
+      for all kinds of games, including collision detection, saved
+      game states, graphics, and more. But first, the game must be
+      designed, keeping these game theory principles you have just
+      learnt in mind.
+    </para>
+    </section>
+    
+    <section xml:id="ana-design">
+      <info>
+	<title>Experimental design</title>
+      </info>
+
+      <para>
+	Step away from your Raspberry Pi for this section. If you have
+	a deck of playing cards, you can use that during this
+	exercise. Otherwise, find some blank index cards or a few
+	sheets of paper cut down to approximate playing card
+	size.
+      </para>
+
+      <tip>
+	<para>
+	  At minimum, a game designer&#39;s toolkit should contain
+	  a deck of playing cards and some dice. Neither are items you
+	  necessarily will use in your final version, but they both
+	  provide important templates for common game elements&#59;
+	  the cards are quick and easy representations of different
+	  game elements, and dice produce randomness.
+	</para>
+      </tip>
+      
+      <para>
+	You&#39;re going to invent a new game that modernizes the game
+	you have just programmed, Blackjack. Although the initial
+	design uses a standard deck of cards as a tool, ultimately you
+	will style the game as a battle scenario, so the game&#39;s
+	name will be Battlejack.
+      </para>
+
+      <para>
+	There will be several iterations of this new game, and while
+	this book proscribes much of the game to you, you are
+	encouraged to add your own variations along the way. There are
+	no right or wrong answers here. Any idea is worth trying, and
+	if something breaks the game, then you can adapt it or throw
+	it out as needed.
+      </para>
+
+      <section xml:id="ana-design-iter-1">
+      <info>
+	<title>Iteration One</title>
+      </info>
+
+      <para>
+	The goal in Blackjack is to be the player with cards adding up
+	to 21, so the goal of Battlejack is the same, only in
+	Battlejack, it's the dealer trying to get to 21 while the
+	player attempts to prevent it. The player may cancel out a
+	card that the dealer attempts to use in the journey to 21 with
+	a card of an equal or greater number. For example, if the
+	dealer puts down a 5 of clubs, the player can &#34;kill&#34; that
+	card with a 5 of hearts or greater.
+      </para>
+
+      <para>
+	Each player takes a suit&#58; the dealer is clubs, and the
+	player is hearts. The player starts with a hand of three
+	cards. On the player&#39;s turn, one action may be taken&#58;
+	either a card may be drawn from the deck, or a card may be
+	played against the dealer. On the dealer&#39;s turn, a card
+	from the deck is revealed and placed on the table. If the card
+	is a club, then it counts toward the dealer&#39;s goal of
+	21. If it is a heart, it is discarded.
+      </para>
+
+      <para>
+	Using only the hearts and clubs from a deck of cards, try
+	playing a hand with these rules and see how the game
+	goes. Here&#39;s some sample play&#58;
+      </para>
+
+      <orderedlist>
+	<listitem>
+	  <para>
+	    Player&#58; draws initial hand&#58; 2♣, 3♣, 5♣
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Dealer&#58; 9♣. Total score is now 9
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Player&#58; draws a Ace♣
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Dealer&#58; draws a 3♥, which is discarded
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Player&#58; draws 7♥
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Dealer&#58; draws 10♣. Total score is now 19.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Player&#58; draws Ace♥
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Dealer&#58; draws 8♣. Total score is now 27. Game over.
+	  </para>
+	</listitem>
+      </orderedlist>
+
+      <para>
+	Regardless of how your own play test went, you probably see
+	some problems with the game's current state. The central
+	mechanic of canceling out a card with a more powerful never
+	even had a chance to be used, so that&#39;s a clear indication
+	that something is amiss. The player&#39;s initial hand
+	consisted entirely of cards from the dealer&#39;s suit, which
+	didn&#39;t make for a very empowering start. And finally, the
+	likelihood of the dealer reaching exactly 21 is extremely
+	low. In Blackjack, a game can end without anyone reaching 21
+	because the closest one wins, but in this game only one side
+	is trying to reach 21, leaving no basis for comparison.  
+      </para>
+
+      <para>
+	Before proceeding to the next section, take a moment to modify
+	some of the rules and play another hand of Battlejack to see
+	how your changes affect the game.
+      </para>
+      
+      </section>
+
+      <section xml:id="ana-design-iter-2">
+      <info>
+	<title>Iteration Two</title>
+      </info>
+
+      <para>
+	It&#39;s obvious that the player and dealer drawing from the
+	same deck is problematic, because it means that each side of
+	the game ends up with cards that are useless to them. You can
+	try to think of a solution to this yourself, but here are two
+	suggestions&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Instead of limiting the total deck to just two suits, use
+	    all four available suits. Player uses all red cards and
+	    dealer uses all black cards.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    The player and dealer get separate decks, such that the 
+	    player always draws from a red deck, and the dealer always
+	    draws from a black deck. 
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	The first option adds variety, but it doesn&#39;t actually
+	change game play. The second option helps, but it alienates
+	the two players from one another. Each player has a unique
+	deck, both players know exactly what one another&#39;s deck
+	contains, and it more or less turns into a matching game or a
+	reverse game of Go Fish.
+      </para>
+      
+      <para>
+	Another serious problem with the game is that there&#39;s
+	actually no win condition for the player. The dealer wins by
+	reaching 21. Since the probability of the dealer hitting
+	exactly 21 is so low, you might loosen the constraints and
+	declare the winner at 21 or more, but there&#39;s still no way
+	for the player to win until the dealer runs out of cards. That
+	does, in effect, emulate a survival game, so maybe this is a
+	path you want to explore. You could design some cards with
+	common survival themes, such that what is now the black deck
+	consists of various zombies and related threats, and what is
+	now the red deck contains of the usual anti-zombie measures.
+      </para>
+
+      <para>
+	But even with a cool survival game theme, the game is still
+	very much limited to action and reaction. The game does have
+	some randomness, because the decks get shuffled, but
+	interestingly the knowledge of what each deck contains lessens
+	the effectiveness of the randomness. Even though the player
+	doesn&#39;t know the order of the cards in the dealer&#39;s
+	deck, the player knows exactly what it contains. When deciding
+	what cards to &#34;spend&#34; to kill a black card, the player
+	can budget using their knowledge of the enemy deck.  And worse
+	still, sometimes the order of the cards create an unbeatable
+	game for the player, so the player has no sense of control
+	over the game, and the stakes are always exactly the same.
+      </para>
+
+      <para>
+	Try playing again, this time with this revised rule set&#58;
+      </para>
+
+      <orderedlist>
+	<listitem>
+	  <para>
+	    Split a standard deck of cards into a red deck and a black
+	    deck. Place one Joker in each deck.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Take six black cards from the black deck and shuffle them
+	    into the red deck. These are, effectively, penalties that
+	    add unpredictable randomness in the player&#39;s deck.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    The player draws three cards at the start of the
+	    game. 
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    On the dealer&#39;s turn, one card from the dealer&#39;s
+	    deck is drawn and placed face up on the table. This is the
+	    dealer&#39;s &#34;stash&#34;. When a dealer&#39;s stash
+	    adds up to 21 or more, the dealer wins.
+	  </para>
+	  <para>
+	    If the player has a black card in their hand, then the
+	    dealer compels that card from the player&#39;s hand into
+	    the dealer&#39;s stash.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    On the player&#39;s turn, the player draws one card from
+	    the player deck. There is no hand limit. If a black card
+	    is drawn, the player must hold it&#59; it cannot be played
+	    or discarded.
+	  </para>
+	  <para>
+	    The player may then either &#34;stash&#34; a
+	    card by placing one card face up in front of them. When a
+	    player&#39;s stash reaches 21 or more, the player
+	    wins.
+	  </para>
+	  <para>
+	    Alternately, a player may &#34;attack&#34; the
+	    dealer by eliminating one card in the dealer&#39;s
+	    stash. To eliminate a card in the dealer&#39;s stash, the
+	    player must sacrifice one or more cards that add up to the
+	    face value of the dealer&#39;s card. Jacks, Kings, and
+	    Queens all count as 10, and Aces as 1.
+	  </para>
+	  <para>
+	    Only one card may be eliminated per turn.
+	  </para>
+	  <para>
+	    At the end of the player&#39;s turn, they draw enough
+	    cards to bring their hand back to three.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    If a Joker is drawn, it destroys all cards in the
+	    dealer&#39;s stash.
+	  </para>
+	</listitem>
+      </orderedlist>	      
+
+      <para>
+	A few play tests reveal that the game is in much better
+	shape. Even if you can&#39;t express why, you probably find
+	that the game feels better. It feels better because the
+	choices and calculations that the player has to make are now
+	subjective. The player has no way of knowing which 6 cards
+	from the black deck is in their own deck, so there&#39;s true
+	randomness in the decks at play. There are moments of surprise
+	when a black card is drawn. And the strategies of each player
+	is inherently different&#58; the dealer uses brute force,
+	marching heedlessly onward toward 21, while the player is
+	forced to choose on each turn whether to fight or bolster
+	their own stash. Sometimes, a player has the perfect hand to
+	achieve 21 but needs two turns to stash, and so must gamble
+	that the dealer&#39;s stash, hovering though it may be at 17,
+	won&#39;t reach 21 on the dealer&#39;s next turn.
+      </para>
+
+      <para>
+	In other words, there&#39;s some skill, there&#39;s risk,
+	there are some good turns of luck and some bad turns of
+	luck. And every game, it&#39;s different.
+      </para>
+    </section>
+
+      <section xml:id="ana-design-iter-3">
+      <info>
+	<title>Iteration Three</title>
+      </info>
+
+      <para>
+	The game is functional now, and fun too. For the third iteration,
+	try to think abstractly about the game. It has been designed
+	with a standard set of playing cards, but think about your
+	favorite genre and imagine how that might be applied to this
+	game. Instead of just playing by numbers, the player could
+	take the role of a barbarian chieftain battling an onslaught
+	of orcs, or a doctor fighting the spread of a global pandemic,
+	or a starbase captain deploying star fighters against an
+	invading empire.       
+      </para>
+
+      <para>
+	There may also be an opportunity to add more resource
+	variety. Right now, all cards drawn by the player are cards
+	that get stashed or played, and they are all basically the
+	same. For a few play tests, use all red Jacks,
+	Kings, and Queens as powerup cards&#58; they don&#39;t count
+	as 10, but as a +1, +2, and +3, respectively. In this version
+	of the game, the player can beat a 9 in the dealer&#39;s stash
+	with a 6 and a +3 Queen powerup, or a 4 with a 2 and a +2
+	powerup, and so on. This could potentially cause a balance
+	problem, because now the dealer has six cards worth 10 points
+	that the player doesn&#39;t have, but it adds flexibility to
+	play, so it may be worth the imbalance. Try it out and see
+	what you think.
+      </para>
+
+      <para>
+	Try out other changes of your own design, too. Some changes
+	will break the game, making it too easy or impossible to win,
+	but other changes will make the game uniquely yours.
+      </para>
+      </section>
+      
+    </section> <!-- end design section  -->
+    
+    <section xml:id="ana-pseudo">
+      <info>
+	<title>Pseudo Code for Battlejack</title>
+      </info>
+
+      <para>
+	Once you&#39;re happy with a game concept, it&#39;s time to
+	write what&#39;s called <emphasis>pseudo
+	code</emphasis>. Pseudo code is an informal but structured
+	method of planning out a program without worrying about syntax
+	and other details. It&#39;s purely an exercise in logic and
+	planning. Pseudo code doesn&#39;t have to be right, it can be
+	changed later, but it serves as a good guide for you when you
+	sit down at a blank screen to start writing code.
+      </para>
+
+      <para>
+	By design, there are several similarities between Battlejack
+	and Blackjack, which you have already programmed. In fact,
+	you will reuse your card dealer library from Blackjack for
+	Battlejack. Think about the programming tricks you know, and
+	how they apply to Battlejack.   	
+      </para>
+
+<programlisting><![CDATA[
+Construct a player deck and a dealer deck.
+
+Construct a table to track which cards have already been drawn.
+
+Construct a table to track the player's current hand,
+Construct a table to track the dealer's hand.
+
+if player[#player] < 3 then
+    draw another card
+end
+
+if card dragged to stash then
+    add card.val to total
+elseif cards dragged to dealer_stash then
+    compare player_card.val to dealer_card.val
+    if player_card.val > dealer_card.val then
+        remove dealer card from dealer_stash
+    else
+	wait for another card to be added
+    end
+end
+
+if total > 21 then
+    player wins
+elseif ai > 21 then
+    dealer wins
+end
+]]></programlisting>
+
+<para>
+  At just 20 lines, this is obviously a very simplified picture of
+  what the game requires, but it&#39;s a good &#34;big picture&#34;
+  view of what is needed. Having it as a guide will help you stay
+  focused when it comes time to write the actual code.
+</para>
+
+    </section>
+    <section xml:id="ana-doc">
+      <info>
+	<title>Documentation</title>
+      </info>
+    
+<para>
+  It&#39;s just as useful for you as a programmer, and even more useful for
+  your players, if you document your game before you even begin
+  writing code. In big companies, this step is typically done by the
+  UX &#40;user experience&#41; team. They literally draw out what a
+  program is intended to look like, where buttons and menus appear,
+  and what each button or widget does. This is helpful to you because
+  you know, while coding, where to put your interface elements, and
+  it&#39;s good for your users because you can usually re-purpose the
+  design specs as user-facing documentation explaining how to play the game.
+</para>
+
+<para>
+  Here&#39;s a sample spec for Battlejack.
+</para>
+
+  <para>
+    When the game launches, the player is greeted with a menu screen
+    allowing the user to resume a saved game, start a new game, and
+    adjust settings for fullscreen and windowed display, and whether
+    or not tutorial tips are displayed during play.
+  </para>
+
+  <para>
+    During game play, the user clicks their own deck to draw a
+    card. During their turn, the player clicks and drags cards to
+    either the dealer&#39;s stash to cancel out a card in play, or to
+    their own score box to add their card to their own stash. Onscreen
+    prompts alert the player of their choices.
+  </para>
+
+  <para>
+    If a player attempts to cancel a dealer card out with a less
+    powerful card &#40;trying to cancel a 5-strength card with a
+    3-strength card, for example&#41;, nothing happens. The player may
+    add powerups or additional cards to complete the action, or click
+    and drag the card back into their hand to continue.
+  </para>
+
+  <para>
+    There are no undo functions. Once a move has been made, the move
+    is not retractable.
+  </para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Design spec for Battlejack</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/ch4_spec.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    A spec document doesn&#39;t necessarily have to be followed to the
+    letter, but it serves as a guide and a target while coding. Some
+    adjustments might have to be made. Some features might have to be
+    dropped, others added, and still others changed. If you were hired
+    to program to a specification, changes would have to be
+    negotiated to ensure that you&#39;re not cheating your client out
+    of something you assured them you could do. In this case, however,
+    you are your own client, and so this spec document is just a
+    gentle guide and a helpful map of what needs to get coded and what
+    needs to be produced for the game.
+  </para>
+
+  <para>
+    In the next chapter, you&#39;ll learn about &#91;code&#93;
+    libraries, data storage, and deck definition files, both of which
+    are essential for a feature-rich video game.
+  </para>
+  
+    </section>
+    
+    <section xml:id="ana-work">
+      <info>
+	<title>Homework</title>
+      </info>
+
+      <para>
+	Even high-tech video games can be reduced down to tabletop
+	mechanics. Learning why games are fun to play is an important
+	part of designing good games that are, themselves, fun to
+	play.
+      </para>
+
+      <para>
+	Try these analogue hacks&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Take a game you like to play on the computer or console, and
+	    mentally deconstruct it. Determine what its game mechanics
+	    are. For instance, in <productname>Portal</productname>,
+	    the mechanic is solving intricate puzzles with fantasy
+	    portal physics. In <productname>Half Life</productname>,
+	    the mechanic is to shoot enemies while unraveling elements
+	    of a detailed story. In the
+	    <productname>Fallout</productname> series, the mechanic is
+	    storytelling and exploration.
+	  </para>
+	  <para>
+	    Try to come up with a card game version of your favorite
+	    game. It doesn&#39;t have to be an exact match, but see
+	    how close you can get. Incorporate dice as needed.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>    
+</chapter>
+

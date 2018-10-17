@@ -1,0 +1,1047 @@
+<chapter xml:id="power">
+  <!-- Ch09 -->
+    <title>Balance of Power</title>
+
+    <para>
+      There are a few small bugs in Battlejack, and a few
+      opportunities for a better user experience. This chapter fixes
+      the bugs and adds some features to make the game flow better.
+    </para>
+
+    <para>
+      The first bug you may not even have noticed yet&#58; if you
+      click the mouse on the menu screen, the game crashes. This is
+      caused by the <filename>main.lua</filename> file
+      forwarding any detected mouse press or release to
+      <literal>STATE.mousepressed()</literal> or
+      <literal>STATE.mousereleased()</literal>, and finding no corresponding
+      <literal>menu.mousepressed()</literal> or
+      <literal>menu.mousereleased()</literal> function.
+    </para>
+
+    <para>
+      The fix is simple&#58; create functions to process mouse events
+      on the menu screen. Since no action is required on a mouse
+      event, a dummy response is all that&#39;s needed&#58;
+    </para>
+
+<programlisting><![CDATA[
+function menu.mousereleased(x,y,btn)
+   return false
+end
+
+function menu.mousepressed(x,y,btn)
+   return false
+end
+]]></programlisting>
+
+<para>
+  Another noticeable bug is the lack of feedback from the
+  game. The progress of the game is very difficult to follow without a
+  running tally of each player&#39;s score, and without the
+  declaration of who has won and who has lost.
+</para>
+
+<para>
+  To print the current totals of each hand, you must calculate a
+  running total that updates as frequently as each hand changes. The
+  two functions that update most frequently are the
+  <literal>draw()</literal> and <literal>update(dt)</literal>
+  functions, and there&#39;s not necessarily any reason to use one
+  over the other. However, since the <literal>draw()</literal>
+  function is busy drawing cards and hands, put the calculation in the
+  <literal>update</literal> function.
+</para>
+
+<para>
+  For context, the whole <literal>update</literal> function is&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.update(dt)
+   if #grab > 0 then
+      parti:update(dt)
+   end
+   handval=0
+   hordeval=0
+   for i,obj in pairs(hand) do
+      handval = handval+tonumber(obj.value)
+   end
+   for i,obj in pairs(horde) do
+      hordeval = hordeval+tonumber(obj.value)
+   end
+end
+]]></programlisting>
+
+<para>
+  Notice that the values of <varname>handval</varname> and
+  <varname>hordeval</varname> are each reset at the beginning of each
+  update. This ensures that the total score is recalculated with every
+  update rather than compounded upon itself. The total for each hand
+  is the sum of each card in each hand, using the
+  <literal>tonumber</literal> Lua method to translate the value of
+  each card from a string into an integer.
+</para>
+
+<para>
+  Drawing the tally on screen is done the same way as drawing any text
+  on screen, and for added effect you can add a graphical element to
+  suggest a magical glow. Sample graphics are included in the code
+  files for this book.
+</para>
+
+<para>
+  Create the effect graphics for each deck near the top of your
+  <filename>game.lua</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+local glow = love.graphics.newImage('img' .. d .. 'glow.png')
+local shadow = love.graphics.newImage('img' .. d .. 'shadow.png')
+]]></programlisting>
+
+<para>
+  Then add the graphics and running total to your
+  <literal>game.draw()</literal> function. The <literal>draw</literal>
+  function is getting crowded, and order does matter for layering
+  effects, so here is the complete function so far&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.draw()
+   love.graphics.setColor(1,1,1)
+   -- set background
+   love.graphics.draw(tile,ground,0,0)
+   --hand player
+   font = love.graphics.setNewFont("font/Arkham_reg.TTF",36)
+   card = back[1]
+   love.graphics.draw(glow,card.x,card.y-(card.y/4),0,scale,scale,0,0)
+   love.graphics.draw(card.img,card.x,card.y,0,scale,scale,0,0)
+   love.graphics.setColor(0,0,0)
+   love.graphics.printf(tostring(handval),(slot)-slot/2,card.y-pad,slot/2,'center')
+   love.graphics.setColor(1,1,1)
+   --horde ai
+   card = back[2]
+   love.graphics.draw(shadow,card.x,(card.y*2)+card.y/2,0,scale,scale,card.img:getWidth()/2, card.img:getHeight()/2)
+   love.graphics.draw(card.img,card.x,card.y,0,-1*scale,-1*scale,card.img:getWidth()/2, card.img:getHeight()/2)
+   love.graphics.setColor(0.8,0.1,0.1)
+   love.graphics.printf(tostring(hordeval),card.x-pad,card.y+card.y,slot/2,'center')
+   love.graphics.setColor(1,1,1)
+   font = love.graphics.setNewFont("font/Arkham_reg.TTF",72)
+   
+   -- draw cards
+   for i,obj in pairs(horde) do --ai
+      obj.x = WIDE-(slot*i)-slot/2
+      love.graphics.draw(obj.img,obj.x,obj.y,0,scale,scale,0,0) 
+   end
+   for i,obj in pairs(grab) do
+      local count = 1
+      while count < obj.wide/mana:getWidth() do
+	 love.graphics.draw(parti,obj.x+(mana:getWidth()*count+1),obj.y+(pad/3))
+	 count = count+1
+      end
+   end
+   for i,obj in pairs(hand) do --player
+      obj.x = pad+(slot*i)
+      love.graphics.draw(obj.img,obj.x,obj.y,obj.r,scale,scale,0,0)
+   end
+end
+]]></programlisting>
+
+<para>
+  Try playing the game now to test the new functions, taking note of
+  bugs or missing features.
+</para>
+
+<section xml:id="power-git">
+  <info>
+    <title>Git commit</title>
+  </info>
+
+<para>
+  A lot of progress has been made up to this point, so it makes sense
+  to commit the changes to Git, just in case changes you make later
+  render the game unplayable by mistake.  
+</para>
+
+<para>
+  Open <application>git-cola</application> and look in the
+  <guilabel>Status</guilabel> pane to see which files you have changed
+  but not yet committed. A Git <emphasis>commit</emphasis> is like a
+  snapshot, so even though you have committed an earlier version of a
+  file, you must take a new snapshot of any changes since the original commit.
+</para>
+
+<para>
+  You can also review your Git repository in a terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/battlejack
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+
+  modified:   game.lua
+  modified:   menu.lua
+no changes added to commit (use "git add" and/or "git commit -a")
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, right-click on the updated
+  files in the <guilabel>Status</guilabel> pane and select
+  <guimenuitem>Stage selected</guimenuitem>.
+</para>
+
+<para>
+  Or in a terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git add game.lua menu.lua
+]]></programlisting>
+
+<para>
+  To commit the files to Git with <application>git-cola</application>, fill in a brief commit message and then
+  click the <guibutton>Commit</guibutton> button. To do the same in
+  the terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git commit -m 'click interception and running total score'
+]]></programlisting>
+
+<para>
+  In the future, you should commit code whenever you make a
+  significant change that has not broken your codebase. It&#39;s a
+  good habit to get into, and in case of disaster, can save you hours
+  of work.
+</para>
+</section>
+
+<section xml:id="power-level">
+  <info>
+    <title>Leveling up</title>
+  </info>
+
+  <para>
+    Game difficulty is a tricky to get right. What&#39;s gratifyingly
+    difficult for one player is discouraging to another, so the level
+    of challenge in your game is ultimately up to you. However,
+    playing through the game as it is now, it&#39;s arguable that the
+    Joker card in both decks is imbalanced. For the player, it buys
+    valuable time as the AI brute forces its way toward a winning
+    hand, but it would be a guaranteed loss for the player should a
+    Joker be played against them. For that reason, comment out the
+    addition of a Joker card to the AI deck.
+  </para>
+
+<programlisting><![CDATA[
+deck = game.joker(deck,1)
+--ai   = game.joker(ai,0)
+]]></programlisting>
+  
+<para>
+  That balances the game, and catching it early prevents you from
+  having to write the code associated with the AI playing a Joker
+  card. If you decide to add it back in later because you
+  <emphasis>want</emphasis> the extra challenge, you have the
+  <literal>game.blast</literal> function used when the player gets a
+  Joker card, and can write the code necessary.
+</para>
+
+<para>
+  Part of balancing a game isn&#39;t just crippling the opposition,
+  but also bolstering the player. The human player in Battlejack is up
+  against a relentless march of cards that are drawn but never
+  spent. Tipping the scales in the player&#39;s favor has two
+  important effects&#58; it makes the player feel more powerful as
+  they achieve victories, and they assure the player that all their
+  hard work is paying off.
+</para>
+
+<para>
+  To create a leveling system, instantiate a variable at the top of
+  <filename>game.lua</filename>, setting it to 0 by default. The first
+  line in the code sample is for context&#58;
+</para>
+
+<programlisting><![CDATA[
+winner = nil
+level  = 0
+]]></programlisting>
+
+<para>
+  The level can be printed on screen using the usual
+  <literal>love.graphics.printf</literal> function, which you&#39;ve
+  already used in both Blackjack and Battlejack. However, the player
+  doesn&#39;t really need a constant reminder of what level
+  they&#39;re on, so it&#39;s a good idea to create some marker
+  variable to signal the level text to disappear. You could use the
+  Lua function <literal>os.clock</literal> to measure the passage of
+  time, but in a turn-based game like Battlejack, time is more or less
+  relative compared to when the player clicks, so it&#39;s more
+  meaningful to use clicks as a measure of &#34;time&#34; than actual
+  time.
+</para>
+
+<para>
+  Create a new variable called <literal>progress</literal> to
+  represent how far into a game the player has progressed. This
+  variable needs to be reset each time a new game is started, so
+  create and set the variable in the <literal>game.new</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+progress = 0
+]]></programlisting>
+
+<para>
+  Increment the variable whenever the mouse is released. The first two
+  lines are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.mousereleased(x,y,btn)
+   local attack = 0
+   progress = progress+1
+]]></programlisting>
+
+<para>
+  And finally, in the <literal>draw</literal> function, draw the level
+  text until <varname>progress</varname> is 2 or greater.
+</para>
+
+<programlisting><![CDATA[
+if progress < 2 then
+   love.graphics.printf("Level " .. level,0,pad+HIGH/3,WIDE,'center')
+end
+]]></programlisting>
+
+<para>
+  To increment a level, you need a way to determine the winner. You
+  wrote similar code for the Blackjack game, and it only needs minor
+  adjustment for this game. Here is the complete
+  <literal>update</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.update(dt)
+   if #grab > 0 then
+      parti:update(dt)
+   end
+   handval=0
+   hordeval=0
+   for i,obj in pairs(hand) do
+      handval = handval+tonumber(obj.value)
+      if obj.color == "bonus" then
+	 handval = handval-tonumber(obj.value)
+      end
+   end
+   for i,obj in pairs(horde) do
+      hordeval = hordeval+tonumber(obj.value)
+   end
+   -- ID the winner
+   if handval >= 21 and handval > hordeval then
+      winner = "hand"
+   elseif hordeval >= 21 and hordeval > handval then
+      winner = "horde"
+   elseif handval >= 21 and handval == hordeval then
+      winner = "tie"
+   end
+end
+]]></programlisting>
+
+<para>
+  Each mouse release, check to see whether a winner has been declared
+  and either increment the level or start a new round. This check must
+  be performed before anything else so that as soon as there&#39;s a
+  valid winner, game play stops.
+</para>
+
+<para>
+  The first three lines are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.mousereleased(x,y,btn)
+local attack = 0
+progress = progress+1
+
+if btn == 1 and winner ~= nil then
+   if winner == "hand" then
+   level = level+1
+end
+   game.sleep(1)
+   game.new()
+end
+]]></programlisting>
+
+<para>
+  This code refers to a new function that doesn&#39;t exist yet&#58;
+  <literal>game.sleep</literal>. This function causes the game to
+  &#34;sleep&#34;, just to ensure that the player isn&#39;t missing
+  important information. Without a brief pause, the game would go from
+  &#34;You win&#34; to &#34;Level 1&#34; messages in the blink of an
+  eye.
+</para>
+
+<para>
+  Unlike many programming languages, there is no function in Lua&#39;s
+  standard library for sleeping, but it&#39;s an easy function to
+  implement. Add this to <filename>game.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.sleep(s)
+   local ntime = os.clock() + s
+   repeat until os.clock() > ntime
+end
+]]></programlisting>
+
+<para>
+  You can play the game now to see the latest improvements. Remember
+  to commit your changes with Git, as long as everything works as expected.  
+</para>
+</section>
+
+<section xml:id="power-msg">
+  <info>
+    <title>Powerup</title>
+  </info>
+
+  <para>
+    The game increases the player&#39;s levels but so far doesn&#39;t
+    actually reward them with anything substantial. Now that the level
+    mechanism is in place, though, you can use it to add new cards
+    into the player&#39;s deck any time they gain a level. This gives
+    the player the feeling of growing power, and a sense of accomplishment.
+  </para>
+
+  <para>
+    First, you need some way to alert the player of their
+    accomplishment. You could print a message on the game screen, but
+    for something as significant as an hard-earned powerup, a special
+    message screen seems more important and means less clutter in the
+    game play area.
+  </para>
+
+  <para>
+    On the message screen, you can display the new cards added to the
+    deck after each victory. It can do double duty as an alert message
+    when the player draws a black card from their own deck,
+    underscoring that their luck has changed for the worst.
+  </para>
+
+  <para>
+    You need a few new tables and variables for this mechanism. Since
+    there are sets of cards involved, you need new tables,
+    <varname>earn</varname> for earned bonuses and
+    <varname>up</varname> for powerups. Since the
+    <varname>winner</varname> variable gets set back to
+    <literal>nil</literal> with each new game, you need a new
+    persistent variable called <varname>lastwon</varname> to represent
+    whether the player won the last round or not.
+  </para>
+
+  <para>
+    You also need to create a new file called
+    <filename>msg.lua</filename> to serve as your message screen.
+  </para>
+
+  <para>
+    Add these new elements to the top of your
+    <filename>game.lua</filename> file&#58;
+  </para>
+
+<programlisting><![CDATA[
+require("card")
+require("msg")
+
+up    = {} --powerups
+earn  = {} --earned bonuses
+winner = nil
+level   = 0
+lastwon = 0
+]]></programlisting>
+
+<para>
+  In a new file called <filename>msg.lua</filename>, build a new
+  game state called <varname>msg</varname>. This is similar to the
+  <varname>menu</varname> game state. When activated, the
+  <varname>STATE</varname> variable changes to <literal>msg</literal>,
+  meaning all user input is directed to
+  <filename>msg.lua</filename>, meaning you need the same mouse click
+  interception as other modes. Since the point of this message screen
+  is to convey information to the player, create an
+  <guibutton>OK</guibutton> button to dismiss the screen.
+</para>
+
+<programlisting><![CDATA[
+msg = {}
+
+function msg.activate()
+   STATE = msg
+   font = love.graphics.setNewFont("font/Junction_regular.otf",24)
+   button_ok = love.graphics.newImage("img" .. d .. "button_ok.png")
+end
+
+function msg.mousereleased(x,y,btn)
+   return false
+end
+
+function msg.keypressed(k)
+   game.activate()
+end
+]]></programlisting>
+
+<para>
+  You also need a function to detect clicks made on the
+  <guibutton>OK</guibutton> button, and a mouse click function to
+  respond to those clicks. It&#39;s arbitrary, in this case, whether
+  you respond to a mouse press or a mouse release, since in either
+  case the result is the dismissal of the message screen and the
+  activation of the <literal>game</literal> state.
+</para>
+
+<programlisting><![CDATA[
+function msg.clicker(x,y,tgt)
+   return (
+      x < (WIDE/2)-(button_ok:getWidth()/2) + tgt:getWidth() and
+        x > (WIDE/2)-(button_ok:getWidth()/2) and
+	 y < HIGH/2 + tgt:getHeight() and
+        y > HIGH/2
+    )
+    -- returns True or False
+end
+
+function msg.mousepressed(x,y,btn)
+   if btn == 1 and msg.clicker(x,y,button_ok) then
+      game.activate()
+   end
+end
+]]></programlisting>
+
+<para>
+  And finally, you must generate the content of the message. Since
+  the message screen is going to serve as an alert for bonuses
+  and powerups as well as the unfortunate instance of drawing a black
+  card from the player deck, you must use an <literal>if</literal>
+  statement to determine whether you need to display two cards &#40;a
+  bonus and a powerup&#41; or just one card &#40;a single black card
+  drawn from the player deck&#41;
+</para>
+
+<programlisting><![CDATA[
+function msg.draw()
+   love.graphics.setBackgroundColor(0.1,0.1,0.1)
+   if earncard ~= nil then
+      love.graphics.draw(upcard.img,((WIDE-upcard.wide)/2)-upcard.wide,pad,0,scale,scale,0,0)
+      love.graphics.draw(earncard.img,(WIDE+earncard.wide)/2,pad,0,scale,scale,0,0)
+   else --only one card to display
+      love.graphics.draw(upcard.img,((WIDE-upcard.wide)/2),pad,0,scale,scale,0,0)
+   end
+   love.graphics.printf(message,0,pad+HIGH/3,WIDE,'center')
+
+   love.graphics.draw(button_ok, (WIDE/2)-(button_ok:getWidth()/2),HIGH/2,0,1,1,0,0)
+end
+]]></programlisting>
+  
+<para>
+  This introduces two new variables&#58; an
+  <varname>earncard</varname> and an <varname>upcard</varname>. These
+  variables don&#39;t exist yet, but you will create them before
+  calling the new <literal>msg</literal> screen. They will contain the
+  card or cards that have been generated from either a victory or an
+  unfortunate hand. 
+</para>
+
+<para>
+  As with the card sets for your player and AI, you must populate your
+  earned bonus and powerup tables in the
+  <literal>game.setup()</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+up = game.setsplit("up",1,up,1)
+earn = game.setsplit("earn",1,earn,1)
+]]></programlisting>
+
+<para>
+  You also need a method for inserting new cards into the player&#39;s
+  deck. You have already created a method to insert a Joker card into
+  a deck, and while it seemed like a sensible function at the time,
+  you can see now that it could be expanded into a generic method for
+  inserting any card type into a deck. An additional argument is
+  required so that the function can differentiate between a normal
+  card and a bonus or powerup card, and the function name should
+  change to better reflect its new generic purpose.
+</para>
+
+<para>
+  Change the <literal>game.joker</literal> function to this&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.adder(tbl,human,card,v,bonus)
+   if bonus == 1 then
+      color="bonus"
+   elseif bonus == 0 and human == 1 then
+      color="red"
+   else
+      color="black"
+   end
+   tbl[#tbl+1] = color .. "," .. card .. "," .. tostring(v)
+   return tbl;
+end
+]]></programlisting>
+   
+<para>
+  Accordingly, change the Joker addition to the player deck in the
+  <literal>game.setup</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+deck = game.adder(deck,1,"joker",0,0)
+]]></programlisting>
+
+<para>
+  And then add the bonus and powerup cards to the deck. These cards
+  are only added after level 0 has been won, and the player is only
+  alerted to new additions that have been won from the previous
+  victory. Once the cards have been earned, they are silently added to
+  the deck. This means that a message screen is only shown when
+  <varname>lastwon</varname> is set to <literal>1</literal>. It also
+  means that which cards are added can be controlled according to the
+  current value of the <varname>level</varname> variable. That is,
+  starting at level 1, all cards in the <varname>earn</varname> and
+  <varname>up</varname> tables, from 1 to 1, are added. At level 2,
+  all cards from 1 to 2 are added. At level 3, all cards from 1 to 3
+  are added, and so on. When you have no further cards to add, the
+  limit is capped to the highest number of cards defined in the
+  <literal>earn</literal> and <literal>up</literal> sets of
+  <filename>deck.ini</filename>.
+</para>
+
+<para>
+  Add this code to your <literal>game.setup</literal> function. The
+  first two and last two lines are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+   deck = game.adder(deck,1,"joker",0,0)
+   --ai = game.adder(ai,0,"joker",0)
+
+   -- power ups
+   if level > 0 then
+      local limit = level
+      if level > 8 then limit = 8 end
+      for i = 1, limit, 1 do
+	 c,f,v = up[i]:match("([^,]+),([^,]+),([^,]+)")
+	 deck = game.adder(deck,1,f,v,1)
+      end
+      upcard = Card.init("bonus",v,f,WIDE/2,HIGH/2)
+
+      -- earned bonuses
+      local limit = level
+      if level > 5 then limit = 5 end
+      for i = 1, limit, 1 do
+	 c,f,v = earn[i]:match("([^,]+),([^,]+),([^,]+)")
+	 deck = game.adder(deck,1,f,v,0)
+      end
+      earncard = Card.init(c,v,f,WIDE/2,HIGH/2)
+
+      --alert player if recent win
+      if lastwon == 1 then
+	 message="New cards added to your deck!"
+	 msg.activate(earncard,upcard,message)
+      end
+   end
+
+   -- shuffle
+   deck = game.shuffle(deck)
+   ai = game.shuffle(ai)
+]]></programlisting>
+
+<para>
+  The alert mechanism requires that <varname>lastwon</varname> is kept
+  updated across rounds. It only gets set to 1 when the player has
+  just won a round, and it gets set to 0 in the can of a loss or a
+  tie. Add <varname>lastwon</varname> management to the
+  <literal>game.draw</literal> function code that monitors for a
+  winner. Most of this code exists in your function already, so just
+  add the <varname>lastwon</varname> lines to your existing code&#58;
+</para>
+
+<programlisting><![CDATA[
+   if winner == "hand" then
+      lastwon = 1
+      love.graphics.printf("You have won!",0,pad+HIGH/3,WIDE, 'center') 
+   elseif winner == "horde" then
+      lastwon = 0
+      love.graphics.printf("You have lost.",0,pad+HIGH/3,WIDE, 'center')
+   elseif winner == "tie" then
+      lastwon = 0
+      love.graphics.printf("Tied game.",0,pad+HIGH/3,WIDE,'center')
+   end
+]]></programlisting>
+
+<para>
+  The other purpose for the message screen is to alert the player when
+  a traitor has been discovered among their ranks, or in mechanical
+  terms, they have drawn a black card from their own red deck.
+</para>
+
+<para>
+  This requires an <literal>if</literal> statement in the
+  <literal>game.mousereleased</literal> function, when a new card is
+  drawn from the player deck. When a card is generated, you assign it
+  to the <varname>card</varname> variable, and since card generation
+  uses your own <filename>card.lua</filename> code, you know that you
+  can look at its color by looking at
+  <literal>card.color</literal>. If the color is black, then you can
+  trigger a few actions. First, a message should be given to the
+  player, telling them of the bad news. Then, the card must be placed
+  into the AI hand and removed from its default destination of the
+  player&#39;s hand.
+</para>
+
+<para>
+  Adjust the final <literal>elseif</literal> clause in your <literal>game.mousereleased</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+   elseif btn == 1 then
+      --take a card
+      for i,obj in pairs(back) do
+	 if game.clicker(x,y,obj) and y > HIGH-slot-pad then
+	    card = game.cardgen(deck)
+	    if card.color == "black" then
+	       -- insert card into horde
+	       card.y = pad/4
+	       horde[#horde+1] = card
+	       message="Black card drawn!"
+	       earncard = nil
+	       upcard   = card
+	       msg.activate()
+	       -- remove card from hand
+	       hand[#hand] = nil
+]]></programlisting>
+
+<para>
+  Try playing a few rounds to see how the new bonus and powerup cards
+  perform.
+</para>
+</section>
+
+<section xml:id="power-draw">
+  <info>
+    <title>Powerup double draw</title>
+  </info>
+
+  <para>
+    Now that the game is more complex and more complete, play testing
+    is a little difficult. You have to play longer and press more keys
+    or click on more things to find the bugs. Don&#39;t let that deter
+    you, though&#59; there are bugs to fix yet.
+  </para>
+
+  <para>
+    One notably missing feature is the way powerup cards are
+    treated. First of all, they&#39;re counting toward the total of
+    the player&#39;s hand, but they&#39;re meant to be powerups, not
+    just another card. Contrariwise, the powerup cards count as one
+    card draw, meaning that in a sense they penalize the player
+    because the game&#39;s most urgent mechanic is the need for more
+    cards. If a &#34;powerup&#34; card takes up a turn but adds
+    nothing to the player&#39;s points stash, then the player is
+    arguably better off without the powerup.
+  </para>
+
+  <para>
+    The way to make a powerup feel like a powerup is to give the
+    player a second card any time a powerup card is drawn. That way, a
+    powerup card adds temporary ammunition to the player&#39;s hand
+    but doesn&#39;t cost them any points toward their score.
+  </para>
+
+  <para>
+    Add this exemption to the score
+    calculation in the  <literal>update</literal> function&#58;
+  </para>
+
+  
+<programlisting><![CDATA[
+handval=0
+hordeval=0
+for i,obj in pairs(hand) do
+   handval = handval+tonumber(obj.value)
+   if obj.color == "bonus" then
+      handval = handval-tonumber(obj.value)
+   end
+end
+]]></programlisting>
+
+<para>
+  And then add a free additional card draw whenever a bonus card is
+  detected in the <literal>game.draw</literal> function. This requires
+  an additional <literal>elseif</literal> clause at the end of the
+  final <literal>if</literal> code. The first line and last five lines
+  are for context &#40;and are marked as such&#41;&#58;
+</para>
+
+<programlisting><![CDATA[
+      hand[#hand] = nil --context
+   elseif card.color == "bonus" then
+      card = game.cardgen(deck)
+      if card.color == "black" then
+         -- insert card into horde
+         card.y = pad/4
+         horde[#horde+1] = card
+         hand[#hand] = nil
+      end
+   end
+   card = game.cardgen(ai) --context
+   end
+  end
+ end --if
+end
+]]></programlisting>
+
+<para>
+  The logic here is fairly simple, but for the one exception when a
+  player draws a bonus card and then a black card. The code first
+  checks for a bonus card. If the card is a bonus card, then a new
+  card is immediately drawn. If that card is a black card, then that
+  card is silently moved into the AI&#39;s hand and removed from the
+  player&#39;s hand. This is done without a message to avoid too many
+  alerts. You can change this, if you prefer verbosity, but during
+  play testing pay close attention to how often the game is
+  interrupted so that you don&#39;t annoy your players.
+</para>
+</section>
+
+<section xml:id="power-font">
+  <info>
+    <title>Font and UI consistency</title>
+  </info>
+
+  <para>
+    There&#39;s another bug hidden in the code that you might not have
+    discovered yet. Because the game uses two different fonts and font
+    sizes, going back to the menu screen after a game has started
+    results in unreadable menu options. The fix for this is to monitor
+    font settings closely. Specifically, you can enforce the
+    &#34;default&#34; font for each game state in the
+    <literal>activate</literal> functions.
+  </para>
+
+  <para>
+    For instance, the only font needed for the menu state is the
+    rather plain Junction font at 14 points. Make sure that the
+    <varname>font</varname> variable gets set to that every time the
+    menu is activated&#58;
+  </para>
+
+<programlisting><![CDATA[
+function menu.activate()
+   STATE = menu
+   selection = 1
+   font = love.graphics.setNewFont("font/Junction_regular.otf",14)
+end
+]]></programlisting>
+
+<para>
+  Similarly, the primary font for the game state is the stylish Arkham
+  font at 72 points. 
+</para>
+
+<programlisting><![CDATA[
+function game.activate()
+   -- switch to game screen
+   STATE = game
+   font = love.graphics.setNewFont("font/Arkham_reg.TTF",72)
+end
+]]></programlisting>
+
+<para>
+  And the message screen uses plain old Junction, for
+  readability. This should already exist in your code, but confirm
+  that your <literal>msg.activate</literal> function is&#58;
+</para>
+
+<programlisting><![CDATA[
+function msg.activate()
+   STATE = msg
+   font = love.graphics.setNewFont("font/Junction_regular.otf",24)
+   button_ok = love.graphics.newImage("img" .. d .. "button_ok.png")
+end
+]]></programlisting>
+
+<para>
+  This resolves any inconsistencies in the user interface.
+</para>
+</section>
+
+<section xml:id="power-gc">
+  <info>
+    <title>Garbage collection</title>
+  </info>
+
+  <para>
+    The final bug to squash is a rather serious crash that you only
+    see after several rounds. The crash renders an <emphasis>out of
+    memory</emphasis> error, and it&#39;s caused by the vast amounts
+    of data being moved in and out of this game. This is a niche
+    problem caused by this type of game&#59; usually, Lua is fully
+    capable of managing memory, but with all the cards and graphics
+    that Battlejack cycles through, it&#39;s difficult for Lua to know
+    what information we expect to have access to. 
+  </para>
+
+  <para>
+    Part of memory management is called <firstterm>garbage
+    collection</firstterm>. Most modern programming languages have it
+    built in, although some low-level languages like C and C++ do
+    not. Lua, although built upon C, has automated garbage collection
+    but allows for manual memory management when needed.
+  </para>
+
+  <para>
+    Garbage collection, as its name suggests, is a signal you can send
+    to Lua to assure it that it&#39;s safe to cycle through old
+    variables and clear them from memory. There are a few places that
+    you can expect this to be safe&#58; at the beginning of a new
+    game, there&#39;s certainly no reason to keep information from
+    previous rounds, and when the player uses the Joker card, which
+    only happens once per round, it can be safely assumed that very
+    old data is no longer required. This is mostly guess work, of
+    course&#59; you have no way of monitoring exactly what Lua is
+    keeping track of in the recesses of its memory allotment, but the
+    Lua <literal>collectgarbage()</literal> function is just a
+    trigger for Lua to run a garbage collection cycle sooner than its
+    default schedule. You&#39;re still leaving it up to Lua to decide
+    what to remove from memory, and Lua is smart enough to know that,
+    for instance, the <varname>lastwon</varname> variable is still
+    important and must <emphasis>not</emphasis> be erased, while the
+    structure of the previous decks are safe to discard.
+  </para>
+
+  <para>
+    Add a <literal>collectgarbage()</literal> flag to the
+    <literal>game.new()</literal> function&#58;
+  </para>
+  
+<programlisting><![CDATA[
+function game.new() --for context
+collectgarbage()
+game.blast(deck)    --for context
+]]></programlisting>
+
+<para>
+  And when a Joker is used&#58;
+</para>
+  
+<programlisting><![CDATA[
+if card.face == "joker" then
+   game.blast(horde)
+   game.postbattle(grab,hand)
+   collectgarbage()   --added 
+end
+]]></programlisting>
+
+<para>
+  For most Lua programs, you won&#39;t run into memory management
+  problems. However, if you do, you now know how to prompt Lua to
+  review its resources and clear out unused data.
+</para>
+</section>
+
+<section xml:id="power-work">
+  <info>
+    <title>Homework</title>
+  </info>
+
+  <para>
+    The game, strictly speaking, is now complete. There are a few
+    features, like save files and screen size, implemented in the next
+    chapter, but otherwise game play is smooth and, ideally, bug
+    free. Here are a few things to look at between now and the next chapter&#58;
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+	Before moving on, commit your changes to Git.
+      </para>
+    </listitem>
+    
+    <listitem>
+      <para>
+	Play a few rounds of Battlejack to get a feel for difficulty. Is
+	it challenging enough? Is it too difficult? What adjustments can
+	you make?
+      </para>
+      <para>
+	You can leverage your new <varname>level</varname> system to
+	adjust difficulty. For instance, you might want to start the
+	game with fewer traitor cards in the red deck, and then ramp
+	up the number as the player progresses.
+      </para>
+
+<programlisting><![CDATA[
+if level >= 4 and level < 6 then
+   game.mole(ai,deck,4)
+elseif level >= 6
+   game.mole(ai,deck,6)
+else
+   game.mole(ai,deck,2)
+end
+]]></programlisting>
+
+<para>
+  Or you might want to do the opposite, such that the game appears to
+  become easier as the player progresses. This is an alternate theory
+  of game design, in which to give the player the illusion of
+  increasing power, you &#34;nerf&#34; the enemies.
+</para>
+
+<programlisting><![CDATA[
+if level < 2 then
+   game.mole(ai,deck,6)
+else
+   game.mole(ai,deck,4)
+end
+]]></programlisting>
+
+<para>
+  Try the game again to see how it progresses.
+</para>
+
+<para>
+  Think of some other ways to help the balance of power in
+  Battlejack and try them out.
+</para>
+    </listitem>
+
+<listitem>    
+  <para>
+    It&#39;s not easy, but it is possible to exhaust a full
+    deck with no winner or loser. There&#39;s
+    no code to handle this event, so the game crashes.
+  </para>
+
+  <para>
+    Invent a reliable way for the game to respond to empty draw
+    decks. There are several ways to do this. You could declare a
+    winner based on the state of the game when the decks are exhausted
+    &#40;closest to 21 wins&#41;. You could hold a final death-match
+    to decide the winner, in which the player and AI each draw a card
+    from a fresh deck&#59; best card wins. Or you could just create
+    fresh decks and continue the game seamlessly.
+  </para>
+</listitem>
+  </itemizedlist>  
+</section>
+</chapter>

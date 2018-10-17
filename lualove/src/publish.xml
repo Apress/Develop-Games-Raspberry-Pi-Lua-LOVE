@@ -1,0 +1,1130 @@
+<chapter xml:id="publish">
+  <!-- Ch13 -->
+  <info>
+    <title>Game Distribution</title>
+  </info>
+
+  <para>
+    People used to go to computer stores to buy video games. That
+    tradition is mostly relegated to console gaming now, with most PC
+    game and all mobile game purchases happening online. If you want
+    to get a game you make out into the hands of the gaming public,
+    you need to know how to package a game and where to post it.
+  </para>
+
+  <section xml:id="publish-package">
+  <info>
+    <title>Packaging</title>
+  </info>
+
+  <para>
+    Game packaging, from the perspective of a programmer, has nothing
+    to do with literal packaging and marketing. Packaging, in the
+    coding business, refers to how you gather up all the libraries and
+    assets your game depends on so you can effectively deliver it to
+    the public. LÖVE makes it easy, but as every programmer knows, you
+    never package software only <emphasis>once</emphasis>. Inevitably,
+    your users are going to find bugs you never noticed, or request
+    features you never imagined, and you&#39;re going to have to
+    release updates. That means packaging your game not once but
+    several times over the course of its life, but since you&#39;re a
+    programmer now, you should already be asking how you can automate
+    the process so you never have to do the actual work more than
+    once.
+  </para>
+
+  <para>
+    As you know from the dice game early in this book, the simplest
+    possible LÖVE game file is a ZIP file containing a valid
+    <filename>main.lua</filename> file. So to package a LÖVE game, all
+    you need to do is gather all of the game&#39;s code files, assets,
+    and libraries, and then compress them into a ZIP file.
+  </para>
+
+  <para>
+    Throughout this book, each game has been developed in a unique
+    project directory. Even the external libraries you&#39;ve
+    installed from Luarocks or the Internet at large were placed in a
+    <filename>local</filename> folder in your project directory. So
+    that&#39;s the first requirement sorted.
+  </para>
+
+  <para>
+    One of the most common methods of automating software releases is
+    the <firstterm>make file</firstterm>. Not all software projects use
+    a make file, but most use something like it&#58; a script designed
+    to perform routine tasks to save you from making a stupid mistake
+    while packaging up your game.
+  </para>
+  
+  <para>
+    Open <application>Geany</application> and create a new file called
+    <filename>luamake</filename> in your
+    Battlejack project directory.
+  </para>
+
+  <para>
+    You might recall the command you used to create a game file
+    for your dice project. Lua can use the same command, thanks to the
+    <literal>os.execute</literal> function, which runs any command you
+    would normally run from the operating system. Add this line to
+    <filename>luamake</filename>&#58;
+  </para>
+
+<programlisting><![CDATA[
+os.execute("zip battlejack.love -r *.lua deck.ini font img local snd")
+]]></programlisting>
+
+<para>
+  Open a terminal window and run the <filename>luamake</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cd battlejack
+$ lua ./luamake
+  adding: card.lua (deflated 54%)
+  adding: game.lua (deflated 72%)
+  adding: main.lua (deflated 55%)
+  ...
+$ ls -1
+battlejack.love
+...
+]]></programlisting>
+
+<para>
+  The make file works as expected. Scripting this simple command
+  ensures that you never accidentally package your game but forgetting
+  to include the images, or the <filename>local</filename> libraries,
+  or anything essential to the application.
+</para>
+
+<bridgehead>Versioning</bridgehead>
+
+<para>
+  One problem with updating an application is that once you release an
+  update, there are different versions of the same application. The
+  last thing anyone wants is to run an old, buggy version of an
+  application after a fix has been released, so it&#39;s smart for you
+  and smart for your users to use a versioning scheme.
+</para>
+
+<para>
+  There are many versioning schemes out there. Applications that
+  develop rapidly and release often tend to use semantic versioning, as
+  described on <link
+  xlink:href="https://semver.org">semver.org</link>. Applications that
+  only release once a year might just use a major version number, like
+  <literal>5</literal> or the release year. Others use code names, or
+  something entirely unique. 
+</para>
+
+<para>
+  You can choose your own schema, but for simplicity&#39;s sake this
+  example uses the date to automatically generate a version. In a
+  terminal, try out the standard Linux <command>date</command> command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ date +%Y
+2019
+$ date +%Y-%m
+2019-06
+$ date +%Y%m%d
+20190603
+]]></programlisting>
+
+<para>
+  The <command>date</command> command syntax uses shorthand to request
+  specific aspects of the current date. The final command in the
+  example output displays the year, month, and date with no
+  delimiter. Normally, a version string is separated with dots, but
+  some file managers on Android have trouble opening
+  <filename>.love</filename> files that contain any more dots but the
+  final one, so for compatibility, avoid complex version strings for
+  now.
+</para>
+
+<para>
+  Lua has a similar syntax in its <literal>os.date</literal>
+  function. Update <filename>luamake</filename> to match this&#58;
+</para>
+
+<programlisting><![CDATA[
+d = os.date("%Y%m%d")
+
+os.execute("zip battlejack-" .. d .. ".love -r *.lua deck.ini font img local snd")
+]]></programlisting>
+
+<para>
+  The output of <command>luamake</command> would be, for example,
+  <filename>battlejack-20190603.love</filename>. That&#39;s better
+  than just <filename>battlejack.love</filename> but it ignores the
+  possibility that you might make two updates to your application in
+  one day. Ideally, you would only actually publish the most recent
+  update, but crazy things happen in software development.
+</para>
+
+<para>
+  Commands issued directly to the operating system are described by
+  the POSIX standard, and the convention is that the first string you
+  type into a terminal is the command itself, followed by
+  optional <firstterm>options</firstterm> or
+  <firstterm>flags</firstterm> &#40;which are often, appropriately,
+  optional&#41;, and then by an <firstterm>argument</firstterm>. For
+  example&#58;
+</para>
+
+<programlisting><![CDATA[
+$ $ readlink --canonicalize luamake 
+/home/pi/battlejack/luamake
+]]></programlisting>
+
+<para>
+  In this example, <command>readlink</command> is the command,
+  <option>--canonicalize</option> is the option, and
+  <filename>luamake</filename> is the argument.
+</para>
+
+<para>
+  Lua is a command, and so it uses the same syntax, which means your
+  <filename>luamake</filename> file can accept an optional version
+  number chosen by you at run time.
+</para>
+
+<para>
+  When you run a Lua application, even a simple script like
+  <filename>luamake</filename>, everything you type into the terminal
+  is recorded by Lua in a table called <literal>arg</literal>. For
+  example, if you were to type this&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua ./luamake --foo bar
+]]></programlisting>
+
+<para>
+  The <literal>arg</literal> table for <filename>luamake</filename>
+  contains <command>luamake</command> in <literal>arg[0]</literal>, <option>--foo</option> in <literal>arg[1]</literal> and
+  <literal>bar</literal> in <literal>arg[2]</literal>.
+</para>
+
+<para>
+  By looking at the <literal>arg</literal> table in a Lua script, you
+  can get extra parameters from the user &#40;in this case, you&#41;.
+</para>
+
+<para>
+  Add this <literal>if</literal> statement to
+  <filename>luamake</filename> to detect an optional version number&#58;
+</para>
+
+<programlisting><![CDATA[
+d = os.date("%Y%m%d")
+
+for k,v in ipairs(arg) do
+   if v == "-v" or
+   v == "--version" then
+      ver = arg[k+1]
+   end
+end
+
+if ver == nil then
+   ver = 0
+end
+
+os.execute("zip battlejack-" .. d .. "-" .. ver .. ".love -r *.lua deck.ini font img local snd")
+]]></programlisting>
+
+<para>
+  Its syntax is now&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua ./luamake --version 1
+...
+$ ls *love
+battlejack-20190602-1.love
+]]></programlisting>
+
+<para>
+  If you provide no version, then it is assumed to be
+  <literal>0</literal>, producing a file like
+  <filename>battlejack-20190603-0.love</filename>.
+</para>
+
+
+<bridgehead>Help message</bridgehead>
+
+<para>
+  Since your formerly simple one-line script now has an optional flag,
+  you should document how to use it. It might seem obvious now, but
+  you&#39;ll thank yourself in a month when you go back to fix a bug
+  and suddenly realize you don&#39;t remember how to generate a
+  release package.
+</para>
+
+<para>
+  Help messages are best when they&#39;re intuitive. You shouldn&#39;t
+  need a help message to tell you how to get a help message. The
+  traditional flag for help is <option>--help</option> and, for lazy
+  typists, <option>-h</option>. However, you can add other flags if
+  you have other ideas. It&#39;s your toolchain, after all. Change the
+  <literal>for</literal> loop in <filename>luamake</filename> file to
+  match this&#58;
+</para>
+
+<programlisting><![CDATA[
+for k,v in ipairs(arg) do
+   if v == "-v" or
+   v == "--version" then
+      ver = arg[k+1]
+   end
+   if v == "-h" or
+   v == "--help" then
+      help()
+      os.exit()
+   end
+end
+]]></programlisting>
+
+<para>
+  There is no <literal>help</literal> function yet, so add one that
+  explains to your future self how to use your custom
+  <command>luamake</command> command&#58;
+</para>
+
+<programlisting><![CDATA[
+local function help()
+   print("luamake      : generate a .love package")
+   print("luamake -v 2 : set the iteration version to 2")
+   print("luamake -h   : print this help message")
+end
+]]></programlisting>
+
+
+<bridgehead>Executable</bridgehead>
+
+<para>
+  On Linux, you&#39;re encouraged to write your own
+  commands. You&#39;ve just written one, but it doesn&#39;t
+  <emphasis>feel</emphasis> like a command because you have to use Lua
+  to run your script.
+</para>
+
+<para>
+  The <command>lua</command> command is what&#39;s called a
+  <firstterm>binary</firstterm> executable, meaning that it has been
+  translated from code to a machine language. If you were to open
+  <command>lua</command> in <application>Geany</application>, you
+  wouldn&#39;t see code, you&#39;d see garble.
+</para>
+
+<para>
+  The Lua programs you have been writing are scripts that are
+  interpreted by either LÖVE or Lua directly. Without LÖVE or Lua,
+  your scripts are just plain text files. 
+</para>
+
+<para>
+  You can, however, make your Lua script act like a binary executable
+  file by adding a special line, <firstterm>shebang</firstterm> or
+  <firstterm>magic cookie</firstterm>, of text at the very top of the
+  file&#58;
+</para>
+
+<programlisting><![CDATA[
+#!/usr/bin/env lua
+]]></programlisting>
+
+<para>
+  This defines what application to use to run the text contained in
+  the script.
+</para>
+
+<para>
+  Not just any file can be launched as if it were an application. Linux
+  won&#39;t run the contents of a file unless it is explicitly marked
+  as <emphasis>executable</emphasis>. This is done with the
+  <command>chmod</command> command. Make sure you are in your project
+  folder and run this command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ chmod +x ./luamake
+]]></programlisting>
+
+<para>
+  Now you can treat <filename>luamake</filename> as an independent command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ./luamake --version 3
+]]></programlisting>
+</section>  
+
+<section xml:id="publish-dist">
+  <info>
+    <title>Distribution</title>
+  </info>
+
+  <para>
+    You can distribute your LÖVE games anywhere online. If you have a
+    website, then you can post your game for download and you&#39;re
+    officially a game distributor. Posting something online and people
+    knowing that your game exists, however, are two different things.
+  </para>
+
+  <para>
+    For better exposure, you can also post your game on established
+    indie game distribution sites.
+  </para>
+
+  <section xml:id="publish-dist-online">
+    <info>
+      <title>Online</title>
+    </info>
+
+    <para>
+      Open source programming is everywhere, and several very large
+      websites are eager to host your code. Popular code hosting sites
+      include <link xlink:href="http://gitlab.com">Gitlab.com</link>, 
+      <link xlink:href="http://github.com">Github.com</link>, 
+      <link xlink:href="https://notabug.org/">notabug.org</link>,
+      <link xlink:href="http://bitbucket.org">Bitbucket.org</link>,
+      <link xlink:href="http://sourceforge.net">Sourceforge.net</link>,
+      and many others. Most are based on Git, which you have been using
+      during the course of this book to track your work.
+    </para>
+
+    <para>
+      These hosting services provide not only a no-cost online storage
+      space for your game projects, they also provide the ability to
+      open your code for others to see. Sometimes that means other
+      people will learn from your hard work, and other times it means
+      someone smarter than you will improve your code and teach you
+      something new. It&#39;s the open source model, and it&#39;s
+      popular for a good reason.
+    </para>
+
+    <para>
+      Some of the hosting services even provide basic homepages so you
+      can design a simple page or two to advertise your game&#39;s
+      features.
+    </para>
+
+    <para>
+      Because Gitlab itself is open source and can be installed on
+      private servers, it&#39;s become popular among both hobbyists
+      and professional software houses, so its web interface is worth
+      learning. All of them are practically the same, so learning Gitlab
+      teaches you the same principles you need to use the others.  
+    </para>
+
+    <para>
+      Register an account on <link
+      xlink:href="http://gitlab.com">Gitlab.com</link> &#40;you are
+      required to confirm your email address, so use a valid
+      email&#41; and log in.
+    </para>
+
+      <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Gitlab user settings</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch13_skenlon/gitlab_user.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    In <guilabel>User Settings</guilabel>, click the <guilabel>SSH
+    Keys</guilabel> link in the left panel. An SSH key is a pair of
+    files used to authenticate one computer to another. This level of
+    trust isn&#39;t necessary when you&#39;re just downloading a file
+    from the Internet, but when you <emphasis>upload</emphasis>
+    something to someone else&#39;s servers, they want to make sure
+    you&#39;re always the same person you claim to be.
+  </para>
+
+  <para>
+    You must generate an SSH key to authenticate to your remote
+    Git server. Open a terminal and create a new hidden folder in your home
+    directory called <filename>.ssh</filename>, and then make it
+    private with <command>chmod</command> <option>600</option>,
+    meaning that only you have access to the folder &#40;do this even
+    if you are the only person using your computer, because SSH
+    requires it as part of its security policy&#41;.
+  </para>
+
+<programlisting><![CDATA[
+$ mkdir --parents ~/.ssh
+$ chmod 600 ~/.ssh
+$ ssh-keygen -t ed25519 -f ~/.ssh/git.key
+]]></programlisting>
+
+<para>
+  You are prompted for an optional password. This is a password for
+  access to the key itself, in the event that your key should fall
+  into the wrong hands. You don&#39;t have to use a password, in which
+  case anyone with your SSH key files would have access to your online
+  Git account.
+</para>
+
+<para>
+  The result of the command are two files in a hidden directory called
+  <filename>.ssh</filename>.
+</para>
+
+<para>
+  One file is a private key file, which you
+  must never post anywhere. It&#39;s like a password&#59; you would
+  never tell anyone your password, regardless how official they may
+  appear or however nicely they may ask. Treat your private SSH key
+  file the same. Your private SSH key is named
+  <filename>git.key</filename>, because you named it that as part of
+  your command.
+</para>
+
+<para>
+  The other file created by your command is
+  <filename>git.key.pub</filename>, and it is meant specifically to be
+  distributed <emphasis>publicly</emphasis>. If you place your
+  <emphasis>public</emphasis> key on a server, then when you try to
+  access that server using your private key, authentication is
+  successful. You can think of these SSH keys as a &#34;friendship
+  necklace&#34;, with two interlocking pieces that are relatively
+  meaningless on their own but perfectly complete together. In more
+  technical terms, the public file is like a padlock and the private
+  file is the key that unlocks it.
+</para>
+
+<para>
+  View your SSH public file by opening it in
+  <application>Geany</application>, or in a terminal with this
+  command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cat ~/.ssh/git.key.pub
+]]></programlisting>
+
+<para>
+  Select the text of your key from <literal>ssh-ed25519</literal> to
+  the very end and select <guimenu>Edit</guimenu> &#62;
+  <guimenuitem>Copy</guimenuitem>.
+</para>
+
+<para>
+  In your web browser, paste your public key text into the
+  <guilabel>Key</guilabel> text field, and then click the <guibutton>Add
+  key</guibutton> button.
+</para>
+
+<mediaobject>
+  <info>
+    <othercredit>
+      <orgname>Slackermedia</orgname>
+    </othercredit>
+  </info>
+  <alt>Adding an SSH key</alt>
+  <imageobject>
+    <imagedata align="right" width="6in" format="PNG"
+	       fileref="../img/Ch13_skenlon/gitlab_ed25519.png"/>
+  </imageobject>
+</mediaobject>
+
+<para>
+  Click the <guimenu>Projects</guimenu> menu in the top left of the
+  Gitlab interface and select <guimenuitem>Your
+  Projects</guimenuitem>. This takes you back to your Gitlab
+  home screen. Since you haven&#39;t got any projects yet,
+  click the <guibutton>Create a project</guibutton> button.
+</para>
+
+<para>
+  On the <guilabel>New Project</guilabel> screen, provide a name for
+  your project, such as <literal>battlejack</literal>. Optionally, you can provide
+  a short description of the project. Set the project visibility,
+  keeping in mind that public code increases your chances of getting
+  useful feedback and also that others will be able to learn from
+  you.
+</para>
+
+<para>
+  Click the <guibutton>Create project</guibutton> button to
+  instantiate the project on Gitlab&#39;s servers.
+</para>
+
+<para>
+  After the project is created, you are brought to the project&#39;s
+  page, which provides instructions on how to post your code to the
+  empty project. It assumes you know how to configure SSH, however, so
+  there are some additional steps you must take before pushing your
+  code to Gitlab.
+</para>
+
+<bridgehead>Configuring SSH for Git</bridgehead>
+
+<para>
+  You&#39;ve configured your SSH keys on both your computer and on
+  the Git server, but the <command>git</command> on your computer 
+  doesn&#39;t know what SSH key to use &#40;or even that you want to
+  use SSH, since Git is capable of using many different
+  protocols&#41;. If you provide the <command>git</command> command or
+  <application>Git-Cola</application> an SSH address, then Git knows
+  to use your SSH configuration. The problem is, you don&#39;t have
+  a SSH configuration yet.
+</para>
+
+<para>
+  Create a file in the hidden <filename>.ssh</filename> folder in your
+  home directory, and call it <filename>config</filename>. You can do
+  this in a terminal&#58; 
+</para>
+
+<programlisting><![CDATA[
+$ touch ~/.ssh/config
+]]></programlisting>
+
+<para>
+  Open this file in <application>Geany</application>. Since it&#39;s a
+  hidden file, it may be easiest to do this from a terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ geany ~/.ssh/config &
+]]></programlisting>
+
+<para>
+  Enter this configuration into your <filename>config</filename>
+  file&#58;
+</para>
+
+<programlisting><![CDATA[
+host gitlab
+     hostname gitlab.com
+     user git
+     identityfile /home/pi/.ssh/git.key
+]]></programlisting>
+
+<para>
+  The <varname>user</varname> value <emphasis>must</emphasis> be
+  <literal>git</literal>. That&#39;s not your user name, but most
+  online Git hosts use <literal>git</literal> as the generic user name
+  for all of their users, since they rely exclusively on SSH keys to
+  actually identify each person.  
+</para>
+
+<para>
+  The value of <varname>identityfile</varname>, however, may differ on
+  your computer. For instance, this example assumes that your user
+  name is <literal>pi</literal>, which is often the default user on a
+  Raspberry Pi Linux distribution. If you&#39;ve created your own
+  user, or changed your user name, or aren&#39;t using a Pi at all,
+  then change <literal>pi</literal> for your actual user name.
+</para>
+
+<para>
+  If you don&#39;t know your user name, use the
+  <command>whoami</command> command to find it out.
+</para>
+
+<para>
+  Save the config file.
+</para>
+
+<bridgehead>Pushing to Git</bridgehead>
+
+<para>
+  Now that SSH is fully configured for Git, you can add your remote
+  Git project to your local project directory. This example uses the
+  Battlejack, but this process is the same for any project you work
+  on, as long as you have a local directory that is being tracked by
+  Git and a remote Git server upon which you&#39;ve created an empty
+  project.
+</para>
+
+<para>
+  First, go to your project directory on your computer.
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/battlejack
+]]></programlisting>
+
+<para>
+  Add your remote Git server to your Git project. The URL you use in
+  your command must include <emphasis>your</emphasis> Gitlab account name rather than
+  <literal>demo2019</literal>. Find the Git project location
+  on your Gitlab project page, either in the instructions at the
+  bottom of the page or near the top of the page under the project name
+  &#40;make sure you get the SSH version of the URL, not the HTTPS
+  version, since the latter doesn&#39;t provide write access&#41;.
+</para>
+
+<programlisting><![CDATA[
+$ git remote add server git@gitlab.com:demo2019/battlejack.git
+]]></programlisting>
+
+<para>
+  This command does exactly like it reads&#58; Git is adding a
+  <emphasis>remote</emphasis> &#40;that is, not in the same location
+  as you&#41; destination called <literal>server</literal>, with the
+  address of
+  <literal>git@gitlab.com:demo2019/battlejack.git</literal>. The name
+  <literal>server</literal> is arbitrary, and exclusively for your own
+  use. It is the shortened term you will use to refer to
+  <literal>git@gitlab.com:demo2019/battlejack.git</literal>. Some
+  users name it <literal>origin</literal>, others call it
+  <literal>upstream</literal>, and so on.
+</para>
+
+<para>
+  If you prefer to use <application>Git-Cola</application>, open your
+  project and select <guimenu>File</guimenu> &#62; <guimenuitem>Edit
+  Remotes</guimenuitem>. In the <guilabel>Edit Remotes</guilabel>
+  window, click the <guibutton>+</guibutton> button in the lower left
+  corner.
+</para>
+
+<para>
+  In the <guilabel>git-cola</guilabel> dialogue box that appears,
+  enter <literal>server</literal> for the <varname>name</varname>
+  field, and the Git project location, such as
+  <literal>git@gitlab.com:demo2019/battlejack.git</literal>, for the
+  <varname>URL</varname> field.
+</para>
+
+<para>
+  You can now push your code to your remote Git server. In a
+  terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/battlejack
+$ git push --set-upstream server HEAD
+]]></programlisting>
+
+<para>
+  This command is very specific&#59; it tells Git to push your code
+  and to set the remote location &#40;called
+  <literal>server</literal>&#41; as an &#34;upstream&#34;
+  location. That&#39;s fancy software development terminology meaning
+  that Git is not only pushing code <emphasis>to</emphasis> your
+  server, but also should, in the future, pull changes from it.
+</para>
+
+<para>
+  In the future, you need only issue this simpler command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git push server HEAD
+]]></programlisting>
+
+<para>
+  If you prefer <application>Git-Cola</application>, go to the
+  <guimenu>Actions</guimenu> menu and select
+  <guimenuitem>Push</guimenuitem>. In the <guilabel>Push</guilabel>
+  window that appears, set <guilabel>Remote</guilabel>, along the top
+  of the window, to
+  <literal>server</literal>. Select the <guilabel>Set
+  upstream</guilabel> option along the bottom of the window &#40;you
+  only need to do that the first time you push to a project on your
+  server&#41;, and then click the <guibutton>Push</guibutton> button.
+</para>
+
+<para>
+  <application>Git-Cola</application> warns you that the target server
+  is devoid of any of your code, so a new branch is being created to
+  mirror your local project directory. Click the <guibutton>Create
+  Remote Branch</guibutton> to accept.
+</para>
+
+  </section> <!-- publish-dist-online -->
+  
+  <section xml:id="publish-dist-itch">
+    <info>
+      <title>Itch.io</title>
+    </info>
+
+  <para>
+    Itch is a leading indie game distribution site, offering video
+    games for Linux, Windows, and Mac. Developers can post games and
+    set either a fixed price, no price, or pay-what-you-want. Some
+    games, like <link
+    xlink:href="https://tangramgames.itch.io/mrrescue/purchase">Mr. Rescue</link>,
+    are even programmed with LÖVE.
+  </para>
+
+  <para>
+    Itch is not curated or moderated. This means that you can post
+    nearly anything to it. There&#39;s no approval process. With this
+    freedom comes great responsibility&#59; don&#39;t post the games
+    that you&#39;ve written haven&#39;t had anyone else test,
+    don&#39;t post half-baked games that are bound to frustrate your
+    users. Post your games after extensive testing and refinement. The
+    Itch audience and your own reputation will thank you. 
+  </para>
+  
+  <para>
+    You can sign up for Itch for free and post your game. Tag your
+    game with relevant information, such as the genre and game engine,
+    to help people find your game, and set it as fully cross-platform,
+    since LÖVE itself runs on Linux, Windows, and Mac.
+  </para>
+</section> <!-- publish-dist-itch -->
+
+<section xml:id="publish-dist-lutris">
+  <info>
+    <title>Lutris</title>
+  </info>
+
+  <para>
+    Lutris is not exactly a game distributor, but a game
+    aggregator. For fans of retro, indie, and open source gaming,
+    Lutris is a unified library for thousands of games. Unlike Itch,
+    it is a curated collection, meaning that not just any game gets
+    posted. However, you can write your own Lutris installer and
+    distribute that independently, or you can wait until game is
+    nearly perfect, well-tested, and ready to stand up to the scrutiny
+    of serious gamers, and then post it.
+  </para>
+
+  <para>
+    Lutris is something of a hybrid system. <link
+    xlink:href="http://lutris.net">Lutris.net</link> is an online
+    community, with a library filled with installer files. It does
+    <emphasis>not</emphasis> distribute games, only scripts to make
+    games already downloaded by a user appear in the user&#39;s Lutris
+    desktop application.
+  </para>
+
+  <para>
+    <application>Lutris</application>, the desktop application, is a
+    game library that makes it easy for a user to browse through their
+    personal collection and launch a game regardless of whether it was
+    written for Linux, Windows, a web browser, LÖVE, and many other
+    platforms.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Lutris</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch13_skenlon/lutris_client.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    A Lutris install file is a simple script written in YAML, a
+    popular configuration format. A Lutris installer needs to
+    communicate to Lutris where a game executable is located, and what
+    application on the user&#39;s computer must be used to launch
+    it.
+  </para>
+
+  <para>
+    Using the Battlejack project as an example, create a file called
+    <filename>battlejack.yml</filename> in your home directory. Open
+    this file in <application>Geany</application>.
+  </para>
+
+  <para>
+    First, you must identify where the game file is located. Assuming
+    your game is freely available online with no purchase required,
+    then you can have the Lutris installer download it for your user&#58;
+  </para>
+
+<programlisting><![CDATA[
+files:
+- lovefile: https://example.com/games/battlejack-2018.09.03-3.love
+]]></programlisting>
+
+  <para>
+    Lutris has no storefront, so if you are charging money for your
+    game, then you must prompt the user to point
+    <application>Lutris</application> to the game &#40;the
+    <filename>.love</filename> file&#41; they have already purchased
+    and downloaded&#58;
+  </para>
+
+<programlisting><![CDATA[
+files:
+- lovefile: N/A:Please select the Battlejack.love file.
+]]></programlisting>
+
+<para>
+  This configuration option tells Lutris that there is one file
+  required for this game, but that the location is not yet
+  known. When a user installs the game, Lutris will prompt the user to
+  select the <filename>.love</filename> file on their hard drive.
+</para>
+
+<para>
+  Regardless of how the game is acquired, the location of the game
+  file is assigned to a new variable called
+  <varname>lovefile</varname>.
+</para>
+
+<para>    
+  Next, you must tell Lutris how to run the game. You know the full
+  command to run Battlejack is <command>love</command>
+  <filename>battlejack.love</filename>, and that&#39;s exactly the
+  same command that Lutris must use, although the syntax is specific
+  to the YAML configuration&#58;
+</para>
+
+<programlisting><![CDATA[
+game:
+- args: $GAMEDIR/$lovefile
+- exe: love
+]]></programlisting>
+
+<para>
+  This configuration block tells Lutris that the actual executable
+  command is <command>love</command>, and the argument to pass to LÖVE
+  is a variable containing the name of the game directory &#40;which
+  is defined by the user during install&#41; and a variable containing
+  the name of the game file.
+</para>
+
+<para>
+  Next, the actual install is described in YAML. For LÖVE games, there
+  isn&#39;t really an installer&#59; they just play in LÖVE. All your
+  configuration file needs to do is make sure that the
+  <filename>.love</filename> file is placed in whatever directory the
+  user has told Lutris to use as their game folder. This value is
+  <varname>$GAMEDIR</varname>, defined by Lutris.
+</para>
+
+<programlisting><![CDATA[
+move:
+- dst: $GAMEDIR/$lovefile
+- src: $lovefile
+]]></programlisting>
+
+<para>
+  Finally, you must alert Lutris that this game requires LÖVE to
+  run. LÖVE has its own Lutris installer, so should anyone install
+  your game, they have a similar one-click access to LÖVE, as well. 
+</para>
+
+<programlisting><![CDATA[
+requires: love2d
+]]></programlisting>
+
+<para>
+  Your installer is finished. Log in to <link
+  xlink:href="https://lutris.net">lutris.net</link>, add a new game,
+  paste in your installer, and submit it for moderation. While
+  you&#39;re at it, add a screenshot of your game, a description, and
+  other data so that people can see that&#39;s a legitimate, playable
+  game.
+</para>
+
+</section> <!-- publish-dist-lutris -->
+
+
+<section xml:id="publish-dist-mobile">
+  <info>
+    <title>Mobile market</title>
+  </info>
+
+  <para>
+    The mobile market, including phones and tablets, is a major game
+    outlet, and LÖVE is perfectly suited for creating mobile
+    games. LÖVE is available for both Android and,
+    <emphasis>technically</emphasis>, iOS. Android is open source, so
+    it&#39;s easier for both users and developers to install LÖVE onto
+    it than onto iOS.
+  </para>
+
+  <note>
+    <para>
+      Even the Android version of LÖVE lacks a few
+    important features at the time of this writing, although it&#39;s
+    being updated constantly and new features are appearing
+    rapidly.
+    </para>
+  </note>
+
+  <para>
+    Apple places restrictions on what users and developers may do on
+    Apple devices. Highly technical users can load LÖVE onto their
+    Apple mobile device, but most will not. Until Apple decides to
+    permit independent app usage and development, iOS is a difficult
+    market for small app developers. However, now that you understand
+    Lua and advanced programming concepts, you can explore
+    Apple-sanctioned app development if that&#39;s your primary target.
+  </para>
+
+  <para>
+    It is smart, however, to at least <emphasis>plan</emphasis> for both,
+    even if you don&#39;t guarantee full compatibility with the
+    platform you cannot, for whatever reason, test. The more universal you make
+    your game, the more people are able to play them.
+  </para>
+
+  <bridgehead>Installing LÖVE on Android</bridgehead>
+    
+  <para>
+    To play a LÖVE game on your Android mobile device, you have to
+    install LÖVE itself. You might find LÖVE in the Google Play store
+    or in <ulink
+    xlink:href="https://f-droid.org/en/">F-Droid.org</ulink>, but
+    it&#39;s best to download the latest available version directly
+    from <ulink xlink:href="http://love2d.org">love2d.org</ulink>.
+  </para>
+
+  <para>
+    Android packages are delivered as <filename>.apk</filename>
+    files. Your mobile device might warn you that such a file is
+    dangerous or harmful, presumably for fear that you are installing
+    malware. It&#39;s safe to ignore this particular warning, since
+    you&#39;re familiar with the LÖVE project, and download the package. 
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Downloading an Android installer package</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch13_skenlon/apk.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    Your mobile may offer to install the APK file once it&#39;s
+    downloaded. If not, you must install a file manager so you can get
+    to your files. Your mobile probably doesn&#39;t have one, or else
+    not a very good one, so download the open source Amaze file
+    manager from <link
+    xlink:href="https://play.google.com/store/apps/details?id=com.amaze.filemanager">play.google.com/store/apps/details?id=com.amaze.filemanager</link>.
+  </para>
+
+  <para>
+    Once installed, launch <application>Amaze</application>, locate
+    the <filename>.apk</filename> file you downloaded, and tap it to
+    install.
+  </para>
+
+  <para>
+    You may be warned again that the APK installer is from an unknown
+    source. It&#39;s perfectly safe to ignore this error.
+  </para>
+
+  <para>
+    There&#39;s no use in launching LÖVE directly once it&#39;s
+    installed. It&#39;s just the game engine, so what the user
+    actually launches is a <filename>.love</filename> file. The
+    <application>Amaze</application> file manager, and many others,
+    prompts the user to select which application to use.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Android launcher</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch13_skenlon/android.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    The game launches, and reads taps as
+    <literal>mousepressed</literal> and
+    <literal>mousereleased</literal> events.
+  </para>
+    
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Mobile blackjack</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch13_skenlon/blackjack.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <bridgehead>Limitations of LÖVE on Mobiles</bridgehead>
+
+  <para>
+    LÖVE on Android and iOS is a rapidly developing technology, so
+    there are fewer and fewer limitations every month. Whatever state
+    the engine is in, however, there are a few things to keep in mind
+    when developing for mobiles&#58;
+  </para>
+  
+  <itemizedlist>
+    <listitem>
+      <para>
+	There&#39;s no expectation that mobile devices have a
+	keyboard, so <literal>mousereleased</literal> and
+	<literal>mousepressed</literal> should be favored in a mobile
+	game.
+      </para>
+      <para>
+	For menus, define buttons rather than text entries so it&#39;s
+	easier for a finger or stylus to trigger a click event.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	Screen sizes on mobile devices vary wildly, and as the
+	popularity of Android continues to grow, so will the range of
+	resolutions. If you want your game to run on palm-sized
+	phones, paper-sized tablets, and big screen TVs, you must
+	design your game to scale. 
+      </para>
+      <para>
+	Furthermore, the aspect ratio and pixel density on some mobile
+	devices won&#39;t match your computer screen. If what you see
+	on your screen isn&#39;t matching what&#39;s ending up on your
+	device, try doubling a value or similarly adjusting your game
+	dimensions &#40;or better yet, make your game resolution
+	independent with proper scaling&#41;. For example, the spec
+	sheet of a phone with a high pixel density might report that
+	its screen is 300 pixels wide, but your game only fills the
+	screen if you design it with at 600 pixel wide instead.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	At the time of this writing, LÖVE lacks permission to write
+	data to the phone&#39;s internal storage. That means you
+	can&#39;t get the <literal>os.getenv('HOME')</literal>
+	location or create save files yet.
+      </para>
+    </listitem>
+  </itemizedlist>
+
+  <para>
+    Watch <link xlink:href="http://love2d.org">love2d.org</link> for
+    updates.
+  </para>
+  
+  </section>
+</section> <!-- publish-dist -->
+</chapter>
+ 

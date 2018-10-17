@@ -1,0 +1,731 @@
+<chapter xml:id="db">
+  <!-- Ch05 -->
+    <title>Database and Libraries</title>
+
+    <para>
+      There are lots of ways to store data. In the Blackjack game, you
+      stored the building blocks for a deck of playing cards in two
+      tables, one for suits and one for values. That&#39;s a good
+      method for small data sets that don&#39;t change from game to
+      game, but it won&#39;t work if, for instance, it was possible
+      for a player to level up and earn the ability to play with
+      Jokers in the deck, because the tables defining the deck is
+      hard-coded into the application. 
+    </para>
+
+    <para>
+      To make permanent changes to a game environment, or to track
+      player progress, scores, or preferences, you must create a data
+      file outside of the <filename>.love</filename> file, on your
+      user&#39;s computer. Any game that keeps track of player&#39;s
+      progress has to do this, so it&#39;s a common task, but it does
+      require additional Lua libraries designed to read and write data
+      files.
+    </para>
+
+    <para>
+      The problem with pulling in more libraries than what Lua and
+      LÖVE provide is that there&#39;s no reason to expect your users
+      to coincidentally also have those libraries installed on their
+      computer &#40;and why would they, unless they were also Lua
+      programmers?&#41;. There are two ways around this&#58;
+    </para>
+
+    <orderedlist>
+      <listitem>
+	<para>
+	  Bundle the library along with your game. 
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Tell your users to install the libraries before trying to play
+	  your game.
+	</para>
+      </listitem>
+    </orderedlist>
+
+    <para>
+      The first option is most common in the game industry, but
+      sometimes a library&#39;s license doesn&#39;t allow you
+      to distribute it along with your own application. There&#39;s a
+      strong culture of open source around Lua, though, and so most
+      Lua libraries are licensed to permit you to use them as you
+      please as long as you credit their authors.
+    </para>
+
+    <para>
+      Some Lua libraries, however, depend on other applications
+      running on a system, however, and must be built especially for
+      those systems. If you use advanced libraries, you will have to
+      maintain different builds, one for each platform. Usually,
+      that means one build for Linux, one for Windows, and one for
+      Mac &#40;unfortunately, Apple Macs are hardware dependent, so
+      you must have a recent Mac available upon which you can
+      build your release.&#41;
+    </para>
+    
+    <note>
+      <para>
+	Some game developers choose not to bundle libraries, however,
+	to ensure that their users are free to manage which libraries
+	are on their computer. While most users don&#39;t care what
+	obscure programming library is on their computer, they
+	probably do care about getting security updates, and a library
+	&#34;hidden away&#34; in your <filename>.love</filename> file
+	won&#39;t get updated along with the rest of a system. So when
+	you do distribute a library, you owe it to your users to check
+	in with those libraries often for important bug fixes and
+	security updates, and then to update your own application with
+	the new versions.
+      </para>
+    </note>
+
+    <para>
+      Building libraries for each operating system you want your game
+      to run on is an advanced topic and outside the scope of this
+      book. There are several good tools, such as <link
+      xlink:href="http://win-builds.org">win-builds.org</link> to help
+      you do it, but it does require some advanced knowledge of
+      compiling software. For this reason, this book uses pure Lua
+      libraries that can be bundled with your game and run on any
+      platform with LÖVE installed.
+    </para>
+    
+    <section xml:id="db-lib">
+      <info>
+	<title>Installing new libraries</title>
+      </info>
+      
+    <para>
+      In most games, the kind of data needing storage is not very
+      complex, so usually a simple configuration text file is
+      sufficient. For Lua to know what to do with a text file, though,
+      the text must have a predictable structure. Highly structured
+      text storage forms a non-relational database that Lua loads into
+      memory and uses just like any other variable you might create in
+      Lua.
+    </para>
+
+    <para>
+      There are many popular formats for these kinds of files,
+      including YAML, JSON, and INI. These formats allow you to store
+      data in a consistent structure, which enables its parent
+      application to accurately parse it.
+    </para>
+
+    <para>
+      One library &#40;sometimes also called a &#34;module&#34;&#41;
+      to enable plain text configuration files is
+      <literal>inifile</literal>. As its name suggests, it interacts
+      with INI configuration files &#40;if you don&#39;t know what
+      that is, you&#39;ll write one soon, so don&#39;t worry&#41;.
+    </para>
+
+    <para>
+      The best place to find libraries for Lua is <link
+      xlink:href="http://luarocks.org">luarocks.org</link>, a website
+      dedicated to tracking and distributing Lua libraries. The site
+      is useful for a new Lua programmer because it has several
+      methods for you to search for libraries that you may not even
+      know exist yet. As you become more familiar with programming,
+      though, you&#39;ll get a feel for what to expect from any
+      language, and the <command>luarocks</command> command will prove
+      far more efficient.
+    </para>
+
+    <para>
+      To install the <command>luarocks</command> command, either look
+      for it in the <application>Synaptic</application> application
+      installer or do this in a terminal&#58;
+    </para>
+
+<programlisting><![CDATA[
+$ sudo apt install luarocks
+]]></programlisting>
+
+<para>
+  Once <command>luarocks</command> is installed, type it into a
+  terminal to see a helpful message.
+</para>
+
+<para>
+  As the help message indicates, use the <command>search</command>
+  argument to search for <literal>inifile</literal>, the library you
+  need to parse text files in the INI format&#58;
+</para>
+
+<programlisting><![CDATA[
+$ luarocks search inifile
+
+Search results:
+inifile
+   1.0-2 (rockspec) - https://luarocks.org
+   1.0-2 (src) - https://luarocks.org
+   1.0-1 (rockspec) - https://luarocks.org
+]]></programlisting>
+
+<para>
+  A common trap that programmers fall into is installing a library
+  they need on <emphasis>their</emphasis> system, and then forgetting
+  to bundle the library with their application. For that reason, you
+  will not install <literal>inifile</literal> to your own system, the
+  way you installed Lua or LÖVE. Instead, create a new folder in your
+  home directory called <filename>config</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+$ mkdir ~/config
+]]></programlisting> 
+
+<para>
+  Use <command>luarocks</command> to download and install the
+  <literal>inifile</literal> package directly into your sample game
+  folder&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/config
+$ luarocks install --tree=local inifile
+]]></programlisting>
+
+<para>
+  The <option>--tree</option> option tells <command>luarocks</command>
+  to create a new folder, called <filename>local</filename> in this
+  example, for all the files that would normally get installed. With
+  this simple trick, you install all the dependency code you want to
+  use in your project into the project directory itself. Your user
+  doesn&#39;t have to worry about installing anything extra, because
+  it&#39;s all contained in your project.
+</para>
+
+<para>
+  Now you know why you might want to add a library to a project, and
+  how to do it. Now it&#39;s time to try some libraries to help with
+  configuration files.
+</para>
+
+</section>
+
+<section xml:id="db-ini">
+  <info>
+    <title>Configuration files</title>
+  </info>
+  
+  <para>
+    To see how to interact with a text-based configuration file, open
+    <application>Geany</application> and create a new file and enter
+    this sample data in INI format&#58;
+  </para>
+
+<programlisting><![CDATA[
+[player1]
+name= slasher
+defeated = zombie,vampire
+level=7
+
+[player2]
+name= vecna
+defeated = vampire,gug,shantak
+level=8
+]]></programlisting>
+
+<para>
+  Save the file as <filename>sample.ini</filename> into your home
+  directory, <emphasis>not</emphasis> the <filename>config</filename>
+  directory. After all, saving the configuration file into your LÖVE
+  project directory is exactly what you&#39;re trying to avoid,
+  because you want the configuration file to be separate from your
+  application.
+</para>
+
+<para>
+  Imagine that this file is a save file for a game, with the progress
+  of each player in each configuration block. Were this a real game,
+  you would save a configuration file in a hidden folder named
+  <filename>~&#47;.config</filename> but for now you can keep this
+  sample unhidden.
+</para>
+
+<para>
+  Create a second file named <filename>main.lua</filename> and enter
+  this simple program to parse the <filename>sample.ini</filename>
+  file, change a value, and then update the config&#58;
+</para>
+
+<programlisting><![CDATA[
+inifile = require('inifile')
+
+-- find home directory
+home = os.getenv('HOME')
+
+-- detect path separator
+-- returns '/' for Linux and Mac
+-- and '\' for Windows
+d = package.config:sub(1,1)
+
+-- parse the INI file and
+-- put values into a table called conf
+conf = inifile.parse(home .. d .. 'sample.ini')
+
+-- print the data for review
+print(conf['player1']['name'])
+print(conf['player1']['level'])
+print(conf['player1']['defeated'])
+
+-- level up player1
+conf['player1']['level'] = tonumber(conf['player1']['level'])+1
+
+-- save the change
+inifile.save(home .. d .. 'sample.ini', conf)
+]]></programlisting>
+
+<para>
+  This simple application detects the user&#39;s home directory,
+  detects how the operating system finds its way to the home
+  directory, parses the INI file, and then increments the
+  <literal>level</literal> entry for <literal>player1</literal> by 1.
+</para>
+
+<para>
+  Save the file. Change to the <filename>~/config</filename> directory
+  in a terminal, and then try running the application &#40;it will
+  fail, but that&#39;s intentional&#41;.
+</para>
+
+<programlisting><![CDATA[
+$ lua ./main.lua
+lua: ./main.lua:4: module 'inifile' not found...
+]]></programlisting>
+
+<para>
+  This tells you that Lua attempted to use the
+  <literal>inifile</literal> library, but couldn&#39;t locate
+  it because the library is&#39;t installed on your system,
+  it&#39;s installed in your project directory.
+</para>
+
+<bridgehead>Setting the package path</bridgehead>
+
+<para>
+  When you created your own card dealer class for Blackjack, you used
+  the <literal>require</literal> keyword to include your library with
+  your main code. You must do the same for the
+  <literal>inifile</literal> library.
+</para>
+
+<para>
+  Just as you generally know where you keep your files on your
+  computer, Lua knows where libraries are normally kept on whatever
+  system it&#39;s installed on. It keeps track of this information in
+  a variable called <varname>package.path</varname>. If you tell Lua
+  to <literal>require</literal> a package called
+  <literal>foo</literal>, then Lua looks in all the locations listed
+  in <varname>package.path</varname>. When it finds
+  <literal>foo</literal>, it stops looking and proceeds to execute
+  code. If <literal>foo</literal> is nowhere to be found, then it
+  throws an error and the application crashes.
+</para>
+
+<para>
+  If you are adding a library to Lua, or a Lua-based application like
+  LÖVE, that is outside the normal Lua
+  <varname>package.path</varname>, then you must tell Lua where to
+  look. If you don&#39;t, your program will crash because Lua
+  can&#39;t find a library that you have told it to require.
+</para>
+
+<para>
+  You can see <varname>package.path</varname> yourself by launching
+  Lua in a terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ Lua
+> print(package.path)
+./?.lua;/usr/share/lua/5.1/?.lua;/usr/share/lua/5.1/?/init.lua;/usr/lib64/lua/5.1/?.lua;/usr/lib64/lua/5.1/?/init.lua
+]]></programlisting>
+
+<para>
+  For a prettier view &#40;and for a little practice with Lua&#41;,
+  use the <literal>gmatch</literal> function of Lua to split each
+  entry, separated by semicolons&#58;
+</para>
+
+<programlisting><![CDATA[
+> for s in package.path:gmatch("([^;]+)") do print(s) end
+./?.lua
+/usr/share/lua/5.1/?.lua
+/usr/share/lua/5.1/?/init.lua
+/usr/lib64/lua/5.1/?.lua
+]]></programlisting>
+
+<para>
+  In these examples, when <literal>require</literal> is used, Lua
+  first searches the current directory for anything ending in
+  <filename>.lua</filename>. If nothing applicable is found, Lua knows
+  to search <filename>/usr/share/lua/5.1</filename> and then
+  <filename>/usr/share/lua/5.1/?</filename> &#40;Lua itself
+  substitutes <literal>?</literal> with the <emphasis>the name of the
+  library you provide in <literal>require</literal>
+  statements</emphasis>&#41;.
+</para>
+
+<para>
+  You can append entries to <varname>package.path</varname> in your
+  program so that if you add a new library outside of Lua or LÖVE, Lua
+  knows where to find it. To do that, you must know where to find the
+  libraries yourself.
+</para>
+
+<para>
+  You told Luarocks to install <literal>inifile</literal> to
+  <filename>local</filename>, so you know where to start. There are
+  two easy ways to find the actual code of the library you
+  installed&#58; the <command>ls</command> command and the <command>find</command> command.
+</para>
+
+<para>
+ If you&#39;re not entirely sure what you&#39;re looking for, you can
+ use the <command>ls</command> <option>--recursive</option> command to
+ list all directories and all the directories in those directories
+ &#40;and so on&#41;.
+</para>
+
+<programlisting><![CDATA[
+$ ls --recursive ./local
+local/:
+lib/  share/
+
+local/lib:
+luarocks/
+
+local/lib/luarocks:
+rocks/
+
+local/lib/luarocks/rocks:
+inifile/  manifest
+
+local/lib/luarocks/rocks/inifile:
+1.0-2/
+
+local/lib/luarocks/rocks/inifile/1.0-2:
+inifile-1.0-2.rockspec  rock_manifest
+
+local/share:
+lua/
+
+local/share/lua:
+5.1/
+
+local/share/lua/5.1:
+inifile.lua
+]]></programlisting>
+
+<para>
+  At the very bottom of the list is the file
+  <literal>inifile.lua</literal>, which is, as its file extension
+  <filename>.lua</filename> suggests, the Lua library you seek.
+</para>
+
+<note>
+  <para>
+    There is a related package path, called
+    <literal>package.cpath</literal>, used to locate complex libraries
+    written in the C programming language. These libraries use the
+    file extension <literal>.so</literal> on Linux,
+    <literal>.dll</literal> on Windows, and <literal>.dylib</literal>
+    on Apple Mac.
+  </para>
+</note>
+
+<para>
+  If you had already known you were looking for a
+  <filename>.lua</filename> file, then you could also have used the
+  <command>find</command> command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ find ./local -name "*.lua"
+./local/share/lua/5.1/inifile.lua
+]]></programlisting>
+
+<para>
+  The end results of the commands are the same&#58; you get the path
+  to the library or libraries you need to add to the very top of your
+  <filename>main.lua</filename> code&#58;
+</para>
+
+<programlisting><![CDATA[
+package.path = package.path .. ';local/share/lua/5.1/?.lua'
+]]></programlisting>
+
+<para>
+  This simple statement sets <varname>package.path</varname> to be
+  <emphasis>whatever it already is</emphasis>, and then appends
+  &#40;..&#41; the <filename>local</filename> directory. It also
+  replaces any instance of <literal>?</literal> with
+  <emphasis>whatever is being required</emphasis>.
+</para>
+
+<note>
+<para>
+  If you read other people&#39;s Lua code, you might see the alternate
+  method of pointing Lua to a library. Sometimes, a programmer
+  provides the path to the library manually in the
+  <literal>require</literal> statement, using dots as delimiters&#58;
+  <literal>require('lib.inifile.inifile')</literal>.
+</para>
+<para>
+  This isn&#39;t wrong or bad, but it is very specific to a
+  <emphasis>single</emphasis> library file. Not all libraries consist
+  of just one file, so that method is less flexible than providing the
+  <varname>package.path</varname>.
+</para>
+</note>
+
+<para>
+  Try your program again. This time, it is successful&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua ./main.lua
+slasher
+7
+zombie,vampire
+]]></programlisting>
+
+<para>
+  The file was parsed correctly. Now check the original
+  <filename>sample.ini</filename> file to see if player1&#39;s level
+  was updated. To see the contents of a file quickly in a terminal,
+  you can use the <command>cat</command> command, which is short for
+  <emphasis>concatenate</emphasis> &#40;so you are, in effect,
+  concatenating the file to nothing, so its contents are just printed
+  to your terminal&#41;.
+</para>
+
+<programlisting><![CDATA[
+$ cat ~/sample.ini
+[player1]
+name= slasher
+defeated = zombie,vampire
+level=8
+
+[player2]
+name= vecna
+defeated = vampire,gug,shantak
+level=8
+]]></programlisting>
+
+<para>
+  Lua has parsed, read, and written a plain text configuration using a
+  local library.  
+</para>
+</section>
+
+<section xml:id="db-deck">
+  <info>
+    <title>Deck building</title>
+  </info>
+
+<para>
+  Having completed the exercise in this chapter, you not only know how
+  to store data on your user&#39;s computer, but you also know how to
+  define data structures in a file to have it imported by your
+  application. That means you don&#39;t have to define a deck of
+  complex battle cards in the main code of your application, which
+  means a smaller file for your executable code, and a lot less
+  clutter in your main script. 
+</para>
+
+<para>
+  For the Blackjack game, the card deck was a simple 52 card poker
+  deck. Your current project, Battlejack, can use a standard card
+  deck, but part of the fun of programming digitally is that you can
+  generate game assets without the costly manufacturing bills involved
+  in creating a new deck of cards in the physical world. It
+  doesn&#39;t make sense to limit the game to a standard poker deck
+  when you can, instead, invent any theme you want for your game.
+</para>
+
+<para>
+  Regardless of your artistic skill or access to artwork, 52 cards is
+  a lot of cards to make. It&#39;s not impossible &#40;there are over
+  10,000 <productname>Magic: The Gathering</productname> cards, and
+  2,000 in <productname>Magic Online</productname>&#41; but for an
+  independent game developer it&#39;s a tall order. When determining
+  the assets for a game, it&#39;s important to look critically at what
+  is necessary and what is just nice to have.
+</para>
+
+<para>
+  For this project, even though the design assets were 52 cards, there
+  were actually only 10 unique values&#58; 1 through 10. For every
+  iteration of cards 1 to 10, there were three cards worth 10
+  &#40;Jack, King, Queen&#41;.
+</para>
+
+<para>
+  Furthermore, although the dev deck had 4 suits, the suits actually
+  had no effect on the game, so those can be thrown out. To create
+  player identities, the alpha version of the game used red and black,
+  and since that&#39;s easy and classic, the digital version can keep
+  that. For accessibility, the digital version will also use a symbol
+  along with the opposing colors, since not everyone can see the color
+  red.
+</para>
+
+<para>
+  To make the game a little more exciting, the digital version of
+  Battlejack will enable players to &#34;level up&#34; as they
+  continue to play. Levels in any game are a mix of rewards and,
+  essentially, penalties&#59; the players levels up and becomes more
+  powerful, but only to face new challenges. That means the digital
+  deck will have a small subset of extra cards that get shuffled into
+  the game, throwing off the predictability of how often certain
+  values get drawn, and a second subset of cards that serve as
+  &#34;power ups&#34;, granting the player a free bonus, anywhere from
+  a +1 to +3, to their hand.
+</para>
+
+<para>
+  There isn&#39;t much to this dataset, but it should be expressed
+  separately from the user data because it is not data that is meant
+  to change. It defines the virtual deck of cards, and that&#39;s
+  all. Tracking which cards have been drawn during a game must be done
+  by the application itself, because it gets reset every time a new
+  game is started. Any permanent rewards or penalties or level data
+  gets written to the user data file.
+</para>
+
+<para>
+  Take a moment to think about what kind of deck you want to use for
+  your Battlejack implementation, or download and use the deck
+  provided with this book &#40;the art is licensed under a Creative
+  Commons license, so you may use the artwork for any
+  purpose&#41;. Once you have decided on a theme, create a project
+  folder called <filename>battlejack</filename>. Create 
+  <filename>font</filename> and <filename>img</filename> directories
+  within your project folder, as usual.
+</para>
+
+<para>
+  Create a deck definition file called <filename>deck.ini</filename>
+  and save it into your project directory. You know that the card
+  dealer library you made for Blackjack uses random numbers to select
+  a card, so the <firstterm>key</firstterm> term in the definition
+  file must be a number, meaning that the <firstterm>value</firstterm>
+  must hold both the face and card value of the card.
+</para>
+
+<para>
+  You can customize the
+  definition file to suit your custom theme, or if you are using the art
+  available with this book, you can use this&#58;
+</para>
+
+<programlisting><![CDATA[
+[card]
+1 = mystic,1
+2 = bard,2
+3 = arcanist,3
+4 = archer,4
+5 = goblin,5
+6 = construct,6
+7 = cavalry,7
+8 = priest,8
+9 = fighter,9
+10 = wizard,10
+11 = cavalry,10
+12 = knight,10
+
+[earn]
+1=zealot,6
+2=cultist,7
+3=charm,8
+4=orc,9
+5=god,10
+
+[up]
+1=sun,1
+2=bird,1
+3=sword,1
+4=ram,2
+5=skull,2
+6=templar,2
+7=weep,3
+8=plague,3
+]]></programlisting>
+
+<para>
+  This isn&#39;t the only way to create a deck definition, and
+  using an INI file isn&#39;t the only format, but because it has a
+  nice, simple dependency and the definition is not complex, it works
+  well for this project.
+</para>
+
+<para>
+  Here&#39;s an example of how it can be used. This sort of code
+  selects a card from the <literal>[card]</literal> deck&#58;
+</para>
+
+<programlisting><![CDATA[
+> print(deck['card'][tostring(2)])
+mystic,1
+> print(deck['card'][tostring(12)])
+knight,10
+]]></programlisting>
+
+<para>
+  The code you use in the actual Battlejack game will require
+  randomness, and must parse the face from the card value
+  &#40;separated by a comma&#41;, but those are details for later.
+</para>
+
+<para>
+  This deck provides just 25 cards to generate. That&#39;s manageable, so now all
+  that&#39;s left is to make them. And that&#39;s just what you&#39;ll
+  do in the next chapter.
+</para>
+</section>
+    <section xml:id="db-work">
+      <info>
+	<title>Homework</title>
+      </info>
+
+      <para>
+	Installing and learning new libraries is an important part of
+	programming. Nobody codes everything from scratch unless
+	absolutely necessary, because there are so many great
+	libraries out there with much of your work already done for
+	you.
+      </para>
+
+      <para>
+	Try these hacks&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    INI files store key and value pairs&#59; one word
+	    correlates to exactly one other word or number. For more
+	    complex data structures, there is a format called YAML,
+	    which allows you to define multiple levels of information
+	    for everything in your data set.
+	  </para>
+	  <para>
+	    Install <literal>lua-yaml</literal> or a similar library 
+	    for parsing YAML and try to parse some sample data.
+	  </para>
+	  <para>
+	    For an example of a working script, download the code
+	    files for this chapter from this book&#39;s code
+	    repository.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+
+</chapter>

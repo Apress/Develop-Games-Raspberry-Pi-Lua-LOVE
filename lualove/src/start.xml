@@ -1,0 +1,909 @@
+<chapter version="5.1" xml:id="start">
+    <info>
+      <title>Getting started with the Raspberry Pi</title>
+    </info>
+
+    <para>
+      Welcome to the exciting world of the Raspberry Pi and the Lua
+      programming language. Whether you&#39;re already a programmer
+      looking to learn Lua for game or shader development, or the
+      proud but confused new owner of a Raspberry Pi looking for a fun
+      project, or a budding freelancer looking to get into mobile app
+      development, or just a curious computerist looking to learn
+      more, this book is your gateway into an exciting new world of
+      fun with software.
+    </para>
+
+    <para>
+      To get through this book, you'll use two main tools: Lua and the
+      Raspberry Pi.
+    </para>
+
+    <important>
+    <para>
+      This book requires no previous experience with computers or
+      programming. Everything you need to know, you can learn from
+      this book and from a healthy dose of practice.
+    </para>
+    </important>
+    
+    <para>
+      Lua is a small, fast, modern programming language that can be
+      used for everything from system maintenance to Vulkan OpenGL
+      shaders and standalone games. It's a leading scripting language
+      in the video game and visual effects industry, and is used for
+      front-end development in several popular game engines. Learning
+      Lua is not only a great way to learn programming, it's a pathway
+      into the software development industry.
+    </para>
+
+    <para>
+      The Raspberry Pi is, of course, the groundbreaking computer,
+      roughly the size of a mobile phone, that costs just $35
+      USD. Against all odds, the non-profit Pi Foundation competes
+      with the dominating mega-corporations by selling an educational
+      product loaded with open source software to students, teachers,
+      and hobbyists like you. It's a great, affordable way to learn
+      programming, open source, and how computers really work.
+    </para>
+
+    <para>
+      You may have acquired a Raspberry Pi for any variety of
+      reasons, but here are the reasons it was a good choice, and why
+      it's the platform this book uses&#58;
+    </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  The Pi uses the ARM architecture, as opposed to the
+	  x86 architecture made popular by AMD and Intel. Most mobile
+	  phones use ARM chips, and mobile technology is the
+	  fastest-growing market for games. You don't have to develop
+	  games on ARM to publish games for mobile, but if you believe
+	  that knowing technology starts with using that technology,
+	  then $35 for a mobile game dev kit is a smart investment.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  The Raspberry Pi runs Linux, a free version of UNIX. You
+	  might not know UNIX yet, but if you're heading into the tech
+	  industry, the more you know about it, the better. UNIX
+	  knowledge is invaluable because most of the Internet is run
+	  on it, and it's the basis for Android phones, Steam
+	  machines, the PlayStation 4, and most of the film and TV
+	  visual FX industry. Besides that, it's a lot of fun.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  When computers first came out, it was expected that they
+	  would be tools that people could use to bring their ideas to
+	  life. It didn't matter whether your idea was great or small,
+	  you could make a computer do what you wanted it to do.
+	</para>
+	<para>
+	  Computers today are largely struggling to meet that
+	  goal. Programming a Mac or a Windows PC through their
+	  official developer channels is an expensive and confusing
+	  endeavour. It wasn't ever meant to be that way, and luckily
+	  open source today makes it easy for normal people, like you
+	  and me, to program our devices and to keep technological
+	  innovation alive.
+	</para>
+	<para>
+	  There shouldn't be a barrier into computing. Use this book,
+	  a Raspberry Pi, and your passion for creativity and
+	  discovery to prove that programming is still for everyone.
+	</para>
+      </listitem>
+      
+      <listitem>
+	<para>
+	  You can learn Windows or you can learn macOS, and either way,
+	  you learn either Windows or macOS. If you learn Linux,
+	  however, you learn computing. There will always be
+	  differences in how different platforms work, but an open
+	  source system like Linux lets you gain familiarity with the
+	  low-level computational basics shared by all computers,
+	  whether desktop, laptop, or mobile.
+	</para>
+      </listitem>
+    </itemizedlist>
+    
+    <section xml:id="start-prep">
+    <info>
+      <title>Preparing your Pi</title>
+    </info>
+
+    <para>
+      Believe it or not, one of the strengths of the Raspberry Pi is
+      that it is low-powered. If you develop on a low-powered
+      computer, then you broaden your audience because not everyone
+      has the latest and greatest gaming rig or mobile device. Indeed,
+      developing on a Pi is perfect for targeting the mobile market,
+      because the Pi shares a lot with the internal hardware of mobile
+      phones.
+    </para>
+
+    <para>
+      In the same spirit of inclusiveness, you don&#39;t actually have
+      to have a Raspberry Pi to follow along with this book. You can
+      buy any <firstterm>System-on-a-Chip</firstterm> (SoC) device;
+      common ones include the BeagleBone, Banana Pi, Pine64, even the
+      $9 CHIP.
+    </para>
+
+    <para>
+      This book is general enough to cover whatever SoC device you use
+      and any Linux or UNIX operating system. Technically, you can
+      even use a spare computer instead, although you'll need to
+      install Linux on it first or boot from a Linux USB drive. The
+      important thing is to get through this section and end up with
+      some computing device loaded with a UNIX or Linux operating
+      system.
+    </para>
+    
+    <para>
+      The advantage to a genuine Raspberry Pi is that it is thoroughly
+      documented. There are lots of tutorials on raspberrypi.org to
+      help you through anything you don't understand, and there's
+      little to no variation in what you see on a Pi compared to
+      what you see in this book.
+    </para>
+
+    <para>
+      Depending on where you buy your Raspberry Pi, you might find
+      that the OS (called either Raspbian or NOOBS) is included in the
+      box. If that's the case, then you can skip to the next section
+      called <emphasis role="bold">Writing your first Lua script</emphasis>.
+    </para>
+    
+    <para>
+      If you purchased a Raspberry Pi that didn't include the OS on an
+      SD card, or if you purchased a different SoC device that doesn't
+      come already setup, then you have a computer that doesn't know
+      what to do when you turn it on. It needs an operating system,
+      and it's a great learning experience for you to install one.
+    </para>
+
+    <bridgehead>
+      Installing Linux onto your Pi with Etcher
+    </bridgehead>
+
+    <para>
+      To install an OS on your Pi or SoC device, you need a
+      microSD card and an OS image file. OS images are available from
+      <link xlink:href="https://raspberrypi.org/downloads/">
+	raspberrypi.org&#47;downloads </link>. For the quickest
+	install, use the Raspbian &#34;lite&#34; image file, which
+	takes the standard minimal OS image developed by the Pi
+	Foundation and writes it onto whatever card you have (as long
+	as your card is large enough).
+    </para>
+    
+    <warning>
+      <para>
+	This process <emphasis>erases</emphasis> the card, so
+	don't use one containing photos or videos or other data that
+	you care about.
+      </para>
+    </warning>
+
+    <para>
+      There are many ways to get a disk image onto an SD card. This is
+      the easy method, and it&#39;s the same whether you run Linux,
+      macOS, or Windows on your personal computer.
+    </para>
+
+    <orderedlist>
+      <listitem>
+	<para>
+	  If you have not already done so, download the Raspbian
+	  &#34;lite&#34; image from
+	  <link xlink:href="https://raspberrypi.org/downloads/">
+	  raspberrypi.org&#47;downloads</link>. This image provides
+	  you with just an OS with no extra applications and no
+	  graphical desktop, but you will manually install a desktop
+	  and a full development environment later.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  On your personal computer, download and install the
+	  <application>Etcher</application> application from <link
+	  xlink:href="https://etcher.io/">etcher.io</link>.
+	</para>
+      </listitem>
+      
+      <listitem>
+	<para>
+	  Put the SD card into your computer. If your computer
+	  doesn&#39;t have an SD card slot, you must purchase an SD
+	  card reader.
+	</para>
+      </listitem>
+      
+      <listitem>
+	<para>
+	  Once the OS image has downloaded and Etcher has
+	  been installed, launch the <application>Etcher</application>
+	  application.
+	</para>
+
+	<para>
+	  In the <application>Etcher</application> window, select the
+	  Raspbian image file from where it is saved on your hard drive
+	  &#40;probably in your <filename>Downloads</filename>
+	  directory&#41;.
+	</para>
+	<para>
+	  Select the SD card as the destination.
+	</para>
+	<para>
+	  And finally, click the <guibutton>Flash</guibutton> button.
+	</para>
+      </listitem>
+    </orderedlist>
+
+    <para>
+      You can now skip to <emphasis role="bold">Writing your first Lua script</emphasis>.
+    </para>
+  </section>
+
+    <section xml:id="start-soc">
+    <info>
+      <title>Preparing your off-brand SoC</title>
+    </info>
+
+    <para>
+      If you only have a SoC board not made by the Pi Foundation, then
+      the OS images for the Raspberry Pi probably won&#39;t work on
+      your device. There is an OS image that will, you just have to
+      find it.
+    </para>
+
+    <para>
+      There are two types of OS images for Pi-like systems&#58; there
+      are pre-built images, like those that the Pi Foundation
+      distributes, that get copied to your device, and there are
+      images that install an OS on the device for you to configure on
+      your own. As you might expect, the option that requires little
+      or no configuration is easiest, but whether anyone has posted an
+      up-to-date image for your device depends on the popularity of
+      the device.
+    </para>
+
+    <para>
+      Your first step is to visit the website of your device's
+      manufacturer. They probably offer an OS for the device they
+      produce, and since they are targeting their own device, the OS
+      image is likely a pre-built image to copy to your SD card using
+      the <application>Etcher</application> application. This process
+      is described in <emphasis>Installing Linux onto your Pi with
+      Etcher</emphasis>.
+    </para>
+
+    <para>
+      Sadly, not everyone that makes a device reliably maintains
+      software for that device. If you cannot find an official image
+      for your device, the next step is to do an Internet search for
+      the name of your device plus a query such as &#34;Linux
+      image&#34;. It helps to know what chip your device is based
+      upon, too, since sometimes generic OS images target the chip
+      rather than every possible brand name applied to a system built
+      around that chip. Whether you have an Allwinner, armv6, armv7,
+      Tegra, or something else entirely, there&#39;s a good chance
+      that somewhere on the Internet, there are a few hard working
+      hackers supporting your device.
+    </para>
+
+    <para>
+      Finally, if all else fails, you can turn to the two most
+      reliable OS providers in the modern world&#58; Debian Linux and
+      NetBSD. These two groups justifiably pride themselves on
+      providing an operating system that runs on nearly every device
+      you can think to put an OS onto (and a few that you wouldn't).
+    </para>
+
+    <para>
+      Debian Linux is available from <link
+      xlink:href="https://debian.org">debian.org</link>. Depending on
+      your device, you may have to do a little research on the
+      <link xlink:href="https://wiki.debian.org/InstallingDebianOn/">
+      wiki.debian.org&#47;InstallingDebianOn
+      </link>
+      to understand how an install is done, but the good news is that
+      it&#39;s almost certainly possible.
+    </para>
+
+    <para>
+      NetBSD is available from <link
+      xlink:href="http://wiki.netbsd.org/ports/evbarm/">wiki.netbsd.org&#47;ports&#47;evbarm</link>. The
+      install process for NetBSD is remarkably easy, but the setup
+      afterwards is considerably more complex, especially if
+      you&#39;re not familiar with UNIX yet.
+    </para>
+
+    <para>
+      If this is the route you are taking, you should take a little extra time to set up your system and to get familiar with it before continuing in this book. Mostly, the instructions in this book are universal, but instructions on installing software or configuring sound outputs and other details may differ depending on your device and OS.
+    </para>
+    <!-- TODO write an appendix with Debian and NetBSD instructions -->
+    </section>
+
+    <section xml:id="start-board">
+    <info>
+      <title>Using this book without a SoC device</title>
+    </info>
+
+    <para>
+      If you don't have and cannot get a Raspberry Pi or even a CHIP
+      (it's only $9 USD), then you can use a traditional computer to
+      work through this book, even a very old one. You&#39;ll get all
+      the same benefits as those using a Pi&#58; you&#39;ll learn
+      programming, you&#39;ll learn Linux, and you&#39;ll learn all
+      about the software development process, but you will have to
+      work a little harder to get set up.
+    </para>
+
+    <para>
+      To set up a computer to use with this book, you must install
+      Debian Linux from <link
+      xlink:href="http://debian.org">debian.org</link> so that your
+      environment mirrors the one in this book.
+    </para>
+
+    <warning>
+      <para>
+	This <emphasis>erases</emphasis> all contents of your
+	computer, so use a spare computer that doesn&#39;t contain
+	data you care about.
+      </para>
+    </warning>
+    
+    <para>
+      It's out of the scope of this book, but there are many ways to
+      run Linux on a computer, and technically any of them are
+      probably acceptable for this book. For instance, you can run
+      Linux off of a USB drive or DVD using porteus.org, or you can
+      run Linux in a virtual machine using virtualbox.org. Whatever
+      you choose, you will have to translate what is in this book for
+      what you are using. In other words, it's easier to just get a Pi
+      and follow along, but it's not strictly required.
+    </para>
+
+    <para>
+      If this is the route you are taking, you should take a little
+      extra time to set up your system and to get familiar with it
+      before continuing in this book. Mostly, the instructions in this
+      book are universal, but instructions on installing software or
+      configuring sound outputs and other details may differ depending
+      on your device and OS.
+    </para>
+    </section>
+
+    <section xml:id="start-lua">
+      <info>
+	<title>Writing your first Lua script</title>
+      </info>
+      
+      <para>
+	Assuming you have your Pi plugged into a monitor, keyboard,
+	mouse, and ethernet, you can finally boot into your fresh, new
+	Linux operating system. The first time you boot, you may see a
+	message that the hard drive partition is being adjusted to fit
+	your SD card. This maximizes how much space you have available
+	for data on your card, so let this run.
+      </para>
+
+      <note>
+	<para>
+	  From this point on, the term &#34;Pi&#34; is meant to
+	  encompass whatever device you are using to follow along with
+	  this book. 
+	</para>
+      </note>
+      
+      <para>
+	Eventually, the boot process finishes and leaves you at either
+	a blank screen containing a text login prompt, or, if you are
+	using an OS that you got preinstalled on your Pi, a graphical
+	login prompt. Eventually you will install a graphical desktop,
+	just as you find on any desktop PC, but you got the book so
+	you could learn to code, so there&#39;s no rush to get out of
+	the text console. If you're not staring at a text console now,
+	then press
+	<keycombo>
+	  <keycap>Ctrl</keycap>
+	  <keycap>Alt</keycap>
+	  <keycap>F3</keycap>
+	</keycombo>
+	to switch to one.
+      </para>
+
+      <para>
+	The modern computing public likes to think that computers have
+	evolved into interactive virtual worlds, but programmers know
+	the truth: computers, whether it's a mainframe or a mobile
+	phones, are merely highly efficient calculators that get
+	instructions in the form of plain text. When you switch a
+	Linux computer to a text console, you're seeing the
+	not-so-secret side of the operating system that responds to
+	text commands. That's great if you're an experienced UNIX
+	user, but it can be crippling if you don't know what commands
+	exist, much less which commands to use. Throughout the course
+	of this book, you'll get familiar with useful commands for
+	Debian Linux. Most commands that you learn apply to any UNIX
+	system, although some are particular to Debian. Instead of
+	listing common commands and expecting you to memorise them,
+	however, this book uses and explains the same commands
+	throughout so that you get familiar with them.
+      </para>
+
+      <para>
+	First, you need to log in with a user name and password. The
+	default user name on Raspbian is <literal>pi</literal> and the
+	password is <literal>raspberry</literal>. When you type in the
+	password, it <emphasis>appears</emphasis> that nothing is
+	happening; that's to be expected, just keep typing.
+      </para>
+
+      <para>
+	If you are not using Raspbian, or you are using a version of
+	Raspbian distributed by some other entity than the Pi
+	Foundation, the default user name and password may be
+	different. Refer to the distributor's documentation for help.
+      </para>
+
+      <para>
+	Once you&#39;re logged in, you are given a shell prompt that
+	ends with a dollar sign &#40;&#36;&#41;. This means that your
+	computer is ready for a command.
+      </para>
+
+      <para>
+	To program in Lua, you need to have Lua installed.  In UNIX,
+	most of the &#34;obvious&#34; software that users need is
+	stored in repositories of applications on UNIX servers. You
+	can think of it as an app store &#40;although it predates app
+	stores by at least a decade&#41;.
+      </para>
+
+      <para>
+	The Debian <command>apt</command> command searches and
+	installs software from Debian repositories. You will use this
+	command a lot throughout this book, so you will become
+	familiar with it, but for now just type this&#58;
+      </para>
+      
+      <programlisting><![CDATA[
+      $ sudo apt install lua5.3
+      ]]></programlisting>
+      
+      <para>
+	Enter your password when prompted. Remember, when you type
+	your password, the cursor won&#39;t move.
+      </para>
+
+      <note>
+	<para>
+	  If you installed a different OS onto your Pi, then the
+	  command is probably different. For example, on NetBSD the
+	  command is <command>pkg_add</command>
+	  <application>lua53</application>. Refer to the OS image's
+	  documentation for help.
+	</para>
+      </note>
+
+      <para>
+	For your first foray into Lua, you're going to program a
+	simple dice rolling game that pits the user against the
+	computer to see who can roll the highest number on a 20-sided
+	virtual die.
+      </para>
+      
+      <para>
+	So far, you've been controlling your computer with a language called Bash. To switch to Lua, launch a Lua interpreter by typing&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ lua5.3
+      ]]></programlisting> 
+
+      <para>
+	It may not look that different, but you probably notice at
+	least that your shell prompt has changed from a
+	<literal>$</literal> to a <literal>></literal> symbol. Not all
+	programming languages have an interactive prompt like this,
+	but it's a good way to get to know a language before embarking
+	on a big project with it.
+      </para>
+
+      <para>
+	Programming languages have lots of built-in functions that you
+	can use. These functions are called
+	<firstterm>methods</firstterm> or, unsurprisingly,
+	<firstterm>functions</firstterm>. They are organized into
+	<firstterm>libraries</firstterm>.
+      </para>
+
+      <para>
+	For instance, the <function>print()</function> function in
+	Lua's basic library, prints text to the screen. Try this&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      > print("hello world")
+      hello world
+      ]]></programlisting> 
+
+      <para>
+	You can also have Lua print numbers&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > print(23)
+      23
+      > print(21+(378/18))
+      42
+      ]]></programlisting> 
+
+      <para>
+	Or both&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > print("the answer is "..21+(378/18))
+      the answer is 42
+      ]]></programlisting> 
+      
+      <bridgehead>
+	Rolling virtual dice
+      </bridgehead>
+
+      <para>
+	For your first program, you need random numbers so that you
+	can mimic a die roll competition. Computers are producing
+	numbers all the time, but how do you access those numbers? Can
+	you think of something within a computer's normal routine that
+	would produce numbers? If you can't think of anything, try
+	looking up from your screen at the room around you. Is there
+	anything in your physical space that could provide a more or
+	less random number at a glance?
+      </para>
+
+      <para>
+	After some thought, you might realize that computers usually
+	keep track of time, just like a clock in the real world
+	does. It's not perfect, but it's a reliable source of numbers.
+      </para>
+      
+      <para>
+	Lua has many libraries filled with specialized functions. The
+	<function>os</function> library contains the
+	<function>time</function> function, which returns the current
+	time, in seconds, since 1 January 1970 &#40;the &#34;UNIX
+	Epoch&#34;&#41;. That's a lot of numbers, especially in the
+	context of a dice game where you only need up to 20. Setting
+	that aside for now, try using the
+	<function>os.time()</function> function yourself&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > os.time()
+      1524967695
+      ]]></programlisting> 
+
+      <para>
+	When you use a function, you are &#34;calling&#34; the
+	function. The empty parentheses at the end of the
+	<function>os.time()</function> function call allows you to
+	send information to the function when calling it. The
+	<function>os.time()</function> function doesn't require any
+	information from you to do its job, so the parentheses are
+	left empty. Functions like <function>print()</function>, and
+	other advanced functions you will use later &#40;some of which
+	you yourself will write&#41;, require more information.
+      </para>
+      
+      <para>
+	There are a few problems with using
+	<function>os.time()</function> as a stand-in for a die
+	roll. The <function>os.time()</function> function returns a
+	very large number, and it&#39;s not very random.
+      </para>
+
+      <para>
+	There are a few ways to take a large number and reduce it to
+	something within a given range. One easy way uses grade school
+	math: take any number and divide it by your maximum desired
+	value, and use the remainder &#40;the &#34;modulo&#34; in
+	computer terminology&#41; as your result. For instance, if you
+	have the number 103 and divide it by 20, you get 5 with a
+	modulo of 3. In computer science, the <literal>%</literal>
+	sign is used to do division and return just the modulo. Try it
+	Lua&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > 103%20
+      3
+      > os.time()%20
+      6
+      > os.time()%20
+      12
+ ]]></programlisting> 
+	
+      <para>
+	The modulo of <function>os.time()</function> has some degree
+	of variance, depending on the time at which you call it. This
+	introduces a perception of randomness. You can test this by
+	trying to predict what your &#34;roll&#34; will be just before
+	calling os.time(). It's pretty difficult to predict.
+      </para>
+
+      <note>
+	<para>
+	  Press the <keycap>up</keycap> arrow on your keyboard to
+	  recall the previous Lua function call without all the
+	  typing.
+	</para>
+      </note>
+      
+      <para>
+	After trying to predict your roll 20 or 30 times, do you see
+	any problems or patterns in the <function>os.time()</function> solution?
+      </para>
+	
+      <para>
+	You might notice that making the same call to
+	<function>os.time()</function> in rapid succession betrays its
+	very predictable pattern of incrementing steadily once per
+	second.
+      </para>
+
+      <bridgehead>
+	Using variables and user input
+      </bridgehead>
+      
+      <para>
+	Computers are programmed. They don&#34;t exactly produce random
+	events, because they only do exactly as they have been
+	programmed. Yet few computers are dormant; usually they have
+	been programmed to interact and respond to human
+	input. There's nothing quite as unpredictable as the human
+	mind, so why not use it to introduce some randomness to the
+	dice roll?
+      </para>
+
+      <para>
+	It's too obvious to just ask the human player for a random
+	number, especially if they know the goal of the game. If you
+	know the goal of a game is to roll 20 on a virtual 20-sided
+	die, then any good gamer is going to &#34;randomly&#34; choose
+	20 the majority of the time. So instead, you can ask your
+	human player for some input and then use that input as a
+	<firstterm>seed</firstterm> of randomness.
+      </para>
+      
+      <para>
+	Ignoring that this is happening on a computer in a programming
+	language you don't know yet, try to think of some ways you
+	could trick a player into providing you with a random value.
+      </para>
+
+      <para>
+	Here are some ideas&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Ask the user to provide a three digit number and add it to
+	    <function>os.time()</function> as an offset.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Ask the user for two numbers. Use the difference between
+	    the two numbers as an offset.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Ask the user for the name of an animal or a colour. Count
+	    the number of letters in the answer and use that number as
+	    an offset.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Ask for two numbers, divide their sum by 20 and use the
+	    modulo as the offset.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	You can probably imagine even more ways, but to implement any
+	of them, you need to know how to get input from your user. As
+	you might guess, getting input from a user is a common task in
+	programming, so Lua has a function for that as a part of its
+	input/output library, called <classname>io</classname>. The
+	problem is that Lua doesn&#39;t inherently know what to do
+	with input. Watch what happens if you use the
+	<function>read</function> function, and then type 
+	<userinput>hello world</userinput> as input&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > io.read()
+      hello world
+      hello world
+      ]]></programlisting> 
+
+      <para>
+	Lua just repeats what you give it. That's not very useful, and
+	that&#39;s exactly why <firstterm>variables</firstterm> were
+	invented. A variable is like an empty box, and you can put
+	anything into the box that you need to store for later. You
+	can put a word &#40;or <firstterm>string</firstterm>, in
+	programming lingo&#41; or a number or even an image or sound
+	effect. Variables are surprisingly easy to set, and easy to
+	use once you need them&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      > seed=io.read()
+      103
+      > seed%20
+      3.0
+      ]]></programlisting> 
+      
+      <para>
+	A new variable, in this example called
+	<varname>seed</varname>, gets created because you use the
+	<literal>=</literal> after a word that Lua otherwise does not
+	recognise. Whatever <function>io.read</function> gets from the
+	user is placed into the variable you created. From then on,
+	you can call the variable just as you call functions, and use
+	whatever is inside.
+      </para>
+
+      <para>
+	Using variables, you can create interactive
+	applications. Write a dice rolling application based on your
+	new understanding of variables. Of course, since you're
+	running Lua as an interactive session, your program gets
+	written and runs all at the same time, but that's enough for a
+	proof of concept.
+      </para>
+
+      <para>
+	Here is a version of a simple dice rolling game&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      > computer=os.time()
+      > seed=io.read()
+      104
+      > player=os.time()+seed
+      > print("The computer rolled "..computer%20)
+      The computer rolled 6     
+      > print("You rolled "..player%20)
+      You rolled 18.0
+      ]]></programlisting>
+
+      <para>
+	You have written your first fully-functional program&#33;
+	It&#39;s not a fancy game, and the only way to play it is to
+	type it manually into a Lua prompt, but the logic and the
+	results are sound. In the next chapter, you will create a Lua
+	script file so that a more advanced version of this simple
+	dice game can be run like a normal application. In the mean
+	time, practice creating and using variables, and try to come
+	up with alternative random number engines.
+      </para>
+
+      <para>
+	When you're ready to leave the Lua prompt, press <keycombo>
+	<keycap>Ctrl</keycap>
+	<keycap>C</keycap>
+	</keycombo> on your keyboard. When you see a <literal>$</literal> prompt again, you&#39;re back at your UNIX shell.
+      </para>
+
+      <para>
+	To power off your Pi for the day, use the <command>poweroff</command> command.
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ sudo poweroff
+      ]]></programlisting>
+      
+    </section>
+    
+    <section xml:id="start-work">
+      <info>
+	<title>Homework</title>
+      </info>
+
+      <para>
+	I may as well admit to you that Lua actually already has a
+	random number function as part of its
+	<function>math</function> library. Like your own versions of
+	random number generation, it too requires a seed, but it uses
+	a lot of math tricks and entropy to generate a number within
+	whatever range you specify. Here&#39;s how it works&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      > math.randomseed(os.time())
+      > math.random(1,20)
+      6
+      > math.random(1,20)
+      11
+      > math.random(1,20)
+      1
+      > math.random(1,20)
+      17
+      ]]></programlisting>
+      
+      <para>
+	How did I find out that Lua had a random number function? How
+	can you find out what other features Lua has that I haven't
+	told you about? The answer to both questions is documentation.
+      </para>
+
+      <para>
+	Any good programming language is fully documented so that
+	programmers know what the language can do. You're a programmer
+	now, so you should browse through Lua's <link
+	xlink:href="https://www.lua.org/manual/5.3/manual.html">reference
+	manual</link>. Much of it won&#39;t make sense to you yet, and
+	there are several conventions of code documentation that
+	probably won&#39;t make sense to you, but knowing where to
+	find what functions are available to you is a hugely important
+	part of learning to code.
+      </para>
+
+      <para>
+	Here are some challenges for you. Use the Lua documentation to find the answers.
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    One of the ideas for tricking the user into providing a
+	    random number was to ask the user for the name of an
+	    animal, and to count the letters of whatever the user
+	    typed. How would you find the length of a string in Lua?
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Find the cosine of 20. You can do this even if you have no
+	    idea what a cosine is.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Write a program that takes an input string from the user
+	    and then prints that string in capital (uppercase)
+	    letters. There's a way to do this both with and without a
+	    variable.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	Don&#39;t worry about getting these exercises right or
+	wrong. The important thing is to try, because trying means
+	that you are practicing, and practice is the only way to
+	really learn how to code. When you feel ready, or you just get
+	bored of trying these exercises, continue to the next chapter.
+      </para>
+    </section>
+  </chapter>

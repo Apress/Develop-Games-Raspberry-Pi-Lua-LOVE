@@ -1,0 +1,73 @@
+Pixlashed
+
+a free font
+by Vít Èondák
+2017
+
+fonty.condak.cz
+facebook.com/GunnyHandwritingFont
+
+En Cz Sk Pl Fr De Tr
+
+Category:	sci-fi
+
+Panose:		4-3-8-4-4-11-2-2-10-2
+
+
+[ English License ]
+
+This font is free for any use except modification and it may not be sold.
+
+If you think something in this font doesn't feel right please contact me.
+
+
+[English description]
+
+It started as a pixel font with a twist (a missing upper-right corner) but it became a bit more complicated.
+
+
+[ Èeská licence ]
+
+Tento font je zdarma pro libovolné užití s výjimkou úprav a nesmí být prodáván.
+
+Pokud ve fontu objevíte nìco, co by bylo vhodné opravit nebo doladit, tak mì prosím kontaktujte.
+
+
+[ Èeský popis ]
+
+Zaèalo to jako bìžný pixel font s jedním skoseným rohem a trochu se to zkomplikovalo. =)
+
+
+---
+
+History
+
+0.15	2017-07-17
+	+ AEIOU+caron LJ NJ HT+bar AO+dot GKLNST+commabelow
+	+ daggers lira franc ordmas ordfem no
+	* registered pound T
+	* fixed margins: i+... l+...
+	+ ligatures: TT tt 1/2 1/4 3/4
+	+ kerning: LT LY TJ (24 pairs total)
+	* merge and clean up
+	* panose
+
+0.14	2017-07-14
+	+ * 1234-sup mu paragraph multiply pound yen guillemots
+	+ breve+... Oslash Lslash
+	* - 
+
+0.13	2017-07-12
+	+ 0-9 #$@&-=+_ {|}/\ (c) (R) TM AE OE
+	+ caron+... circumflex+... ogonek+... cedilla+...
+	* .,:;?! ()
+
+0.12	2017-07-11
+	+ ()[] quotes '",.:;?!
+
+0.11	2017-07-11
+	+ acute+... grave+... dot+... dieresis+... ring+...
+	* S Z
+
+0.10	2017-07-11
+	+ basic character set A-Z

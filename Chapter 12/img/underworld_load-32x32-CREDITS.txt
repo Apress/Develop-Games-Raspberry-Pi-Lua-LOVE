@@ -1,0 +1,9 @@
+underworld_load
+CC BY 3.0
+by poikilos
+(based on Redshrike's
+overworld sprites:
+door, quad swirl,
+basis for wall & creatures
+Stephen Challener (Redshrike),
+hosted by OpenGameArt.org)

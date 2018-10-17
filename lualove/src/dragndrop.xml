@@ -1,0 +1,159 @@
+<appendix id="apx-drag">
+<title>Drag and drop</title>
+
+<para>
+  The examples in this book have primarily used clicking or key
+  presses for user interaction. LÖVE is capable of responding to other
+  forms of input, such as gamepads, touch screens, and mouse
+  movement.
+</para>
+
+<para>
+  All of the input functions are documented on
+  <link xlink:href="https://love2d.org/wiki">love2d.org&#47;wiki</link>, so mostly you can
+  use them as easily as key presses and mouse clicks. However,
+  dragging and dropping requires more code than simple if
+  statements.
+</para>
+
+<para>
+  A word of caution&#58; dragging and dropping as the only way to
+  interact with an application has accessibility issues. Selecting a
+  source and a target with either a click or a series of key presses
+  is easier for both users who need a screen-reader or have limited
+  mobility or are just plain uncoordinated, while controlling a mouse
+  can be difficult. Dragging and dropping also assumes that whatever
+  device your application is running on has the ability to process a
+  drag and a drop&#59; while most devices today have either a touch
+  screen or a mouse, you never know what tech will bring in the
+  future.
+</para>
+
+<para>
+  On the other hand, dragging and dropping is a valid mechanic, and it
+  can be useful for some styles of games.
+</para>
+
+<section xml:id="apx-dot">
+  <info>
+    <title>Draggable object</title>
+  </info>
+
+  <para>
+    For this demo, you need an object that you can drag. In practise,
+    this object would be whatever game asset you want your user to
+    move. For this example, create a file called
+    <filename>dot.lua</filename> and create the essential
+    attributes&#58; the X and Y coordinates, the item rotation, and
+    whether or not the item is currently moving.
+  </para>
+
+<programlisting><![CDATA[
+Dot = { }
+
+function Dot.init(x,y)
+   local self = setmetatable({}, Dot)
+   self.img = love.graphics.newImage("img.png")
+   self.x = x
+   self.y = y
+   self.moving = 0 --is it being dragged
+   self.r = 0 --rotation
+   return self
+end
+]]></programlisting>
+</section>
+
+<section xml:id="apx-main">
+  <info>
+    <title>Code</title>
+  </info>
+
+  <para>
+    The main code doesn&#39;t contain anything you haven&#39;t already
+    encountered, it just uses concepts in a way that&#39;s new to
+    you.   
+  </para>
+
+  <para>
+    A mouse press uses collision detection to determine whether the
+    user has clicked on a movable object. Even though there&#39;s only
+    one movable object in this example, all movable objects are in a
+    table, which this code calls <literal>hot</literal>. If the object
+    that has been clicked is movable, then it is rotated as a visual
+    cue and its <literal>moving</literal> variable is set to
+    <literal>1</literal>. The <literal>love.update</literal> function
+    ensures that the X and Y values of any moving object in the
+    <literal>hot</literal> table are constantly updated.
+  </para>
+
+  <para>
+    A mouse release action sets the object&#39;s rotation back to its
+    original orientation and sets its <literal>moving</literal>
+    variable back to <literal>0</literal>.
+  </para>
+  
+  <para>
+    Create a second file called <filename>main.lua</filename>, and add
+    this code&#58;
+  </para>
+
+<programlisting><![CDATA[
+require("dot")
+
+hot = {}
+
+function love.load()
+   Dot = Dot.init(300,300)
+   hot[#hot+1] = Dot
+end
+
+function love.update(dt)
+   for i,obj in ipairs(hot) do
+      if obj.moving == 1 then
+	 --DEBUG print(obj.x,obj.y)
+	 obj.x,obj.y = love.mouse.getPosition()
+      end
+   end
+end
+
+function love.draw()
+   for i,obj in ipairs(hot) do
+      love.graphics.draw(obj.img,obj.x,obj.y,obj.r,1,1,79,79)
+   end
+end
+
+function love.mousepressed(x,y,btn)
+   for i,obj in ipairs(hot) do
+      if x > obj.x and
+	 x < obj.x + obj.img:getWidth() and
+	 y > obj.y and
+      y < obj.y + obj.img:getHeight() then
+	 obj.moving = 1
+	 obj.r = 0.3
+      end
+   end
+end
+
+function love.mousereleased(x,y,btn)
+   for i,obj in ipairs(hot) do
+      obj.moving = 0
+      obj.r = 0
+   end
+end
+]]></programlisting>
+
+<para>
+  Add any image file, called <filename>img.png</filename> to your
+  project and test the code. You should be able to drag and drop the
+  object around your game window.
+</para>
+
+<para>
+  To detect whether one object has been dragged onto another object,
+  add more collision detection to this code to detect whether two
+  objects are overlapping or not. It&#39;s the same principle as
+  detecting mouse clicks.
+</para>
+
+</section>
+</appendix>

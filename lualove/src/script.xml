@@ -1,0 +1,1383 @@
+<chapter xml:id="script">
+  <info>
+    <title>Understanding computers through scripting</title>
+  </info>
+  
+  <para>
+    In the previous chapter, you got your Pi or SoC device to boot,
+    and then explored Lua from an interactive text console. That's
+    more than some first year computer science students learn about
+    how computers work, so consider yourself a success.
+  </para>
+
+    <para>
+      There&#39;s a lot more to learn, but first it&#39;s time to set
+      up a development environment.
+    </para>
+  
+  <section xml:id="script-dev">
+      <info>
+	<title>Establishing a development environment</title>
+      </info>
+
+      <para>
+	Having a development environment means having all the tools
+	you need to develop software, and having a place where you can
+	do that development without affecting the rest of your system
+	or letting the rest of your system affect your work.
+      </para>
+
+      <para>
+	First, you should install a desktop. That is, you want to make
+	your Pi boot to a graphical login screen, and give you a
+	desktop with files and folders, and so on. It's important, as
+	a programmer, to understand that you don't
+	<emphasis>need</emphasis> those things to use your Pi
+	effectively, but these are sometimes nice things to
+	have.
+      </para>
+
+      <para>
+	If your Pi already boots to a graphical interface, do this
+	section any way. In addition to you learning more about how
+	your Pi and Linux works, this section ensures that what you
+	see in front of you matches what this book expects.
+      </para>
+
+      <para>
+	For now, switch back to a text console using <keycombo>
+	<keycap>Ctrl</keycap>
+	<keycap>Alt</keycap>
+	<keycap>F3</keycap>
+      </keycombo>.
+      </para>
+      
+      <bridgehead>
+	Installing a desktop
+      </bridgehead>
+      
+      <para>
+	While Microsoft Windows and Apple Mac each have one desktop to
+	choose from, the UNIX world has several. In the future, as you
+	explore UNIX, you can find a desktop that suits your work
+	style. For now, use the Enlightenment desktop, a modern yet
+	lightweight desktop ideal for low-powered hardware like the
+	Pi. Lightweight desktops have a special name in UNIX: they are
+	called &#34;window managers&#34;.
+      </para>
+      
+      <para>
+	You might recall from the previous chapter that the Raspbian
+	command to install software is <command>apt</command>. Now
+	that you now know that the specific kind of desktop you're
+	meant to install is a window manager, try searching for that
+	term with <command>apt</command>. Enclose the term in quotes
+	since there's a space between the two words&#58;
+      </para>
+      
+      <programlisting><![CDATA[
+      $ apt search "window manager"
+      ]]></programlisting>
+
+      <para>
+	You probably get more results than will fit on your screen at
+	once. A feature of the UNIX shell is that you can
+	&#34;pipe&#34; the output of one command to serve as the input
+	of another command. To buffer screens and screens of data into
+	an interactive viewer, use the UNIX command
+	<command>less</command>&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ apt search "window manager" | less
+      ]]></programlisting>
+      
+      <para>
+	Use the <keycap>up</keycap> and <keycap>down</keycap> arrows
+	on your keyboard to scroll through the contents of
+	<application>less</application>. Look for a window manager
+	called <application>Enlightenment</application> or
+	<application>e17</application> for short &#40;or e18, or e20,
+	or whatever the latest version is when you read this
+	book&#41;. To return to a shell prompt, press the
+	<keycap>Q</keycap> key.
+      </para>
+
+      <note>
+	<para>
+	  <application>e17</application> refers to version 17 of the
+	  Enlightenment desktop. Enlightenment, not coincidentally,
+	  in programmed partly in Lua.
+	</para>
+      </note>
+
+      <para>
+	Before installing and using the Enlightenment desktop, you
+	need an application to let you sign in to the desktop. As with
+	all other applications in UNIX, there are several to choose
+	from, but I recommend <application>lightdm</application> for
+	the Pi. You can install both this and the desktop with one
+	command.
+      </para>
+      
+      <para>
+	This command will ultimately fail, but try it any way so
+	you can experience the error yourself&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ apt install e17 lightdm
+      ]]></programlisting>
+
+      <para>
+	The error tells you that you do not have permission to install
+	applications. On UNIX, just like on any computer, you must
+	have special permission to alter anything outside your home
+	directory.
+      </para>
+
+      <para>
+	You can grant yourself the privilege to make system-wide
+	changes with the <command>sudo</command> command. On a larger
+	UNIX system that you don&#39;t own &#40;such as a
+	supercomputer in a visual effects house or game studio&#41;,
+	you may not have <command>sudo</command> access, so you would
+	have to request permission from a system administrator. In
+	this case, however, your user is already in the
+	<command>sudo</command> group because you're the owner of the
+	Pi, so all you have to do is invoke the command and enter your
+	password &#40;the default password on Raspbian, remember, is
+	<literal>raspberry</literal>&#41;.
+      </para>
+
+      <programlisting><![CDATA[
+      $ sudo apt install e17 lightdm
+      ]]></programlisting>
+
+      <para>
+	Type <userinput>y</userinput> when prompted. This
+	time, your install works.
+      </para>
+
+      <note>
+	<para>
+	  It's automated on Raspbian, but if you&#39;re not on a
+	  Raspberry Pi or you had to use a different OS image, then
+	  you might need to tell your system to use what you have just
+	  installed. Do this with the <command>systemctl</command>
+	  command. In this context, you are only ensuring that
+	  defaults are set, so if you get any errors, then the
+	  defaults are probably already set, so you can ignore them.
+	</para>
+
+      <programlisting><![CDATA[
+      $ sudo systemctl set-default graphical
+      $ sudo systemctl enable lightdm
+      ]]></programlisting>
+      </note>	
+
+      <para>
+	When the install process is finished, reboot your Pi.
+      </para>
+      
+      <bridgehead>
+	Navigating the Enlightenment desktop
+      </bridgehead>
+      
+      <para>
+	After you reboot. you are greeted with a login screen as you
+	probably expect from a desktop or laptop computer. Don't
+	worry, the UNIX shell is still accessible to you, and you'll
+	still use it often during this book.
+      </para>
+
+      <para>
+	Log in to your Pi using the same user name and password
+	as before. The first time you log in, you must step through a
+	setup sequence for the Enlightenment desktop. Most options are
+	obvious, but here is clarification on some items that might be
+	unfamiliar to you&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    profile: choose <literal>computer</literal>, unless you
+	    are using a touchscreen
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    focus: choose <literal>click</literal> to emulate your
+	    desktop experience on Windows or Mac
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    network manager: the Enlightenment network manager is not
+	    needed, so just click through any warning about installing
+	    <application>ConnMan</application>
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    compositing: choose OpenGL for faster graphics. If your
+	    device can't handle that, it will warn you and fallback to
+	    what it can do
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    updates: accept the default
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    taskbar: accept the default
+	  </para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>
+	Once you've gone through the setup, you're delivered to
+	your new desktop. As long as you have used a computer before,
+	Enlightenment feels pretty familiar, although it has a few
+	interesting features you might find fun.  For instance, notice
+	that clicking on any empty space on the desktop produces a
+	system menu for your convenience. This means that no matter
+	where you are, you're just a click away from launching an
+	application. This will be useful once you have applications you
+	want to launch&#33;
+      </para>
+
+      <para>
+	Another interesting feature of the UNIX desktop is that the
+	desktop is bigger than what you see in your monitor. To get a
+	feel for how it works, double-click the
+	<guibutton>Home</guibutton> icon that appears in the upper
+	left corner of your screen. This opens a file manager window
+	to your home directory, the place where all of your data is
+	stored. Click the <guibutton>up</guibutton> arrow icon in the
+	upper right corner of this window to maximize it so that it
+	fills your screen. Now your monitor is occupied by one
+	window. You could open up another application and work on top
+	of it, switching back and forth between them with
+	<keycombo>
+	  <keycap>Alt</keycap>
+	  <keycap>Tab</keycap> </keycombo>, just as you would on any
+	  other computer, but some people find it more sane to just
+	  scroll over to a new workspace. At the bottom of your
+	  screen, there are four empty spaces. One is highlighted with
+	  an indicator. The highlighted space is the desktop you are
+	  currently on, but if you click the one next to it, you're
+	  whisked away to a clean desktop. Of course, you can click
+	  back to your previous desktop just as easily.
+      </para>
+
+      <bridgehead>
+	Installing development applications
+      </bridgehead>
+
+      <para>
+	Now that you have a desktop installed, you need all the usual
+	programming tools that software developers use on a daily
+	basis. There are lots of tools that a programmer might use,
+	depending on what the project demands, but there are some
+	things that are expected no matter what. These include:
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Text editor: a person who codes needs an application to
+	    write code in. Most programmers use a special kind of text
+	    editor called an <firstterm>Integrated Development
+	    Environment</firstterm> (IDE), which not only edits text
+	    but also knows enough about the language being used to add
+	    convenience features such as word completion, bug
+	    highlighting, and file management.
+	  </para>
+
+	  <para>
+	    Popular IDEs include Eclipse, QtCreator, and
+	    Netbeans. This book uses <application>Geany</application>,
+	    a lightweight IDE that's perfect for the Pi and Lua.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Terminal: it's helpful to have direct access to the
+	    platform you're programming. A terminal gives you a shell
+	    prompt as an application inside your desktop. No more
+	    switching back to a text console with
+	    <keycombo>
+	      <keycap>Ctrl</keycap>
+	      <keycap>Alt</keycap>
+	      <keycap>F3</keycap>
+	      </keycombo>&#33;
+	  </para>
+	  <para>
+	    There are many terminal emulators for Linux; this
+	    book uses <application>QTerminal</application>.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Git: programming is all about
+	    <firstterm>iteration</firstterm>. You try something, test
+	    it, improve it, and then try it again. With so many
+	    iterations, it's helpful to have a historical record of
+	    each attempt you make at solving a problem. Git is the
+	    basis for popular sites like <link
+	    xlink:href="http://gitlab.com">Gitlab</link> and <link
+	    xlink:href="http://github.com">Github</link>, so it's a
+	    good version control system to learn.
+	  </para>
+	  <para>
+	    There are many interfaces to Git. This book uses a plain
+	    old terminal as well as
+	    <application>git-cola</application>.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Web browser: if you are going to refer to the Lua
+	    reference manual, you need a way to access the
+	    Internet. This book recommends the lightweight
+	    <application>qupzilla</application> browser.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Software catalog: to make it easier to find software in
+	    the future, install the
+	    <application>synaptic</application> package manager
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	That's not all you'll need to complete this book, but it's a good start for now.
+      </para>
+
+      <para>
+	You have already installed an entire desktop, so you basically
+	already know how to install your development
+	&#34;stack&#34;. First, return to your text console with
+	<keycombo>
+	<keycap>Ctrl</keycap>
+	<keycap>Alt</keycap>
+	<keycap>F3</keycap>
+	</keycombo>. Once there, log in again with your user name and password.
+      </para>
+
+      <para> There&#34;s a lot of great software out there for Linux,
+      so you could search for packages to install, and then try each
+      one out until you find the one you like best. You are encouraged
+      to do that some time when you have a free month or two, but for
+      the sake of efficiency, install these fine applications&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ sudo apt install qterminal geany geany-plugin-lua git-cola qupzilla synaptic
+      ]]></programlisting>
+
+      <para>
+	Once everything has installed, switch back to your desktop with <keycombo>
+	<keycap>Ctrl</keycap>
+	<keycap>Alt</keycap>
+	<keycap>F7</keycap>
+      </keycombo>
+      </para>
+    </section>
+
+    <section xml:id="script-exercise">
+      <info>
+	<title>Exercise</title>
+      </info>
+
+      <para>
+	Before you start the next section, take some time to explore
+	your desktop. Here are some things you might try&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Launch the <application>Qupzilla</application> web
+	    browser, download a desktop wallpaper from the Internet,
+	    and set it as your desktop background.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Try to locate hidden files in your home directory. Don't
+	    do anything with them, just learn how to view and hide
+	    them again.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Customize some of the settings of your desktop, like the
+	    position of the shelf, or the fonts used in window titles,
+	    and so on.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Right-click on the desktop slots at the bottom of the
+	    screen and choose <guimenuitem>Virtual Desktop
+	    Settings</guimenuitem>. Customize what prompts a desktop
+	    flip, and the animation it uses to represent it.
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	Getting comfortable with your workstation is important, and
+	there's no limit to the ways that Linux can be
+	customized. Explore your new world, and when you're feeling at
+	home and ready to code, start the next chapter.
+      </para>
+    </section>
+
+    <section xml:id="script-lua">
+      <info>
+	<title>Creating a graphical game</title>
+      </info>
+
+      <para>
+	The dice game you experimented with in the previous chapter
+	demonstrated to you some of the very basic principles of code,
+	but now it's time to program a game with graphics, and that
+	someone else can play without having to type the code in
+	first. To keep things simple, why not try a revised version of
+	the dice game.
+      </para>
+
+      <para>
+	You may as well start off with proper organization, so create
+	a folder &#40;or &#34;directory&#34;, in UNIX terminology&#41;
+	for your first Lua project.
+      </para>
+
+      <para>
+	You can do this two different ways. Maybe the most obvious way
+	is just as you would on any computer you're used to:
+	double-click the <guilabel>home</guilabel> icon on the desktop
+	to open a window to your personal directory, and then
+	right-click in the empty space of the window and choose
+	<guimenuitem>New</guimenuitem> &#62;
+	<guimenuitem>Directory</guimenuitem>. Call you new directory <filename>dice</filename>.
+      </para>
+
+      <para>
+	The other way is slightly faster. Launch the <application>QTerminal</application> application from either the right-click menu or the application menu on the left end of the shelf at the bottom of the screen. In the terminal window, type&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+	$ mkdir dice
+      ]]></programlisting>
+
+      <para>
+	Remember that the <literal>$</literal> is your shell prompt, so don't type that.
+      </para>
+
+      <para>
+	Whatever way you choose, the end result is a new directory in
+	your home, called <filename>dice</filename>. This is where the
+	data files for this, your first game, must be stored.
+      </para>
+
+      <para>
+	You are going to write your code in your IDE &#40;Integrated Development Environment&#41;, called Geany. Launch Geany now using either your desktop menu or the shelf menu. You can even launch it from a terminal, if you have one open&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ geany&
+      ]]></programlisting> 
+
+      <note>
+      <para>
+	The <literal>&amp;</literal> tells your shell to launch an
+	application and then return you to your shell
+	prompt. Sometimes, when debugging, it's useful to leave off
+	the <literal>&amp;</literal> so that you maintain a link with the
+	running application and get to see any messages it sends.
+      </para>
+      </note>
+
+      <para>
+	The Geany IDE is highly configurable, with many themes and
+	plugins. You can spend some time to customize it, but at the
+	very least click the <guimenu>Tools</guimenu> menu and select
+	<guimenuitem>Plugin Manager</guimenuitem>. In the
+	<guilabel>Plugin Manager</guilabel> window, select the
+	<guimenuitem>Lua</guimenuitem> and <guimenuitem>File
+	Browser</guimenuitem> plug-ins to activate and enable them.
+      </para>
+
+      <bridgehead>
+	Load and main loop
+      </bridgehead>
+
+      <para>
+	Once you&#39;ve configured Geany, coding can begin. Before coding
+	dice rolls as you did in the first iteration of the game,
+	there's some setup to make this a graphical game. The first
+	thing you need are the libraries to let Lua produce
+	graphics. There are a few different libraries that could be
+	used for this, because there are several GUI frameworks that
+	provide Lua &#34;hooks&#34;. However, you are specifically
+	looking to make games, and conveniently there are
+	<firstterm>game engines</firstterm> that can be controlled by
+	Lua scripts. Just as Lua itself has built-in functions for
+	common tasks, like <function>math.random</function>, game
+	engines have functions for common game tasks, like launching a
+	window that can go full-screen on demand, listeners for
+	joystick and mouse input, physics, and so on.
+      </para>
+
+      <para>
+	The LÖVE engine is a game framework written specifically for
+	Lua. You can install it two different ways. You can either
+	launch the <application>Synaptic</application> package manager
+	and search for <literal>love2d</literal> and install the
+	result, or you can launch <application>QTerminal</application>
+	and type&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ sudo apt install love2d
+      ]]></programlisting>
+
+      <para>
+	LÖVE is a set of libraries for Lua, so it isn&#39;t an application
+	you launch to write code. Instead, you use LÖVE functions in
+	your code.
+      </para>
+
+      <para> First, create two variables to set the window size for
+      your game. This is a simple dice game and the Pi isn&#39;t a very
+      powerful computer, so keep the window size small. At the very
+      top of your file, type this&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      view_w = 777
+      view_h = 472
+      ]]></programlisting> 
+
+      <para>
+	Creating variables for the size of the window doesn&#39;t do
+	anything special. These are normal variables containing normal
+	numbers. It&#39;s how the game script uses these variables that
+	actually sets the window size.
+      </para>
+
+      <para>
+	The LÖVE game engine is programmed to do just two things
+	automatically when it's launched: call the
+	<function>love.load()</function> function once, and then call
+	the <function>love.draw()</function> function until the user
+	quits. So for LÖVE to do anything with your game, you need to
+	create both of those functions. LÖVE doesn't care what's in
+	those functions, and in fact it expects you to fill that in
+	for yourself. In other words, it's in these functions that the
+	actual game code is going to go.
+      </para>
+
+      <para>
+	Make your game code look like this&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      view_w = 777
+      view_h = 472
+
+      function love.load()
+      -- loads once at launch
+      end
+
+      function love.draw()
+      -- main loop
+      end
+      ]]></programlisting>
+      
+      <para>
+	Notice that functions in Lua end with the keyword
+	<literal>end</literal>. The text within each function block
+	now are called comments. A comment is a line of code that the
+	computer ignores. They're just notes for the programmer.
+      </para>
+
+      <programlisting><![CDATA[ 
+      -- in Lua, this is a comment
+      ]]></programlisting> 
+
+      <para>
+	Spawning a window for your game is a one-time task. When the
+	user launches your game, the window's attributes, like the
+	size, title, and background color, only needs to happen
+	once. After those attributes are set, LÖVE can move on to the
+	rest of the code. This means, of course, that window setup
+	should happen in the <function>love.load()</function>
+	function.
+      </para>
+
+      <para>
+	Add this to your game code&#58;
+      </para>
+      
+      <programlisting><![CDATA[ 
+      function love.load()
+          -- loads once at launch
+          love.window.setMode(view_w,view_h,{resizable=false, vsync=false})
+          love.window.setTitle('DiCE')
+          love.graphics.setBackgroundColor(0,0,0)
+      end
+      ]]></programlisting>
+	    
+      <para>
+	Most of the names of the functions are pretty descriptive, so
+	you can probably surmise what they
+	do. <function>love.window.setMode</function> sets the width
+	and height of the window, using the variables
+	<varname>view_w</varname> for width and
+	<varname>view_h</varname> for height.
+      </para>
+      <para>
+	The <function>love.window.setTitle</function> function sets
+	the title in the window's title bar, and
+	<function>love.graphics.setBackgroundColor</function> sets the
+	background of the window to the RGB value 0,0,0
+	&#40;black&#41;.
+      </para>
+
+      <para>
+	It's not much to look at, but you can launch your game as
+	is. To see what you've created so far, first save your
+	file. If you don't remember to save before previewing your
+	game, you won't see your changes, so get used to saving often.
+      </para>
+
+      <para>
+	After your changes are saved, click the <guilabel>terminal</guilabel> tab in the bottom left of the <application>Geany</application> window. The bottom panel of <application>Geany</application> now gives you a shell prompt. Change your working directory to your game folder&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ cd ~/dice
+      ]]></programlisting>
+
+      <para>
+	The <command>cd</command> command stands for <emphasis>change directory</emphasis>, and the <literal>~</literal> symbol is shorthand for <emphasis>your home directory</emphasis>.
+      </para>
+
+      <para>
+	Now that you are in the <filename>dice</filename> directory, start LÖVE, pointing it to your current directory. In UNIX, your current position in the shell is represented by a dot&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ love .
+      ]]></programlisting>
+      
+      <para>
+	An empty window appears. Notice that its title is <guilabel>DiCE</guilabel>.
+      </para>
+
+      <para>
+	Close the window once your excitement has subsided. For this
+	second iteration of the dice game, don&#39;t worry about how
+	the game looks, just focus on the code. Making the game look
+	good happens in the next iteration.
+      </para>
+
+      <para>
+	You know from the previous version of the dice game that there
+	are three events that must happen for the game to work. The
+	computer must roll die, the player must roll die, and then the
+	values of the roll must be revealed.
+      </para>
+
+      <para>
+	This process is familiar to you. There&#39;s nothing specific
+	to LÖVE here, this is plain old Lua. Add die rolling to the code &#40;the first and last lines are already in your code, but are here for context&#41;&#58; 
+      </para>
+      
+      <programlisting><![CDATA[ 
+    love.graphics.setBackgroundColor(0,0,0)
+    math.randomseed(os.time())
+    player = math.random(1,20)
+    computer = math.random(1,20)
+    ]]></programlisting>
+
+      <para>
+	In the previous version of the game, it was up to the user to
+	compare the rolls and to determine who had won. This time, let
+	Lua compare the values and determine the winner. To do that,
+	you must use two of the most common logic tools in
+	programming: math operators and an if&#47;then statement.
+      </para>
+
+      <para> This will not work, but it's a good lesson, so add this
+      to your code.  The first line is for context&#58;
+      </para>
+      
+      <programlisting><![CDATA[
+      computer = math.random(1,20)
+
+      love.graphics.setColor(255, 255, 255)
+      if player > computer then
+          love.graphics.printf("Player wins!", 0, view_h*0.5,view_w*0.5, 'center')
+	  print("Player wins!")
+      else
+          love.graphics.printf("Computer wins!", 0, view_h*0.5,view_w*0.5, 'center')
+	  print("Computer wins!")
+      end
+      ]]></programlisting>
+      
+      <para>
+	An if&#47;then <firstterm>conditional</firstterm> statement
+	does exactly what an if&#47;then statement does when you use
+	one in everyday speech. If <emphasis>one</emphasis> thing is
+	true, then do <emphasis>one</emphasis> thing, otherwise do
+	<emphasis>something</emphasis> else. In this example, the
+	if&#47;then statement hinges upon whether or not the contents
+	of the variable <varname>player</varname> is greater than the
+	contents of the variable <varname>computer</varname>. It would
+	be equally effective if it depended upon
+	<varname>computer</varname> being less than
+	<varname>player</varname>.
+      </para>
+
+      <para>
+	From the LÖVE library, the code uses the
+	<function>graphics.setColor</function> function to set the
+	foreground color, and the <function>graphics.printf</function>
+	to print text on the screen. Just as the standard Lua
+	<function>print</function> function requires a
+	<firstterm>parameter</firstterm>, specifically
+	<emphasis>what</emphasis> to print, the
+	<function>love.graphics.printf</function> function requires
+	several: what to print, when to line wrap, the location along
+	the X and Y axis, and text justification. These parameters
+	must be given in the order specified by the function&#39;s
+	documentation, located at
+	<link xlink:href="https://love2d.org/wiki/love.graphics.printf">
+	  love2d.org/wiki/love.graphics.printf
+	</link>.
+      </para>
+
+      <para>
+	Try your game to see what happens.
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ cd ~/dice
+      $ love .
+      ]]></programlisting>
+
+      <para>
+	The game window opens, but it&#39;s still just a blank
+	window. This makes it seem like your game doesn't work, but if
+	you look at the terminal, assuming you launched the game in
+	Geany, then you see that Lua did print a winner to your
+	standard output. So the underlying game logic is sound.
+      </para>
+
+      <para>
+	The problem, in fact, is that your game's text got written to
+	the screen but only persisted for a millisecond or so. The
+	<function>love.load()</function> function only gets called
+	once per launch, but a screen is refreshed constantly and at a
+	rate much faster than your eye can detect. To generate
+	graphics that get refreshed for as long as the game is
+	running, use the <function>love.draw()</function> function.
+      </para>
+
+      <para>
+	Update your code to match this&#58;
+      </para>
+      
+      <programlisting><![CDATA[
+      computer = math.random(1,20)
+      end
+
+      function love.draw()
+          love.graphics.setColor(255, 255, 255)
+          if player > computer then
+              love.graphics.printf("Player wins!", 0, view_h*0.5,view_w*0.5, 'center')
+	      print("Player wins!")
+          else
+              love.graphics.printf("Computer wins!", 0, view_h*0.5,view_w*0.5, 'center')
+	      print("Computer wins!")
+          end	   
+      end
+      ]]></programlisting>
+      
+      <para>
+	Try your game again.
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ love .
+      ]]></programlisting>
+
+      <para>
+	This time, the winner is printed to the graphical game
+	screen. The message also prints infinitely in your terminal,
+	and that provides you with some insight about why the text
+	remains visible in the game window&#58; the message isn&#39;t
+	just being written once, but several times as your screen
+	refreshes.
+      </para>
+
+      <bridgehead>
+	Graphics and fonts
+      </bridgehead>
+
+      <para>
+	There are a few problems with the game in its current
+	state. First, it isn't very interactive. A player isn't likely
+	to feel that they're rolling the die, virtual or otherwise,
+	because the game just launches and declares a winner. In a
+	related issue, there's no way to roll again except by closing
+	the game and launching it again. And finally, the game isn't
+	much to look at. It has no graphics, the font it uses is
+	boring, and there's generally nothing visually to suggest that
+	this humble application is a game.
+      </para>
+
+      <para>
+	To incorporate graphics and an attractive font, you must have
+	graphics and a font to not only use but that you&#39;re
+	permitted to ship with your game when you distribute it. You
+	probably are&#39;t going to distribute this first dice game
+	that you make, but it&#39;s a good habit to get familiar with
+	the three kinds of assets that you can use in your games&#58;
+	original, Creative Commons, and commissioned. The latter is
+	art that you have someone else make for you, with the express
+	permission granted for you to use the artwork in your
+	game. Creative Commons is the same, in principle; someone else
+	makes art, posts it to the Internet along with some level of
+	permission for you to reuse it &#40;usually you are required,
+	at least, to give them credit for their work, which seems only
+	fair&#41;. Failing those resources, you can just make your own
+	artwork.
+      </para>
+
+      <para>
+	For the sake of brevity, have a look at <link
+	xlink:href="http://openclipart.org">OpenClipArt.org</link>, a
+	website full of Creative Commons artwork. You can search for
+	dice and find several results, but in order to roll dice and
+	show the result, you need one image per side of dice. To
+	simplify the effort, this example uses 6-sided dice instead of
+	20. To make the game look a little more high tech than it
+	actually is, this example eschews traditional dice and instead
+	uses a <link
+	xlink:href="https://openclipart.org/detail/117277/digital-die-0">2-dimensional
+	design</link>. Traditional dice would be very familiar, but
+	the results would be immediately obvious. Since there's not
+	that much going on in this game, using a non-traditional
+	representation of a dice roll forces an unsuspecting user to
+	solve a little puzzle to figure out why the player or the
+	computer wins with each roll. In other words, the game adds a
+	game to the game.
+      </para>
+
+      <para>
+	Fonts have the same requirements as graphics. To use them in
+	your game, you have to send the font file along with your
+	game, and to do that legally, you must respect the license of
+	whatever font you choose. Fonts don't often use a Creative
+	Commons license, but have their own special Open Font License
+	or GNU General Public License, or similar. There are several
+	good sites offering fonts. This example uses the boldly
+	futuristic font Orbitron from <link
+	xlink:href="https://www.theleagueofmoveabletype.com/orbitron">TheLeagueOfMoveableType.com</link>,
+	which is a good source of openly-licensed fonts while, at the
+	same time, not having so many options as to be overwhelming.
+      </para>
+
+      <para>
+	Create two new directories in your dice folder, one called
+	<filename>font</filename> and the other called
+	<filename>img</filename>. To create a new directory,
+	right-click in your dice folder and select
+	<menuchoice>
+	  <guisubmenu>New</guisubmenu>
+	  <guimenuitem>Directory</guimenuitem>
+	</menuchoice>.
+      </para>
+
+      <para>
+	To create the new directories from the terminal&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      $ mkdir ~/dice/{img,font}
+      ]]></programlisting> 
+
+      <para>
+	Download the dice graphics as PNG files and the font
+	now. Place the dice graphic files into the
+	<filename>img</filename> directory and the font TTF and LICENSE files
+	into the <filename>font</filename> directory.
+      </para>
+
+      <para>
+	Graphics from openclipart.org do not require attribution, so you do not have to credit the creator. Obligation is one thing, and being a good sport is another, so create a new file in Geany called CREDIT. Open the file and list the assets you are using&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      Dice graphics by Orsonj
+      https://openclipart.org/detail/117277/digital-die-0
+
+      Font by the League of Moveable Type
+      https://www.theleagueofmoveabletype.com
+      ]]></programlisting>
+
+      <bridgehead>
+	Tables
+      </bridgehead>
+      
+      <para>
+	In the current iteration of the game, the variables
+	<varname>computer</varname> and <varname>player</varname>
+	contain one piece of information each. The new iteration, like
+	probably any game you do from this point on, is more complex.
+	One attribute per "object" in your program is not enough. For
+	instance, the <varname>player</varname> in your game must
+	contain a number representing its dice roll as well as a
+	graphic that shows your user what that roll was. That's at
+	least two data for one variable. Surely that's not possible!
+      </para>
+
+      <para>
+	Of course, Lua has a way to make this possible. Lua uses
+	<literal>tables</literal> to store a list of variables along
+	with what those variables contain. At the very top of your
+	file, create two new tables, one for each &#34;player&#34;.
+      </para>
+
+      <programlisting><![CDATA[ 
+      human = {}
+      computer = {}
+      ]]></programlisting>
+
+      <para>
+	The tables don't contain variables yet, but you can add them
+	as needed. For instance, give each player a name in the
+	<function>love.load</function> function. The first three lines are for context&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      math.randomseed(os.time())
+      computer = math.random(1,20)
+      player = math.random(1,20)
+      player.name = "You"
+      computer.name = "Computer"      
+      ]]></programlisting>
+
+      <para>
+	You can also set the graphic of each player to a neutral position. In terms of the digital die graphic used in this example, neutral is die position 0.
+      </para>
+
+      <programlisting><![CDATA[  
+      player.img = love.graphics.newImage('img/digital-die0.png')
+      computer.img = love.graphics.newImage('img/digital-die0.png')
+      ]]></programlisting>
+
+      <para>
+	You also need some useful variables outside of the players. For instance, set the font for the game&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      font = love.graphics.setNewFont("font/orbitron-bold-webfont.ttf",72)
+      ]]></programlisting>
+
+      <para>
+	The font size is set to <literal>72</literal> points. That will be important later.
+      </para>
+      
+      <bridgehead>
+	Game and GUI logic
+      </bridgehead>
+
+      <para>
+	When you were running your dice game from the Lua shell,
+	everything was instantaneous. Applications with graphical user
+	interfaces, by nature, tend to sit idly until the user tells
+	it to do something. Currently, your GUI dice game launches,
+	rolls the dice, and announces a winner. You need to slow it
+	down so that it waits for the user before taking action.
+      </para>	
+
+      <para>
+	Common conventions for making a GUI application do something
+	are buttons and menus. Both of these are usually triggered by
+	a mouse click. Why not make the dice game wait to roll die
+	until the user clicks the mouse? The act of clicking on the
+	game screen helps the user feel that they have more
+	involvement with the game, and also makes the game something
+	that can be played several times without having to be closed
+	and the reopened.
+      </para>
+
+      <para>
+	You already know that the main loop of a LÖVE game is the
+	<function>love.draw</function> function, so that's the part of
+	your code that you need to control. The first task is to force
+	<function>love.draw</function> to wait for input before
+	displaying any change. A common trick for such a control is to
+	create a variable and then force the main loop to wait for
+	that variable to change before taking action.
+      </para>
+
+      <para>
+	For this game, use a variable called <varname>start</varname>
+	set to <literal>true</literal> to indicate that a new game has
+	been launched, but that the main loop is waiting for input
+	from the user. Create the variable in
+	<function>love.load</function> so that the game begins in the
+	<varname>start</varname> mode.
+      </para>
+
+      <programlisting><![CDATA[ 
+      start = true
+      ]]></programlisting>
+
+      <para>
+	Erase whatever you have in the <function>love.draw</function>
+	function, replacing it with a conditional statement that
+	checks whether <varname>start</varname> is true or not. If it
+	is not true, then the game commences. If true, it draw
+	the neutral die graphic&#58;
+      </para>
+
+      <para>
+	There's quite a bit of math involved in positioning the
+	graphics. You originally set the game window sizes in the
+	global variables <varname>cw</varname> &#40;canvas width&#41;
+	and <varname>ch</varname> &#40;canvas height&#41;, so you know
+	the area you have to work with.
+      </para>
+
+      <para>
+	In most computer graphic applications, LÖVE included, the
+	upper left corner of the canvas is 0, and the X and Y axis
+	increase to the right and down screen.
+      </para>
+
+      <mediaobject>
+	<info>
+	  <othercredit>
+	    <orgname>Slackermedia</orgname>
+	  </othercredit>
+	</info>
+	<alt>Screen coordinates</alt>
+	<imageobject>
+	  <imagedata align="right" width="6in" format="PNG"
+		     fileref="img/ch2_cartesian.png"/>
+	</imageobject>
+      </mediaobject>
+		    
+      <para>
+	Technically, you could start the first dice display at 0, but
+	so that it's not crowded against the left window edge, the
+	example code indents it by 33 pixels. The same holds true for
+	the distance from the top edge, which gets indented by 30
+	pixels. The offset of the dice are set to 0, and the scale is
+	set to 0.2, because the source graphics are larger than the
+	screen.
+      </para>
+
+      <para>
+	The dice display on the right of the screen is slightly
+	different. To determine its position along the X axis, the
+	width of the canvas is divided in half &#40;or multiplied by
+	0.5, as the case may be&#41;. You could do that math yourself,
+	and then put in the number manually &#40;777*0.5=388&#41; but
+	if you ever changed the canvas size, you'd have to go through
+	your code and find all the wrong numbers and
+	recalculate. Well, that's exactly what computers are for, so
+	it's much smarter to take the time to figure out the correct
+	equation rather than doing the math yourself.
+      </para>
+      
+      <programlisting><![CDATA[ 
+      function love.draw()
+        if start == false then
+	  -- do something here
+        end
+
+        love.graphics.draw(human.img,   33,    30,0,0.2,0.2)
+        love.graphics.draw(computer.img,cw*0.5,30,0,0.2,0.2)
+      end
+      ]]></programlisting>
+
+      <para>
+	Save and then launch the game. At the very least, it shows you
+	the neutral positions of the die. Not terribly exciting, but
+	it's a good start.
+      </para>
+
+      <bridgehead>
+	Mouse click
+      </bridgehead>
+
+      <para>
+	One of the nice things about using a game engine is that
+	there's a lot of code already written for you. Listening and
+	processing mouse events is a perfect example of that. Imagine
+	having to write the code to monitor the system for mouse
+	clicks, especially given that different operating systems and
+	platforms send mouse click events differently. LÖVE takes care
+	of all of that for you.
+      </para>
+
+      <para>
+	Interestingly, it's technically not the mouse
+	<emphasis>click</emphasis> that you want, but the mouse
+	release. If you set your game to start its main loop when a
+	mouse is clicked, then it might get very confused if a user
+	clicks and holds the button down for 10 seconds before
+	releasing. A release, on the other hand, only happens once. To start the game when the mouse button is released, set the <varname>start</varname> variable to <literal>false</literal>.
+      </para>
+
+      <para>
+	Add this function at the bottom of your code&#58;
+      </para>
+
+      <programlisting><![CDATA[ 
+      function love.mousereleased()
+      start = false
+      end
+      ]]></programlisting>
+
+      <para>
+	It's when the mouse button is released that the dice actually
+	get rolled, so instead of putting the dice rolls in
+	<function>love.load</function>, that dice rolls must happen in
+	the <function>love.mousereleased</function> function. Remove
+	these lines from <function>love.load</function>&#58;
+      </para>
+      
+      <programlisting><![CDATA[ 
+      player = math.random(1,20)
+      computer = math.random(1,20)
+      ]]></programlisting> 
+
+      <para>
+	And add dice rolls to the
+	<function>love.mousereleased</function> function, storing the
+	result in the appropriate human or computer table. After the
+	rolls happen, change the graphic in the <varname>img</varname>
+	variable of each player to the corresponding dice image.
+      </para>
+
+      <programlisting><![CDATA[ 
+      start = false
+      computer.roll = math.random(1,6)
+      human.roll = math.random(1,6)
+      -- set graphics
+      human.img = love.graphics.newImage('img/digital-die'..human.roll..'.png')
+      computer.img = love.graphics.newImage('img/comp-die'..computer.roll..'.png')
+      ]]></programlisting>
+
+      <para>
+	To drive home the point, your game should declare a winner. This logic happens in the <function>love.mousereleased</function> function, since it only needs to happen when the mouse button is released. Add this conditional statement to the bottom of your code, and then close the <function>love.mousereleased</function> function&#58;
+      </para>
+      
+      <programlisting><![CDATA[       
+        if human.roll > computer.roll then
+          human.win = true
+        else
+          human.win = false
+        end
+      end
+      ]]></programlisting>
+
+      <para>
+	With all the important variables set depending on how the dice
+	roll, the main loop has relatively little to do in terms of
+	logic. However, the main loop is still important to keep the
+	graphics going, so now it's time to make sure the interface
+	responds appropriately to input.
+      </para>
+
+      <para>
+	You've already set the main loop to appear dormant until it
+	receives input from the user, but it should also react once a
+	mouse button is released. Specifically, it should look at the
+	variables of the players to determine who has won the roll and
+	announce the winner.
+      </para>
+
+      <para>
+	Insert a another conditional statement in the main loop that
+	checks for a winner. Announce the winner by printing a message
+	to the screen using the
+	<function>love.graphics.printf</function> function. To help differentiate between the human user and the computer, this example changes the foreground color to either green or red when writing the font to screen, and then back to white for general purpose drawing.
+      </para>
+
+      <note>
+	<para>If you fail to reset the color to white, your other graphic elements might be rendered incorrectly.
+      </para>
+      </note>
+
+      <para>
+	You can choose whatever colour you prefer. If you don&#39;t think in RGB colors, click the <menuchoice>
+	<guimenu>Tools</guimenu><guimenuitem>ColorChooser</guimenuitem>
+	</menuchoice>. Choose a color and then use the red, green, and
+	blue values along the right side of the
+	<guilabel>ColorChooser</guilabel> window.
+       </para>
+
+       <para>
+	 Determining the correct position of the text and graphics
+	 takes a little bit of math. Notice that the variables
+	 <varname>cw</varname> &#40;canvas width&#41; and
+	 <varname>ch</varname> &#40;canvas height&#41; are used to
+	 create a sort of invisible &#34;text box&#34; that is as wide
+	 as the canvas and that extends all the way down the canvas
+	 height <emphasis>minus</emphasis> 76 pixels. Why 76 pixels?
+	 Because the font was set to 72 points in the
+	 <function>love.load</function> function, so taking the height of the canvas minus the size of the font ensures that the text is printed, more or less, along the bottom border of the window.
+       </para>
+		
+      <programlisting><![CDATA[ 
+        if start == false then
+          if human.win == true then
+            love.graphics.setColor(20, 255, 20)
+            love.graphics.printf("human wins!", 0, ch-76,cw, 'center')
+            love.graphics.setColor(255, 255, 255)
+          else
+            love.graphics.setColor(255, 20, 20)
+            love.graphics.printf("Computer wins!", 0, ch-76,cw, 'center')
+            love.graphics.setColor(255, 255, 255)
+          end
+      ]]></programlisting>
+
+      <para>
+	Try your game now. It responds to your click, changes the dice
+	graphics, and announces a winner. What more could a user
+	possibly want?
+      </para>
+      
+      <para>
+	Well, since there's no visual cue for the user that the game
+	is waiting for a mouse click and hasn't just crashed, it would
+	be better UI design to provide guidance for a new user. This
+	can be implemented as an alternative to the
+	<varname>start</varname> condition. If
+	<varname>start</varname> is true, then that means the user has
+	just started the game and has not yet clicked the mouse button
+	&#40;if the button had been clicked, the screen would display
+	the winner and the <varname>start</varname> would be set to
+	<literal>false</literal>&#41;.
+      </para>
+
+      <para>
+	Add a friendly start message. The first three lines are for context.
+      </para>
+	 
+      <programlisting><![CDATA[ 
+            love.graphics.printf("Computer wins!", 0, ch-76,cw, 'center')
+            love.graphics.setColor(255, 255, 255)
+          end
+        else
+	  -- start message 
+          love.graphics.printf("Click to roll", 0, ch-76,cw, 'center')
+        end
+      ]]></programlisting>
+
+      <bridgehead>
+	Packaging
+      </bridgehead>
+
+      <para>
+	You now have a fully functional dice rolling game. It's
+	simple, but it's only about 50 lines of code and demonstrates
+	many important principles of game logic, UI design, and
+	programming fundamentals.
+      </para>
+
+      <para>
+	It's programmed in LÖVE, so any of your friends or family can
+	play it as long as they install love on their
+	platform. However, if you send them a folder of code, images,
+	and fonts, they won't know what to do with it. It's time to
+	package up your game for distribution.
+      </para>
+
+      <para>
+	LÖVE files are nothing more than ZIP files with a special
+	suffix, so a redistributable LÖVE games are remarkably easy
+	to build. In a terminal &#40;you can use the one in
+	<application>Geany</application> or you can launch
+	<application>QTerminal</application>&#41;, use the
+	<command>zip</command> command to bundle up the main.lua file,
+	the <filename>font</filename> directory, and the
+	<filename>img</filename> directory into a game file called
+	<application>dice.love</application>&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ cd ~/dice
+      $ zip dice.love -r main.lua font img
+      ]]></programlisting>
+
+      <para>
+	Open a desktop window to your <filename>dice</filename> folder
+	and double-click <application>dice.love</application>. Your
+	game launches just like any normal application would. You can
+	send this file to anyone you want to, and as long as they
+	install LÖVE, they can play your game.
+      </para>
+    </section>
+    
+    <section xml:id="script-work">
+      <info>
+	<title>Homework</title>
+      </info>
+
+      <para>
+	The <function>love.mousereleased</function> function accepts
+	three parameters from your operating system&#58; the X and Y
+	coordinates of where the mouse was clicked and which button it
+	was that got released.
+      </para>
+
+      <para>
+	Try these hacks&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Using these parameters, try to create a version of the game
+	    that only responds to a left-click &#40;button 1&#41;.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Using the same parameters, add a cheat to the game such that
+	    the computer automatically wins if the right mouse button
+	    &#40;button 2&#41; is released, and the player automatically
+	    wins if the middle button &#40;button 3&#41; is released.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    If you are feeling particularly brave, try this
+	    advanced exercise&#58; change which dice display represents
+	    the player depending on which one side of the screen the
+	    player clicks.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+  </chapter>

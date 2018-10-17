@@ -1,0 +1,1270 @@
+<chapter xml:id="adv">
+  <!-- Ch03 -->
+    <title>Modular Programming with LÖVE</title>
+  
+  <para>
+    The dice game of the previous chapter was created in one
+    file. Small programs, usually just called &#34;scripts&#34;, are
+    often just one file, but the larger an application gets, the less
+    convenient it is to write it all in one monolithic file. After
+    all, most large applications aren&#39;t written by just one
+    developer but a whole team, and only one person can work on a file
+    at a time. Additionally, if you keep your code modular, you just
+    might be able to reuse a file from one project in the next.
+  </para>
+
+  <para>
+    In this chapter, you will set up a typical project directory and
+    program a modular Blackjack game using a custom card dealer
+    library. The game allows a player to click on an empty deck of
+    cards to draw a card and compete against the computer in an effort
+    to get as close to 21 without exceeding it. When the player
+    decides to stop drawing new cards for fear of exceeding 21, the
+    player clicks on the game table to signal that their hand is
+    complete. The game keeps a running total of card values, and
+    detects and announces a winner. The player may click on the deck
+    again to start a new game.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Blackjack game running in LÖVE</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/ch3_blackjack.png"/>
+    </imageobject>
+  </mediaobject>
+    
+  <section xml:id="adv-project">
+      <info>
+	<title>Project directory</title>
+      </info>
+
+      <para>
+	There is no rule for how you organize your code, but there is
+	a general convention, especially within the open source
+	software world. You can get a feel for this convention if you
+	browse a few open source projects online, and you&#39;ve
+	already implemented some principles as your created your dice
+	game.
+      </para>
+
+      <para>
+	First, your code should have its own directory. You already
+	have a directory called <literal>dice</literal> in your home
+	folder, so create one for your new game. You can make a new
+	directory from your Enlightenment desktop or in a terminal&#58;
+      </para>
+      
+      <programlisting><![CDATA[
+      $ mkdir ~/blackjack
+      ]]></programlisting>
+
+      <para>
+	For your dice game, you created directories for images and
+	fonts, so create those directories in your new project
+	directory&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ mkdir ~/blackjack/img
+      $ mkdir ~/blackjack/font
+      ]]></programlisting>
+
+      <para>
+	One of the primary goals of this project is to learn to use
+	more than one file of Lua code. Your project directory would
+	get pretty untidy if you kept all your code files out in the
+	main folder, so make a directory for your source
+	code. It&#39;s common for source code to be kept in a
+	directory called <literal>src</literal>.
+      </para>
+
+      <programlisting><![CDATA[
+      $ mkdir ~/blackjack/src
+      ]]></programlisting>
+      
+      <para>
+	That takes care of the obvious folders, but there are also
+	a few files that most people expect to find in a software
+	source directory: <literal>README</literal> and
+	<literal>LICENSE</literal>.
+      </para>
+
+      <para>
+	A <literal>README</literal> file tells a casual observer what
+	your project is, what code it contains, and so on. You can
+	create the file now and fill it in later. Give it the
+	<literal>.md</literal> extension to help online hosting
+	services recognize it as documentation&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ mkdir ~/blackjack/README.md
+      ]]></programlisting>
+      
+      <para>
+	The <literal>LICENSE</literal> file tells anyone looking at
+	your source how they may use your code. There are several
+	varieties of open source licenses, listed in detail at <link
+	xlink:href="https://www.gnu.org/licenses/license-list.html">
+	gnu.org&#47;licenses&#47;license-list.html
+	</link>.
+      </para>
+
+      <para>
+	As the author of the code, I license the program you are about
+	to copy and learn from under the GNU Public License
+	version&#xA0;3 &#40;GPLv3&#41;. This grants you permission to
+	redistribute, or even sell, and modify it as you wish, as long
+	as you give everyone else permission to do the same. As open
+	source licenses go, this is a common and sensible agreement:
+	you get to do whatever you want to do with the code as long as
+	you let the next person in line do whatever they want.
+      </para>
+
+      <para>
+	Many popular open source licenses are aggregated for
+	convenient download at <link
+	xlink:href="https://gitlab.com/everylicense/everylicense">
+	gitlab.com&#47;everylicense&#47;everylicense
+      </link>. As a developer, you use a license every time you
+      start a project, so you may as well have the common ones
+      handy. Since the <literal>everylicense</literal> project is kept
+      as a Git repository, the process of downloading and keeping it
+      updated is best done with Git, which you installed while setting
+      up your developer environment. The act of downloading a Git
+      project &#40;or &#34;repository&#34;, in Git terminology&#41;
+      from the Internet to your computer is called making a <literal>clone</literal>.
+      </para>
+
+      <programlisting><![CDATA[
+      $ git clone https://gitlab.com/everylicense/everylicense.git ~/everylicense.clone
+      ]]></programlisting>
+
+      <para>
+	Copy the GNU Public License version 3 from the
+	<filename>everylicense</filename> directory into your code
+	directory, and then rename it to <filename>LICENSE</filename>. You know how to do this in your graphical file
+	manager, but you can do it all in one step from a terminal&#58;
+      </para>
+
+      <programlisting><![CDATA[
+      $ cp ~/everylicense.git/gnu_gpl_3/gpl-3.0.txt ~/blackjack/LICENSE
+      ]]></programlisting>
+
+      <para>
+	That&#39;s all the bureaucracy and preparation taken care
+	of. Now you need to build a virtual card deck.
+      </para>
+    </section>
+
+    <section xml:id="adv-card">
+      <info>
+	<title>Classes and objects</title>
+      </info>
+
+      <para>
+	In the dice game, you had two dice &#34;objects&#34; to
+	code. You coded each object separately because there were only
+	two. This time, you are writing a game involving 52 playing
+	cards, so it doesn&#39;t make sense to code each card
+	separately, just as programmers in major game studios
+	don&#39;t manually code every single enemy you have to
+	fight.
+      </para>
+
+      <para>
+	When a program requires lots of different objects with
+	basically the same properties, you can use a
+	<literal>class</literal>. A class is a snippet of code,
+	usually stored in its own unique file, that your main program
+	can use as a template when building an object in your
+	game. This template not only generates an object for your
+	program, it creates a whole infrastructure with variables and
+	other properties unique to just that one instance of the
+	object.
+      </para>
+
+      <para>
+	Open <application>Geany</application> and create a new, empty
+	file called <filename>card.lua</filename>. Lua technically
+	doesn&#39;t have classes, but it has tables that can be
+	treated like classes. You&#39;ve already created a table for
+	the dice game, so some of this process may seem familiar to you.
+      </para>
+
+      <para>
+	First, establish a table called <literal>Card</literal> to
+	represent a single card in a deck. In this case, the table can
+	be empty&#58;
+      </para>
+	
+<programlisting><![CDATA[
+Card = {}
+]]></programlisting>
+
+      <para>
+	Next, create a function called
+	<literal>Card.init</literal> &#40;the word &#34;init&#34; is a
+	common programming term meaning &#34;initialize&#34; or
+	&#34;create&#34;&#41;. For the dice game, you used
+	functions, such as <literal>math.random()</literal> and 
+	<literal>love.load()</literal>, included in Lua. This time,
+	you are creating your own function. 
+      </para>
+
+      <para>
+	The same way the <literal>math.random</literal> function
+	requires numbers as arguments, your Card function needs to
+	know what kind of card to create. Since that is expected to be
+	different each time you create a card, you use variables
+	represent them in this Card template.
+      </para>
+	
+<programlisting><![CDATA[
+function Card.init(suit,value)
+    local self = setmetatable({}, Card)
+    self.suit = suit
+    self.value = value
+    return self
+end
+]]></programlisting>
+
+      <para>
+	In this <literal>Card.init</literal> function, you establish a
+	local variable called <literal>self</literal>, which uses a
+	special Lua extension called a <literal>metatable</literal>,
+	as a kind of container for all the properties about that
+	individual instance of a card. A card&#39;s
+	<literal>self</literal> variable ensures that each card can
+	keep track of whatever makes it unique.
+      </para>
+
+      <para>
+	Since each card that gets created gets unique memory out of
+	your computer&#39;s RAM allotted to it, each card can track
+	properties like its suit and value. At the end of the creation
+	process, the Card class alerts your main program of its
+	<literal>self</literal> data, which you can use in your game. 
+      </para>
+
+      <para>
+	Save the <filename>card.lua</filename> file and create a new
+	one called <filename>main.lua</filename>.
+      </para>
+
+      <para>
+	A Lua program knows where to look for the standard Lua
+	functions, but Lua doesn&#39;t know anything about your own
+	custom Card class. So that you can use your custom function,
+	you use the <literal>require</literal> keyword&#58;
+      </para>
+
+<programlisting><![CDATA[
+require("card")
+]]></programlisting>
+      
+<para>
+  This prompts Lua to search the current directory for a library
+  called <literal>card</literal>.
+</para>
+
+<para>
+  To create a card using your function, create a new variable and
+  invoke your function, along with two arguments&#58; one for the suit
+  you want your new card to belong to, and one for the face value.
+</para>
+
+<para>
+  Since this is just a simple example, you wan&#39;t see your card on
+  screen, so use Lua&#39;s <literal>print</literal> function to print
+  out the specifics about the card you have just created&#58;.
+</para>
+
+<programlisting><![CDATA[
+local card = Card.init("hearts",8) 
+
+print(card.suit)
+print(card.value)
+]]></programlisting>
+
+<para>
+  Use the terminal at the bottom of the Geany interface to run the
+  program.
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/blackjack
+$ lua ./main.lua
+hearts
+8
+]]></programlisting>
+
+<para>
+  Try adding some more cards, and print the results.
+</para>
+
+<programlisting><![CDATA[
+local card0 = Card.init("hearts",8) 
+local card1 = Card.init("diamonds",2)
+local card2 = Card.init("spades",6)
+
+print(card0.suit .. " " .. card0.value)
+print(card0.suit .. " " .. card1.value)
+print(card0.suit .. " " .. card2.value)
+]]></programlisting>
+
+<programlisting><![CDATA[
+$ lua ./main.lua
+hearts 8
+diamonds 2
+spades 6
+]]></programlisting>
+
+<para>
+  Effectively, your class produces, upon request, a card
+  &#34;object&#34;. It&#39;s not a physical object, but it&#39;s a
+  virtual playing card with unique properties from the next. Each
+  &#34;object&#34; is produced by filling a variable with a table
+  containing preset variables that you have defined as being an
+  inherent attribute of the object. This is an important principle in
+  modern programming because it lets you make templates for constructs
+  in your program that you want to use over and over again.   
+</para>
+
+</section>
+
+<section xml:id="adv-blackjack">
+  <info>
+    <title>Randomized cards</title>
+  </info>
+
+  <para>
+    Now that you have a card-producing Lua library, you must use it in
+    a way that it&#39;s useful in a game of Blackjack.
+  </para>	
+
+  <para>
+    Blackjack is a simple game of chance and calculated risk. Each
+    player draws a card and adds it to their hand until they are as
+    close to 21 as possible. When both players are satisfied, they
+    compare their hands. The player closest to 21 wins. If a player
+    goes over 21, they lose.   
+  </para>
+  
+  <para>
+    It&#39;s important for Blackjack to be random. Your dice game also
+    used random numbers, so you know that when producing a random
+    number, you constrain Lua with a minimum and maximum value. But
+    Lua has no knowledge of playing cards, so you can&#39;t just tell
+    it to randomly pick a suit or a face card. However, you can create
+    a table listing each suit and a table listing each possible face
+    value and then tell the computer to pick from those numbered
+    lists.
+  </para>
+
+  <para>
+    Change your <filename>main.lua</filename> so that it matches this
+    simple LÖVE project&#58;
+  </para>
+
+<programlisting><![CDATA[
+require("card")
+
+WIDE = 900
+HIGH = 600
+suits  = { "hearts","spades","clubs","diamonds" }
+values = { "Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King" }
+hand   = {} -- player hand
+total  = 0  -- player score
+comp   = {} -- computer hand
+ai     = 0  -- computer score
+
+love.window.setTitle(' Blackjack ')
+love.window.setMode( WIDE,HIGH )
+
+function love.load()
+end
+
+function love.draw()
+end
+]]></programlisting>
+
+<para>
+  This sets up a LÖVE window, an empty table to represent the player
+  and their computer opponent, and a basic skeleton for your code.
+</para>
+
+<para>
+  This also creates two tables containing card data. Lua, like
+  many languages, can extract an item from a list by number
+  &#40;although Lua, unlike many languages, starts counting a list at 1
+  rather than 0&#41;. You can see this at work by launching a lua shell
+  in a terminal either in the lower pane of Geany or elsewhere on your
+  system&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua
+> suits = { "hearts","diamonds","spades","clubs" }
+> print(suits[1])
+hearts
+> print(suits[4])
+clubs
+]]></programlisting>
+
+<para>
+  You can also analyze the table itself. For instance, you can see how
+  many items are in the table with the <literal>#</literal> symbol&#58;
+</para>
+
+<programlisting><![CDATA[
+> print(#suits)
+4
+]]></programlisting>
+
+<para>
+  You can also add items to the end of a table&#58;
+</para>
+
+<programlisting><![CDATA[
+> suits[5] = "joker"
+> print(suits[5])
+joker
+]]></programlisting>
+
+<para>
+  Since you already know how to get a random value from Lua, you can
+  use your card generator library to produce a card object with a
+  random suit and value.
+</para>
+
+<para>
+  There are a lot of drawing cards in Blackjack, and there are two
+  players that need cards. If you tried to write out the code for a
+  new card every time your game needs to generate a card, you'd end up
+  with hundreds of lines of inefficient code. What your program needs
+  is a card generation function that you can call whenever a new card
+  is required. At the very bottom of your file, enter this code&#58;
+</para>
+
+<programlisting><![CDATA[
+function cardgen()
+    local c = math.random(1,4)
+    local s = suits[c]
+    local c = math.random(1,13)
+    local v = values[c]
+    card = Card.init(s,v)
+    return card
+end
+]]></programlisting>
+
+<para>
+  To use the <literal>random</literal> function, you must initiate a
+  random seed, so change your <literal>love.load()</literal> function
+  to&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.load()
+    math.randomseed(os.time())
+end
+]]></programlisting>
+
+<para>
+  This function creates a temporary variable called
+  <varname>c</varname> and gives it a random number between 1 and
+  4. Then it creates another temporary variable called
+  <varname>s</varname> and uses <varname>c</varname> to select one
+  item from the <literal>suits</literal> table. It does basically the
+  same thing with the <literal>values</literal> table for a variable
+  called <varname>v</varname>, and then it calls your card generator
+  library to create a new card with whatever random results are in the
+  <varname>s</varname> and <varname>v</varname> variables.
+</para>
+
+<para>
+  At the end of the function, there is a <literal>return</literal>
+  statement. This means that after the function runs, it outputs
+  information, which can be assigned to a variable.
+</para>
+
+<para>
+  If a player draws a card, then the player also needs a hand where
+  those cards can be placed. That&#39;s what the
+  empty <literal>player</literal> and <literal>comp</literal> tables
+  are for. Add this to the bottom of your file&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.mousereleased(x,y,button)
+    if button == 1 then
+        var = cardgen()
+        hand[#hand+1]=var
+        total = total+var.value
+    end
+end
+]]></programlisting>	
+
+<para>
+  Like your dice game, user interaction is a simple mouse click. The
+<literal>mousereleased</literal> function of LÖVE sends a variety of
+information, including where on the screen the mouse was released, and
+which physical button on the mouse was released. You don&#39;t have to
+use the information, but it lets you be precise about what input you
+want your game to respond to.
+</para>
+
+<para>
+  In this code, the left mouse button triggers the creation of a new
+  card object by creating a variable called <varname>var</varname>,
+  which is assigned the output of your card generator function. Your
+  card generator function, of course, calls your card library so that
+  <varname>var</varname> contains a table detailing the suit and value
+  of a card.
+</para>
+
+<para>
+  Once the card has been created, the <varname>var</varname> variable
+  containing the card is copied into the player&#39;s hand. When you
+  add an item to a table, you must add it to the end of the
+  list, so to specify where in the table the new card goes, you use
+  the <literal>#hand</literal> shorthand to get the current length of
+  the table plus 1.
+</para>
+
+<para>
+  After the card has been added to the player&#39;s hand, tally up the
+  current total score for the player. The value of each card is
+  contained in the card&#39;s table. The current card is still going
+  by the name <literal>var</literal>, so you add whatever is contained
+  in <varname>total</varname> to <varname>var.value</varname>.
+</para>
+
+<para>
+  There are still no graphics being drawn, so add some text to
+  help you see that your application is working up to this point. You
+  can use whatever font you want, but this sample code uses Ostrich from
+  theleagueofmoveabletype.com&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.load()
+    math.randomseed(os.time())
+    font = love.graphics.setNewFont("font/ostrich-sans-regular.ttf",72)
+    love.graphics.setColor(1,1,1)
+end
+]]></programlisting>
+
+<para>
+  To print the card and total score on screen, you must loop over each
+  card in the player&#39;s hand table. For each entry in a table,
+  there are technically at least two values&#58; an index number and
+  the actual entry. Lua&#39;s <literal>ipairs</literal> function
+  unpacks a table for you, placing each pair into two variables of
+  your choice&#58;  
+</para>
+
+<programlisting><![CDATA[
+function love.draw()
+    for i, card in ipairs(hand) do
+        love.graphics.clear()
+	love.graphics.printf(card.suit .. " " .. total, 0, HIGH-76,WIDE, 'center')
+    end
+end
+]]></programlisting>
+
+<para>
+  At this point, the application runs, but there&#39;s a serious
+  bug. Launch it and see if you encounter the bug. Better still, see
+  if you can identify the problem.
+</para>
+
+<programlisting><![CDATA[
+$ cd ~/blackjack/
+$ love .
+]]></programlisting>
+
+<!-- code so far:
+
+require("card")
+
+WIDE = 900
+HIGH = 600
+suits = { "hearts","spades","clubs","diamonds" }
+values = { "Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King" }
+hand   = {}
+comp   = {}
+total = 0
+
+love.window.setTitle(' Blackjack ')
+love.window.setMode( WIDE, HIGH )
+
+function love.load()
+    math.randomseed(os.time())
+    font = love.graphics.setNewFont("font/ostrich-sans-regular.ttf",72)
+    love.graphics.setColor(1,1,1) 
+end
+
+function love.draw()
+		for i, card in ipairs(hand) do
+			love.graphics.clear()
+			love.graphics.printf(card.suit .. " " .. total, 0, HIGH-76,WIDE, 'center')
+		end
+end
+
+function cardgen()
+    local c = math.random(1,4)
+    local s = suits[c]
+    local c = math.random(1,13)
+    local v = values[c]
+    card = Card.init(s,v)
+    return card
+end
+
+function face(c)
+	if c == "Jack" 
+	or c == "King"
+	or c == "Queen" then
+		val=10
+		print("jqk detected")
+	elseif c == "Ace" then
+		val=1
+		print("ace detected")
+	else
+		val=tonumber(c)
+		print("number detced")
+	end
+	return val
+end
+
+function love.mousereleased(x,y,button)
+
+	if button == 1 then
+		var = cardgen()
+	    hand[#hand+1]=var
+		val = face(var.value)
+		total = total+val
+	end
+end -->
+
+<para>
+  The problem lies in how the cards are scored. Some cards are listed
+  as numbers, but others are face cards. Lua can&#39;t very well add
+  &#34;Jack&#34; to the total score, so it crashes.
+</para>
+
+<para>
+  The obvious solution to this problem is to change the King, Queen,
+  and Jack values to 10, and the Ace value to 1. However, if the King
+  and Queen and Jack are all changed to 10, there&#39;s no way to tell
+  them apart when randomly choosing which to display.
+</para>
+
+<para>
+  So instead, create a function to process the values of cards. In
+  this sample, the value being passed to the function becomes
+  <varname>c</varname> while being processed. That means that when you
+  call the function, it requires an argument. Add this to the bottom
+  of your file&#58;
+</para>
+
+<programlisting><![CDATA[
+function face(c)
+    if c == "Jack" 
+    or c == "King"
+    or c == "Queen" then
+        val=10
+    elseif c == "Ace" then
+	val=1
+    else
+	val=tonumber(c)
+    end
+    return val
+end
+]]></programlisting>
+
+<para>
+  Use this function before adding the value of a card to the total
+  score so that you are no longer trying to do mathematics on words
+  and numbers. Notice that when you call the <literal>face</literal>
+  function, you pass <varname>var.value</varname> to it so that it
+  knows what to process.
+</para>
+
+<programlisting><![CDATA[
+function love.mousereleased(x,y,button)
+    if button == 1 then
+        var = cardgen()
+        hand[#hand+1]=var
+	val = face(var.value)
+	total = total+val
+    end
+end
+]]></programlisting>	
+
+<para>
+  Launch your game again. You can keep drawing cards endlessly. No
+  bugs&#33;
+</para>
+
+</section>
+        
+<section xml:id="adv-ai">
+  <info>
+    <title>Graphics</title>
+  </info>
+
+  <para>
+    Cards by names and numbers is effective, but not pretty. To make
+    this a real people-pleasing game, you need graphics. Then again,
+    52 cards are a lot of graphics to come up with. Luckily, a few
+    people on OpenClipArt.org have already done the work for you,
+    posting them as free assets with no recompense
+    required. Download the cards from this book&#39;s code repository,
+    or make your own.
+  </para>
+
+  <note>
+    <para>
+      While OpenClipArt.org requires nothing in return, it&#39;s
+      considered good form to credit those who have helped you make a
+      project. For this reason, you should open your README file in
+      Geany and thank the OpenClipArt.org artists whose work
+      you are using&#58; mariotomo, nicubunu, and notklaatu.
+    </para>
+  </note>
+  
+  <para>
+    Place the <literal>.png</literal> files in the
+    <literal>img</literal> folder of your code directory. They must be
+    named in the format <filename>Value-of-suit.png</filename>.
+  </para>
+
+  <para>
+    When drawing objects in a window, it&#39;s usually useful to
+    establish variables for padding and scale. These both act as an easy,
+    standard location to make global changes in the event that your
+    screen size changes or you just start running out of room.  Add these
+    variables to the top of your file &#40;the first two lines are for context&#41;&#58;
+  </para>
+
+<programlisting><![CDATA[
+WIDE = 900
+HIGH = 600
+pad   = WIDE*0.04
+scale = 0.66
+]]></programlisting>
+
+  <para>
+    When your game uses your card library to generate a new card, it
+    can use these graphics as the card&#39;s visual
+    representation. For that to work, though, your card library must
+    have a space in its table to hold a reference to the appropriate
+    graphic. You have done this sort of assignment before in your dice
+    game. Open <filename>card.lua</filename> and change it to look
+    like this&#58;
+  </para>
+
+<programlisting><![CDATA[
+Card = { }
+
+function Card.init(suit,value)
+    local self = setmetatable({}, Card)
+    self.suit = suit
+    self.value = value
+    self.img = love.graphics.newImage( "img/" .. self.value .. "-of-" .. self.suit .. ".png")
+    return self
+end
+]]></programlisting>
+
+<para>
+  Now whenever a new card is created, the card object is assigned a
+  graphic with a filename corresponding to its randomly selected suit
+  and name. 
+</para>
+
+  <para>
+    Start with the easy graphic first&#58; the one that doesn&#39;t
+    change. The deck from which a player draws new cards is
+    represented by the back of a playing card. This virtual deck sits
+    in the upper right corner of the game screen, serving as a visual
+    cue for the player as well as an actual button. To render this
+    graphic, you must generate a card object for it using your card
+    library, but since it&#39;s only needed once and only once, you
+    create it in the <literal>love.load()</literal> function.
+  </para>
+
+<programlisting><![CDATA[
+function love.load()
+    math.randomseed(os.time())
+    playback= Card.init("card","back")         -- create a deck graphic
+    slot = playback.img:getWidth()*scale       -- calculate card sizes
+    love.graphics.setBackgroundColor(0.3,0.5,0.3) -- green
+    font = love.graphics.setNewFont("font/ostrich-sans-regular.ttf",72)
+    love.graphics.setColor(1,1,1)
+end
+]]></programlisting>	
+
+  <para>
+    Since your game will draw multiple cards on the screen, it&#39;s helpful to
+    have a variable representing the size of a virtual card. In the
+    above code, the variable <varname>slot</varname> is assigned to
+    the results of the <literal>getWidth</literal> function performed
+    on the <varname>playback</varname> card multiplied by the
+    current scale. This allows you to use <varname>slot</varname> to
+    represent any space occupied by a card. In the real world, you
+    would use inches or centimeters, but those don&#39;t mean much on
+    screens, so for this game you use <varname>slot</varname> instead. 
+  </para>
+
+  <para>
+    In addition to creating the deck and a variable for one unit of
+    card measure, this code sample sets the background of the game
+    window to green.
+  </para>
+
+  <para>
+    Next, draw the card deck and some instructions for the
+    player, using your new padding and scale variables to control
+    placement. Additionally, instead of just rendering text describing
+    the cards that the player has drawn, you can draw the actual
+    cards by looping through the <varname>hand</varname> table and
+    drawing whatever image is assigned to each entry.
+  </para>
+
+<programlisting><![CDATA[
+function love.draw()
+    love.graphics.printf("Click deck to deal."    ,pad,66 ,WIDE,'left') 
+    love.graphics.printf("Click anywhere to hold.",pad,122,WIDE,'left')
+    love.graphics.draw(playback.img,WIDE-slot-pad ,pad,0,scale,scale,0,0)
+    for i, card in ipairs(hand) do
+        love.graphics.draw(card.img,pad*i,pad*i,0,scale,scale,0,0)
+    end
+end
+]]></programlisting>
+
+<para>
+  The instructions state that a player must click on the card deck to
+  draw a card, and anywhere else to &#34;hold&#34;, which is Blackjack
+  jargon for not drawing any more cards. So instead of accepting any
+  click as a draw action, limit the &#34;hot&#34; area of the screen
+  to just the location of the deck. To do this, you analyze the x and
+  y coordinates of each click, which is sent to you automatically by
+  LÖVE&#39;s <literal>mousereleased</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.mousereleased(x,y,button)
+    if button == 1 
+    and x > WIDE-slot-pad
+    and y < slot*1.5 then
+        var = cardgen()
+        hand[#hand+1]=var
+	val = face(var.value)
+	total = total+val
+    else
+	hold = true
+    end
+end
+]]></programlisting>
+
+<para>
+  Launch your project. The deck should appear in the upper right
+  corner, instructions on the right. If you click on the green
+  tabletop, nothing happens, but if you click on the card deck, you
+  are dealt a new card. This happens until the cards flow right off
+  the screen.
+</para>
+</section>
+
+<section xml:id="adv-compete">
+  <info>
+    <title>Competition</title>
+  </info>
+
+  <para>
+    Blackjack can be a solitaire game in real life, but people playing
+    competitive computer games usually expect a definitive win and
+    lose condition. That means you need to program an opponent.  
+  </para>
+
+  <para>
+    According to the Internet, the prevailing opinion on Blackjack is
+    to hold at around 17. This being the only real &#34;strategy&#34;
+    &#40;such as it is&#41;, programming an AI is a simple
+    conditional&#58; if the computer&#39;s hand is 17 or over, then the
+    computer must hold. To make the game a little more exciting, you
+    can make the computer more reckless than popular strategy dictates
+    by setting its hold tolerance to 16 or 15.
+  </para>
+
+  <para>
+    The AI&#39;s draw action is basically the same as the
+    player&#39;s, except that the computer&#39;s hand table is called
+    <varname>comp</varname> and its score is <varname>ai</varname>.
+  </para>
+  
+<programlisting><![CDATA[
+function love.mousereleased(x,y,button)
+	if ai < 16 then
+		var = cardgen()
+		var = cardgen()
+	    comp[#comp+1]=var
+		val = face(var.value)
+		ai = ai+val
+		print(var.value)
+	end
+	
+	if button == 1 
+	and x > WIDE-slot-pad
+	and y < slot*1.5 then
+		var = cardgen()
+	    hand[#hand+1]=var
+		val = face(var.value)
+		total = total+val
+	else
+		hold = true
+	end
+end
+]]></programlisting>
+
+<para>
+  Notice that the computer takes its turn <emphasis>before</emphasis> the
+  player. This means that whether or not the player is drawing a card
+  or holding, the computer still has the opportunity to take a turn.
+</para>
+
+<para>
+  Drawing the computer&#39;s hand on the screen is also basically the
+  same as drawing the player&#39;s hand. It uses a loop over the
+  computer&#39;s hand, and an different offset so that the
+  computer&#39;s cards aren&#39;t rendered on top of the
+  player&#39;s. To further help the player differentiate between
+  hands, add a tint to the computer&#39;s hand.
+</para>
+
+<programlisting><![CDATA[
+function love.draw()
+    love.graphics.printf("Click deck to deal.",pad,66,WIDE, 'left') 
+    love.graphics.printf("Click anywhere to hold.",pad,122,WIDE, 'left')
+	
+    for i, card in ipairs(hand) do
+        love.graphics.draw(card.img,pad*i,pad*i,0,scale,scale,0,0)
+    end
+    for i, card in ipairs(comp) do
+        love.graphics.setColor(0.7,0.8,0.7)
+	love.graphics.draw(card.img,(WIDE*0.33)+(76)+(pad*i),pad*i,0,scale,scale,0,0)
+	love.graphics.setColor(1,1,1)
+    end	
+    love.graphics.draw(playback.img,WIDE-slot-pad,pad,0,scale,scale,0,0)
+]]></programlisting>
+
+  <para>
+    Just because the computer chooses to hold doesn&#39;t necessarily
+    mean that the player is going to hold, so a
+    <varname>hold</varname> flag can only be set by the player, which
+    is currently the <literal>else</literal> statement in the
+    player&#39;s <literal>mousereleased</literal> action. 
+  </para>
+
+  <para>
+    Once a player chooses to hold, the game is over. At that point,
+    you could program a pop-up box to ask if the player wants to play
+    another hand. However, when designing an interface, it&#39;s
+    better to default to success as often as possible. A player knows
+    how to exit the game, so there&#39;s no reason to bother them with
+    prompts. That means if the player has decided to hold, the game
+    should just start over. For that to happen, you need a reset function.
+  </para>
+  
+  <para>
+    For a new game to start, hands and scores must be set back to
+    empty, and the <varname>hold</varname> flag must be cleared. Your
+    reset function doesn&#39;t need any information and it doesn&#39;t
+    return any data, it just clears everything out when called. Add it
+    to the bottom of your <filename>main.lua</filename> file&#58;
+  </para>
+
+<programlisting><![CDATA[
+function reset()
+    total = 0
+    hand = {}
+    comp = {}
+    ai = 0
+    hold = false
+end
+]]></programlisting>
+
+<para>
+  It&#39;s good practice to declare globally significant variables
+  early, so add a <varname>hold</varname> variable set to
+  <literal>false</literal> at the top of your file. The first two
+  lines are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+pad   = WIDE*0.04
+scale = 0.66
+hold  = false
+]]></programlisting>
+
+<para>
+  A reset is called when two things are true&#58; the player has
+  decided to hold, but the player has clicked somewhere on the
+  screen. However, since clicking on the table is also a sign to hold,
+  some safeguards need to be introduced to prevent a click on the
+  table from both starting a new game and signaling the end of that
+  new game. A simple way to prevent a premature endgame signal is to
+  ensure that the player has at least one card on the table before
+  flagging a hold or a reset.
+</para>
+
+<para>
+  Change your <literal>mousereleased</literal> function to its final
+  version&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.mousereleased(x,y,button)
+    if hold == true
+    and total > 1 then
+        reset()
+    end
+    -- computer
+    if ai < 16 then
+        var = cardgen()
+	var = cardgen()
+	comp[#comp+1]=var
+	val = face(var.value)
+	ai = ai+val
+    end
+	
+    if button == 1 
+    and x > WIDE-slot-pad
+    and y < slot*1.5 then
+	var = cardgen()
+        hand[#hand+1]=var
+	val = face(var.value)
+	total = total+val
+	elseif #hand >= 1 then
+	    hold = true
+    end
+end
+]]></programlisting>
+
+<para>
+  Launch the game to verify that it&#39;s working, and to see
+  what&#39;s missing.
+</para>
+
+</section>
+
+<section xml:id="adv-win">
+  <info>
+    <title>Winning</title>
+  </info>
+
+  <para>
+    All that&#39;s left now is to detect and declare a
+    winner. Sometimes, it&#39;s easier to detect failure than success,
+    so the first thing you can do is add a watcher function to check
+    whether or not the player has exceeded 21. If ever a player&#39;s hand
+    exceeds 21, then there&#39;s no way for the player to win so the
+    <varname>hold</varname> flag can be set immediately to bring the
+    game to an end.
+  </para>
+
+  <para>
+    LÖVE&#39;s <literal>love.update(dt)</literal> function is similar
+    to the <literal>love.draw()</literal> function, except it
+    doesn&#39;t draw anything on screen, it just runs logic code in
+    the background.
+  </para>
+
+<programlisting><![CDATA[
+function love.update(dt)
+    if tonumber(total) > 21 then
+        hold = true
+    end
+end
+]]></programlisting>
+
+<para>
+  The Lua <literal>tonumber</literal> method is a safeguard to ensure
+  that the contents of <varname>total</varname> is definitely treated
+  as a number and not a string. It&#39;s not very likely that LÖVE
+  would get confused about that, or that <varname>total</varname>
+  would contain a string, but since it&#39;s a math operation it
+  doesn&#39;t hurt to ensure that both sides of the equation are
+  numbers.
+</para>
+
+<para>
+  Detecting a winner is a little more complex. The player wins if&#58;
+</para>
+
+<itemizedlist>
+  <listitem>
+    <para>
+      Their hand is less than or equal to 21
+    </para>
+    <para>
+      But also greater than the computer&#39;s hand
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+      If the computer&#39;s hand is over 21
+    </para>
+  </listitem>
+</itemizedlist>
+
+<para>
+  It&#39;s a tie if both hands are equal, and a bust if both hands are over 21.
+</para>
+
+<para>
+  Add a <literal>winner</literal> function at the end of your file. It
+  returns data about the winner. The <literal>if</literal> statement
+  happens in the order it is written, so if you check only to see
+  whether the computer&#39;s hand is over 21, then no other condition
+  in which that is true will ever happen.
+</para>
+
+<programlisting><![CDATA[
+function winner()
+    if tonumber(total) <= 21
+    and tonumber(total) > tonumber(ai) then
+	win = "You"
+    elseif tonumber(total) <= 21
+    and tonumber(ai) == tonumber(total) then
+	win = "Tie"
+    elseif tonumber(ai) > 21
+    and tonumber(total) > 21 then
+	win = "Bust"
+    elseif tonumber(ai) > 21 
+    and tonumber(total) <= 21 then
+	win = "You"
+    else
+	win = "Computer"
+    end
+    return win
+end
+]]></programlisting>
+
+<para>
+  There can be no win condition unless a hold has either been chosen
+  or imposed, so it&#39;s safe to only call the
+  <literal>winner</literal> function if <varname>hold</varname> is
+  <literal>true</literal>. You can check this in the
+  <literal>love.draw()</literal> section of your code, using this as
+  an opportunity to display on screen a running total of each hand
+  until a winner is announced.
+</para>
+
+<para>
+  Add this code to the end of your <literal>love.draw()</literal>
+  function, just above the final <literal>end</literal> line. The
+  first line is for context&#58;
+</para>
+
+<programlisting><![CDATA[
+    love.graphics.draw(playback.img,WIDE-slot-pad,pad,0,scale,scale,0,0)
+
+    if hold == false then
+	love.graphics.printf("You: " .. total .. " vs. Computer: " .. ai, 0, HIGH-76,WIDE, 'center')
+    else
+	win = winner()
+	love.graphics.printf("Winner: " .. win .. "!!", 0, HIGH-76,WIDE, 'center')
+    end 
+]]></programlisting>
+
+<para>
+  The game is complete. Launch it to try it out.
+</para>
+
+<para>
+  To distribute your new game easily, you can follow the same
+  procedure as you did for your dice game. Zip the files and
+  directories required to play, and then launch from the desktop&#58;
+</para>
+
+      <programlisting><![CDATA[
+      $ cd ~/blackjack
+      $ zip blackjack.love -r main.lua card.lua font img
+      ]]></programlisting>
+
+      <para>
+	Open a desktop window to your <filename>blackjack</filename> folder
+	and double-click <application>blackjack.love</application>. Your
+	game launches just like any normal application. You can
+	send this file to anyone you want to, and as long as they
+	install LÖVE, they can play your game.
+      </para>
+
+    </section>
+    
+<section xml:id="adv-work">
+  <info>
+    <title>Homework</title>
+  </info>
+
+  <para>
+    Here are some tasks to explore after reading this chapter.
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+	The computer only gets one final turn if the player
+	holds. Introduce a second hold variable, such as
+	<varname>aihold</varname>, to detect when the computer has
+	decided to hold regardless of what the player has
+	done. Calculate the winner only
+	after both the computer and player have decided to hold.
+      </para>
+    </listitem>
+    
+    <listitem>
+      <para>
+	Ostensibly, your deck of cards should only have one of each
+	card in it but, in the current state of the code, there is a chance 
+	that the same card could be generated twice. Can you come up
+	with a way to ensure that once a card has been
+	&#34;drawn&#34;, there is no chance of it being drawn again
+	until the next round? 
+      </para>
+      <para>
+	Hint&#58; the answer may involve another set of tables.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+	An attentive player will start to notice, after a few games,
+	that the computer&#39;s strategy is to hold at 15. Try making
+	a change to the code that makes the computer&#39;s stategy
+	less predictable.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+	The <link
+	xlink:href="https://gitlab.com/planter/planter">Planter</link>
+	application allows you to create project directory
+	templates so you don&#39;t have to manually set up a
+	project&#39;s skeleton every time you start something new. Try
+	to install it, and then try to use it.
+      </para>
+
+    </listitem>
+  </itemizedlist>
+</section>
+</chapter>

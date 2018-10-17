@@ -1,0 +1,772 @@
+<appendix id="apx-git">
+<title>Using Git</title>
+
+<para>
+  Git is vital technology in modern software development, so the more
+  comfortable you are with it, the better. Researching Git online can
+  be overwhelming, though, because writing software is a complex
+  industry, and Git can adapt to nearly every development
+  style. Learning Git along with this book is useful because it limits
+  the scope of what you need to learn. This appendix covers the Git
+  basics that you need to use it comfortably along with the coding
+  exercises in this book, and in other projects in your daily
+  computing life. 
+</para>
+
+<para>
+  You can create a Git repository within any directory. While it&#39;s
+  technically possible to make your whole home directory one big Git
+  repository, it&#39;s not generally recommended. Logically, a Git
+  repository is best when it has clearly defined boundaries. A Git
+  repository makes the most sense when it encompasses a specific
+  project or set of data. For instance, if you&#39;ve set up
+  <application>Geany</application> in a very specific way, you could
+  manage its configuration folder with Git&#59; that&#39;s not what
+  you would traditionally think of as a project, but it&#39;s got
+  a single, clear purpose and set of data.
+</para>
+
+<para>
+  To create a Git repository, change directory to the folder you want
+  to use as the basis of the repo. In this example, the directory is
+  called <filename>project</filename>. Then issue this command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ mkdir ~/project
+$ cd ~/project
+$ git init .
+]]></programlisting>
+
+<para>
+  The command is <command>git</command>, the option is
+  <option>init</option>. The argument, a single dot, means
+  &#34;here&#34;&#59; in other words, it ensures that Git initiates a
+  repository precisely where you are currently &#34;parked&#34; in
+  your terminal.
+</para>
+
+<para>
+  A directory is a Git repository if it contains a
+  hidden folder called <filename>.git</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ls --almost-all
+.git/
+]]></programlisting>
+
+<para>
+  If you prefer to use <application>git-cola</application>, launch it
+  and then click the <guibutton>New</guibutton> button in the lower
+  left corner of the <application>git-cola</application> window. You
+  can either select an existing directory or create a new one, and
+  <application>git-cola</application> instantiates the
+  <filename>.git</filename> directory.
+</para>
+
+<section xml:id="apx-git-add">
+  <info>
+    <title>Git add</title>
+  </info>
+
+  <para>
+    To add a file to a Git repository, use the <command>git</command>
+    <option>add</option> command. This command marks a file as a
+    trackable object for Git.
+  </para>
+
+  <para>
+    To try this out yourself, you must create a sample file. You can
+    use Geany or another text editor to do this, if you want, but
+    it&#39;s also valid to just use the <command>echo</command>
+    command in the Bash shell. The <command>echo</command> command
+    does exactly what you probably imagine&#58; it echoes whatever you
+    type back at you.
+  </para>
+
+<programlisting><![CDATA[
+$ echo "print('hello world')"
+print('hello world')
+]]></programlisting>
+
+<para>
+  However, in a terminal, you can redirect anything the computer
+  prints back at you into a file with two &#62;&#62; symbols. If a
+  file doesn&#39;t exist, one is created automatically.
+</para>
+
+<programlisting><![CDATA[
+$ echo "print('hello world')" >> hello.lua
+$ ls
+hello.txt
+]]></programlisting>
+
+<para>
+  Create a second file called <filename>dummy.lua</filename>. It
+  can contain whatever text you like.
+</para>
+
+<programlisting><![CDATA[
+$ echo "print('Dummy file')" >> dummy.lua
+]]></programlisting>
+
+
+<para>
+  You have just created two files, but Git has no awareness of either
+  files because they have not been added to Git.
+</para>
+
+<para>
+  If you&#39;re working with <application>git-cola</application>,
+  select <guimenu>File</guimenu> &#62;
+  <guimenuitem>Refresh</guimenuitem> or press
+  <keycombo><keycode>Ctrl</keycode>-<keycode>r</keycode></keycombo> to
+  refresh it. Your files appear in the <guilabel>Status</guilabel> panel.
+</para>
+
+<para>
+  Tell Git to track the <filename>hello.lua</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git add hello.lua
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, right-click the file in the
+  <guilabel>Status</guilabel> panel and select <guimenuitem>Stage
+  selected</guimenuitem>.
+</para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Git add in git-cola</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/appendix_git/status.png"/>
+    </imageobject>
+  </mediaobject>
+
+</section>
+
+<section xml:id="apx-git-commit">
+  <info>
+    <title>Git commit</title>
+  </info>
+
+  <para>
+    Letting Git track a file and actually committing a change made to
+    a file are two different things. Adding a file just gives Git
+    permission to manage the file. Committing a file tells Git to
+    record changes made to a file, which in turn lets you play those
+    changes back, or rewind the changes to revert to a previous
+    version, or even fast-forward to changes that don&#39;t yet
+    exist &#40;because those changes were made by someone else on your
+    team&#41;.
+  </para>
+
+  <para>
+    Commit your sample <filename>hello.lua</filename> file now&#58;
+  </para>
+
+<programlisting><![CDATA[
+$ git commit --message "created hello.lua"
+]]></programlisting>
+
+<para>
+  The <command>git</command> <option>commit</option> command
+  doesn&#39;t take a specific file as an argument. It commits the
+  current state of your repository, which includes anything you have
+  told Git to track.
+</para>
+
+
+<para>
+  In <application>git-cola</application>, add the commit message to
+  the text field in the <guilabel>Commit</guilabel> panel and then
+  click the <guibutton>Commit</guibutton> button.
+</para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Git commit in git-cola</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/appendix_git/status.png"/>
+    </imageobject>
+  </mediaobject>
+
+<para>
+  You can view a log of your commits with the <command>git</command>
+  <option>log</option> command.
+</para>
+
+<programlisting><![CDATA[
+$ git log
+]]></programlisting>
+
+<para>
+  Press <keycode>q</keycode> to exit your Git log screen.
+</para>
+
+<para>
+  In <application>git-cola</application>, use <guimenu>View</guimenu>
+  &#62; <guimenuitem>DAG</guimenuitem> to view your log.
+</para>
+
+</section>
+
+<section xml:id="apx-git-revert">
+  <info>
+    <title>Reverting changes</title>
+  </info>
+
+  <para>
+    Git&#39;s stated goal is to provide version tracking. That means
+    it lets you keep a record of all the changes made to files,
+    allowing you to revert, or undo, a change when, for instance, some
+    code you thought worked well later reveals itself to introduce a
+    serious bug. 
+  </para>
+
+  <para>
+    There are many ways to access the history of a Git repository, and
+    in practise you might have to search the Internet for the best way
+    to grab data from an old version. The most important thing is for
+    you to understand the basic principles of the process.
+  </para>
+
+  <para>
+    To demonstrate, you need a file that&#39;s changed. Open your
+    <filename>hello.lua</filename> file and change its text from
+    <literal>hello world</literal> to <literal>hello git</literal>. If
+    you prefer to do that in the terminal, you can&#58;
+  </para>
+
+<programlisting><![CDATA[
+$ sed -i 's/world/git/' hello.lua
+]]></programlisting>
+
+<para>
+  However you choose to make the change, verify that the file has been
+  altered&#58;
+</para>
+
+<programlisting><![CDATA[
+bash-4.3$ git diff hello.lua
+diff --git a/hello.lua b/hello.lua
+index 3b18e51..8d0e412 100644
+--- a/hello.lua
++++ b/hello.lua
+@@ -1 +1 @@
+-print('hello world')
++print('hello git')
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, see the
+  <guilabel>Status</guilabel> and <guilabel>Diff</guilabel> panels to
+  see what has changed.
+</para>
+
+<mediaobject>
+  <info>
+    <othercredit>
+      <orgname>Slackermedia</orgname>
+    </othercredit>
+  </info>
+  <alt>Git diff in git-cola</alt>
+  <imageobject>
+    <imagedata align="right" width="6in" format="PNG"
+	       fileref="img/appendix_git/diff.png"/>
+  </imageobject>
+</mediaobject>
+
+<para>
+  Look at the state of your repository&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+        modified:   hello.lua
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        dummy.lua
+
+no changes added to commit (use "git add" and/or "git commit -a")
+]]></programlisting>
+
+<para>
+  You can see from Git&#39;s report that the
+  <filename>hello.lua</filename> file has been modified but not yet
+  committed, and that the file <filename>dummy.lua</filename>
+  exists but is not being tracked by Git at all.
+</para>
+
+<section xml:id="apx-git-float">
+  <info>
+    <title>Restoring with git-reset</title>
+  </info>
+
+  <para>
+    At this point, with a file that has changed but not yet
+    committed, you can reset your repository state back to the last
+    known committed version with the <command>git</command>
+    <option>reset</option> command&#58;
+  </para>
+
+<programlisting><![CDATA[
+$ git reset --hard HEAD
+]]></programlisting>
+
+<para>
+  The <option>--hard</option> <argument>HEAD</argument> options tell
+  Git to wipe the slate clean, and to reset all tracked files to their
+  state as of the latest commit. This is important to understand,
+  because a <command>git</command> <option>reset</option> doesn&#39;t
+  just reset one file, but <emphasis>all</emphasis> files in your
+  repository. This is very efficient if you have spoiled multiple
+  files in your repository and just want to start from a safe place
+  again, but it&#39;s overkill and possible detrimental if you have
+  many good changes and only mean to reset one or two files.  
+</para>
+
+<para>
+  Prove that <filename>hello.lua</filename> is back to its original
+  state&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua ./hello.lua
+hello world
+]]></programlisting>
+
+<para>
+  The <filename>dummy.lua</filename> file remains entirely
+  unaffected by your reset because it is not being tracked by Git at
+  all&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git status
+...
+Untracked files:
+        dummy.lua
+]]></programlisting>
+</section>
+
+<section xml:id="apx-git-checkout">
+  <info>
+ <title>Restoring with git-checkout</title>
+  </info>
+
+  <para>
+    If all you want to do is resurrect one or two files from your
+    history, then you use the <command>git</command>
+    <option>checkout</option> command. The <option>checkout</option>
+    option is used to manipulate a file tree, which includes pulling
+    a file from a previous commit into your current workspace.
+  </para>
+
+  <para>
+    To demonstrate this, first change the file again and then commit the change&#58;
+</para>
+
+<programlisting><![CDATA[
+$ sed -i 's/world/git/' hello.lua
+$ git diff
+...
+-hello world
++hello git
+$ git add hello.lua
+$ git commit --message "changed world to git"
+]]></programlisting>
+
+<para>
+  Now assume that you need to restore <filename>hello.lua</filename>
+  to its original state. You can&#39;t reset, because reset always
+  restores the latest commit.
+</para>
+
+<para>
+  First, use <command>git</command> <option>log</option> to obtain the
+  unique ID &#40;or &#34;hash&#34;, in technical terminology&#41; of
+  each commit. The hashes in this example and your workspace may differ&#58; 
+</para>
+
+<programlisting><![CDATA[
+$ git log --oneline
+42e6b85 (HEAD -> master) changed world to git
+ef5288a created hello.lua
+]]></programlisting>
+
+<para>
+  The commit you want to restore from is not the latest &#40;the one
+  marked HEAD, at the top of the log&#41;, but the original commit,
+  with the hash of ef5288a.
+</para>
+
+<para>
+  The <command>git</command> <command>checkout</command> command
+  can take a hash as an argument, and also a specific file
+  name. However, to signal Git that you are giving it a file name, you
+  must use two dashes as a break point in the command&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git checkout ef5288a -- hello.lua
+]]></programlisting>
+
+<para>
+  Confirm that your file has changed back to its original form&#58;
+</para>
+
+<programlisting><![CDATA[
+$ cat hello.lua
+hello world
+]]></programlisting>
+
+<para>
+  If you&#39;re happy with your new old file, then you can add it and
+  then commit it back into your master timeline. 
+</para>
+
+<para>
+  The file <filename>dummy.lua</filename> is still untouched,
+  because it isn&#39;t being tracked by Git.
+</para>
+
+<para>
+  To perform the same operation in
+  <application>git-cola</application>, select <guimenu>View</guimenu> &#62;
+  <guimenuitem>DAG</guimenuitem> to launch the Git log interface so
+  you can find the file you want to restore. Once you&#39;ve located
+  it, right-click it and select <guimenuitem>Grab file</guimenuitem>
+  and save the file to your drive.
+</para>
+
+<mediaobject>
+  <info>
+    <othercredit>
+      <orgname>Slackermedia</orgname>
+    </othercredit>
+  </info>
+  <alt>Restoring with git-cola</alt>
+  <imageobject>
+    <imagedata align="right" width="6in" format="PNG"
+	       fileref="img/appendix_git/restore.png"/>
+  </imageobject>
+</mediaobject>
+
+</section>
+
+</section>
+
+<section xml:id="apx-git-branch">
+  <info>
+    <title>Git branch</title>
+  </info>
+
+  <para>
+    When you reach a point that involves many changes to many
+    different files, erasing mistakes with resets and checkouts can
+    become complex. If there are several people working on a single
+    code base, then it becomes nearly impossible due to all the
+    changes constantly happening. Luckily, Git provides an infinite
+    number of workspaces, called a <firstterm>branch</firstterm>.
+  </para>
+  
+  <para>
+    When Git initializes a repository, it creates a branch named
+    <literal>master</literal>. A branch is meant to serve as a kind of
+    overlay or even, if you&#39;s inclined to science fiction, an
+    alternate timeline or parallel universe. Branches let you look at
+    the natural timeline of your Git repository and then
+    &#34;branch&#34; off into any direction you think you might want
+    to go. If the work you&#39;re doing in a branch turns out to be
+    less successful than expected, you can abandon the branch
+    and return to the original master timeline, but if it goes well,
+    then you can merge it into the master <emphasis>even if the master
+    timeline has changed since you last left it</emphasis>.
+  </para>
+
+  <para>
+    To test this out, first confirm that a master branch exists&#58;
+  </para>
+
+<programlisting><![CDATA[
+$ git branch
+* master
+]]></programlisting>
+
+<para>
+  Create a new branch&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git branch dev
+$ git branch
+dev
+* master
+]]></programlisting>
+
+<para>
+  And then switch to the new branch&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git checkout dev
+$ ls
+dummy.lua  hello.lua
+]]></programlisting>
+
+
+<para>
+  To do this in <application>git-cola</application>, select
+  <guimenu>Branch</guimenu> &#62; <guimenuitem>Create</guimenuitem>
+  and create a new branch called <literal>dev</literal> with all the
+  default options. You are automatically switched to your new branch,
+  as indicated by the star icon in the <guilabel>Branches</guilabel> panel.
+</para>
+
+<para>
+  Make a change to <filename>hello.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+$ echo "print('I am practising Git')" >> hello.lua
+]]></programlisting>
+
+<para>
+  Confirm that your change has been made&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git diff hello.lua 
+diff --git a/hello.lua b/hello.lua
+index 3b18e51..0eb0a16 100644
+--- a/hello.lua
++++ b/hello.lua
+@@ -1 +1,2 @@
+ print('hello world')
++print('I am practising Git')
+]]></programlisting>
+
+<para>
+  Add and commit your change, and also <emphasis>finally</emphasis>
+  add the <filename>dummy.lua</filename> to your repository&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git add hello.lua dummy.lua
+$ git commit -m "added a second line to hello.lua"
+]]></programlisting>
+
+<para>
+  Get a summary of your dev branch&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git log --oneline
+db5968c (HEAD -> dev) added a second line to hello.lua
+42e6b85 (master) changed world to git
+ef5288a created hello.lua
+$ lua ./hello.lua
+hello world
+I am practising Git
+$ lua ./dummy.lua
+Dummy file
+]]></programlisting>
+
+<para>
+  Now checkout the master branch to see what your original timeline is like&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git checkout master
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, right-click the
+  <literal>master</literal> branch in the
+  <guilabel>Branches</guilabel> panel and select
+  <guimenuitem>Checkout</guimenuitem>.
+</para>
+
+<para>
+  View your Git log in the terminal, or use DAG in
+  <application>git-cola</application>.
+</para>
+
+<programlisting><![CDATA[
+$ git log --oneline
+42e6b85 (HEAD -> master) changed world to git
+ef5288a created hello.lua
+$ lua ./hello.lua
+hello world
+$ lua ./dummy.lua
+lua: cannot open ./dummy.lua: No such file or directory
+]]></programlisting>
+
+<para>
+  The change you made to <filename>hello.lua</filename> in the
+  dev branch doesn&#39;t exist in your master branch, and the
+  <filename>dummy.lua</filename> has seemingly vanished entirely.
+</para>
+
+<para> You haven&#39;t lost your work, it just doesn&#39;t exist in
+this workspace. The version of <filename>hello.lua</filename> in the
+master branch is the original version, before you added a second line,
+and <filename>dummy.lua</filename> is no longer floating around the
+repository, but has been added to the dev branch exclusively so that
+it no longer shows up as an untracked file in the master branch.
+</para>
+
+<para>
+  Jump back over to your dev branch again to verify this&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git checkout dev
+$ git log --oneline
+db5968c (HEAD -> dev) added a second line to hello.lua
+42e6b85 (master) changed world to git
+ef5288a created hello.lua
+$ lua ./hello.lua
+hello world
+I am practising Git
+$ lua ./dummy.lua
+Dummy file
+]]></programlisting>
+
+<para>
+  Generally, you can and should work with Git branches so that you
+  always have a safe, functional code base at the core of your
+  project.  
+</para>
+</section>
+
+<section xml:id="apx-git-merge">
+  <info>
+    <title>Git merge</title>
+  </info>
+  
+    <para>
+      When two Git branches have diverged, at some point you might
+      want to merge them together. This is a common task in
+      software development just before a release date&#59; the
+      development branch gets merged into an official release branch,
+      and then the update is announced to users. 
+    </para>
+
+    <para>
+      When you&#39;re ready to merge two branches, checkout the
+      <emphasis>target</emphasis> branch&#58; the one you want to
+      bring your work into.
+    </para>
+
+<programlisting><![CDATA[
+$ git checkout master
+$ git merge dev
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, the process is similar&#58;
+  checkout the master branch, and then right-click on the dev branch
+  and select <guimenuitem>Merge into current branch</guimenuitem>.
+</para>
+
+<mediaobject>
+  <info>
+    <othercredit>
+      <orgname>Slackermedia</orgname>
+    </othercredit>
+  </info>
+  <alt>Git merge with git-cola</alt>
+  <imageobject>
+    <imagedata align="right" width="6in" format="PNG"
+	       fileref="img/appendix_git/merge.png"/>
+  </imageobject>
+</mediaobject>
+
+<para>
+  Verify that the merge has brought in all of your changes&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ls
+dummy.lua  hello.lua
+$ lua ./hello.lua
+hello world
+I am practising Git
+$ lua ./dummy.lua
+Dummy file
+]]></programlisting>
+
+<para>
+  This is a common workflow in software development&#58; clone a Git
+  repository, create a personal branch for yourself, do your work, and
+  then merge your work into the master branch. When you&#39;re
+  finished with a branch, you can delete it.
+</para>
+
+
+<programlisting><![CDATA[
+$ git branch --delete dev
+Deleted branch dev (was b5dbe64).
+]]></programlisting>
+</section>
+
+<section xml:id="apx-git-practise">
+  <info>
+    <title>Git push</title>
+  </info>
+
+  <para>
+    Using Git locally on your Pi is not very different from using it
+    with a coding website like Gitlab or Github. The most significant
+    difference with Git hosting sites is that you must also perform a
+    <command>git</command> <option>push</option> in order to upload
+    the state of your repository to your Git hosting site. For
+    example, if you had a Git repository on Gitlab for this practise
+    exercise, the final step would be&#58;
+  </para>
+  
+<programlisting><![CDATA[
+$ git push origin HEAD
+]]></programlisting>
+
+<para>
+  In this example, <literal>origin</literal> is the default alias for
+  your Git hosting site, whether it&#39;s Gitlab, Notabug.org, Github, or
+  any other service. The term <literal>HEAD</literal> refers, in this
+  example, to <emphasis>the current commit</emphasis>.
+</para>
+
+  <para>
+    As with Lua, practise with Git makes perfect. It&#39;s a big
+    system with lots of options and many different ways to achieve
+    many different results. As long as you commit your work often, you
+    run little chance of losing work by mistake, and stand a good
+    chance of recovering good work that&#39;s otherwise been spoilt by
+    buggy code. Understanding how Git works is what enables you to ask
+    sensible and clear questions when looking online for specific
+    commands.
+  </para>
+
+</section>
+</appendix>

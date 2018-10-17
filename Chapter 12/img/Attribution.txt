@@ -1,0 +1,35 @@
+underworld_load
+CC BY 3.0
+by poikilos
+(based on Redshrike's
+overworld sprites:
+door, quad swirl,
+basis for wall & creatures
+Stephen Challener (Redshrike),
+hosted by OpenGameArt.org)
+
+
+Seemless walls, obstacles, traps, and items are included in the zip file, with all most necessary underworld stuff in a convenient atlas. There are some minimal outdoor graphics including some farming (garlic, wheat, bread) some of which are in a separate file. This is a vastly expanded version of Redshrike's "A Load of Overworld 34 RPG Sprites" (not the low-fi rerelease sprite sheets of the enemies). Every tile is changed from that except for the open doors, keystones, quad swirl tile and creatures not noted below. I added dead versions of the enemies I selected for the atlas. For dead version of mimic and snail, you can use open treasure chest and snail shell. The atlas should cover almost everything except hero, and has room for one! There is room for 3x4 hero frames at 32x32 pixels each, plus 4 hero attacks, and 1 dead frame. I arranged the frames as "up" "left" "down" "right" to match that part of the LPC standard.
+
+Hero design tips (to pose the hero as if using the bow or sword, which are both already in the same place relative to the hero's hand):
+
+    Temporarily place the sword or bow under the character's layer, and move the bow away from the character by 15 pixels (or whatever works for your character) away from the chracter in the facing direction.
+    the hand for each direction of attack should line up with the bow, so that the hand just covers the bow and goes 1 pixel more so the fingers wrap around the handle by only 1 pixel. That way when the sword is used instead, the fingers will not go over the sword's guard (only the handle).
+
+Changes from Redshrike's version:
+
+    made environment and selected enemies into a game-ready 32x32 atlas
+    arranged all 32x32 stuff to fit atlas, including the golems (I know about RPG Enemies Updated, but I like the art style of your batch_one_0 golems though I had to edit them to fit the grid)
+    made the walls fit correctly into the grid
+    added stairs
+    added several styles of floors
+    added cracked and bombed overlays for floor and door, and overlay for character walking under door, and mask for falling into bombed hole
+    fixed alignment of animation frames
+    fixed animation order to standard order for mushroom (up and down facing animations)
+    fixed ears for grayish creature
+    rearranged blocks in wall graphics to make them fit more easily with new end, corner, and intersection pieces
+    added dead versions of enemies on atlas
+    added several traps, mechanisms, and obstacles
+
+Additional changes will be uploaded: [github.com/poikilos/mgep](https://github.com/poikilos/mgep/blob/master/collections/misc/underworld_load-32x32.png). I have also fixed all of the 16x16 and 16x24 sprites and flame skull, and plan to post them on here along with the 32x32 atlas when it is finished.
+Tags: RPG, farming, house, monster, Enemy, overworld, underworld, dungeon, underground, traps, top down,bright, colorful, tileset, chest, stone, 3/4 view, Fantasy, Map Tileset, Pixel Art, Sprite, Top-down

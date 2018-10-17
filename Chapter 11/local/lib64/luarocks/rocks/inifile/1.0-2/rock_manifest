@@ -1,0 +1,6 @@
+rock_manifest = {
+   ["inifile-1.0-2.rockspec"] = "1ee2d8e0bdc590de22fce6da9838f10b",
+   lua = {
+      ["inifile.lua"] = "d23b0b2689d7d32a101dd545f38aaf7c"
+   }
+}

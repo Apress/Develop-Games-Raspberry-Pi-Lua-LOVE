@@ -1,0 +1,28 @@
+#!/usr/bin/env lua
+
+d = os.date("%Y.%m.%d")
+
+local function help()
+   print("luamake      : generate a .love package")
+   print("luamake -v 2 : set the iteration version to 2")
+   print("luamake -h   : print this help message")
+end
+
+for k,v in ipairs(arg) do
+   if v == "-v" or
+   v == "--version" then
+      ver = arg[k+1]
+   end
+   if v == "-h" or
+   v == "--help" then
+      help()
+      os.exit()
+   end
+end
+   
+if ver == nil then
+   ver = 0
+end
+
+-- print(ver)
+os.execute("zip -9 battlejack-" .. d .. "-" .. ver .. ".love -r *.lua deck.ini font img local snd")

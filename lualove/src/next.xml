@@ -1,0 +1,325 @@
+<chapter xml:id="next">
+  <!-- Ch14 -->
+  <info>
+    <title>Next Steps</title>
+  </info>
+
+  <para>
+    With this book, you have learned the foundations of not just Lua,
+    but of programming. You have access to the building blocks of very
+    advanced code. All you have to do now is use the knowledge you
+    have gained for new projects.
+  </para>
+
+  <section id="next-practice">
+    <info>
+      <title>How to practice</title>
+    </info>
+    
+  <para>
+    You&#39;re familiar with the old saying <emphasis>practice makes
+    perfect</emphasis>, and it should be no surprise that it applies
+    as much to programming as to anything else. You cannot hope to
+    become an efficient, comfortable programmer without weeks and
+    weeks, and then months and months, of practice. The key is to find
+    an excuse to use Lua. Make Lua work for you. Make it do stuff you
+    don&#39;t feel like doing yourself. You have already learned how
+    to use Lua to build and release your software, for example, so
+    find other small tasks for Lua to do for you.
+  </para>
+
+  <note>
+    <para>
+      If you want to create a GUI application in Lua, there are
+      several toolkits you can use. Obviously, there is LÖVE itself,
+      but it is intended as a game engine. For a generic GUI libraries
+      providing common widgets like buttons and text fields, try TekUI
+      at <link
+      xlink:href="http://tekui.neoscientists.org">tekui.neoscientists.org</link>,
+      SUIT for LÖVE at <link
+      xlink:href="https://github.com/vrld/SUIT">github.com&#47;vrld&#47;SUIT</link>,
+      and Luce at <link
+      xlink:href="https://github.com/peersuasive/luce/">github.com&#47;peersuasive&#47;luce</link>.
+    </para>
+  </note>
+  
+  <para>
+    Sometimes, learning new tricks on computers seems like a waste of
+    time. For instance, you already know how to start a basic LÖVE
+    project, but imagine how much you would learn by creating a Lua
+    script to generate fresh project directories and even basic file
+    starters for you. Find common, everyday tasks that you find
+    yourself doing frequently, and spend time programming an
+    application or command to help you accomplish them. The task
+    itself may only take you a minute or two to do, and programming a
+    solution might take you a few days, but you&#39;ll learn a lot,
+    and after the 300th time of doing the same old task, you&#39;ll
+    thank yourself for the application you created. And after your
+    300th script, you won&#39;t even be able to remember when you
+    didn&#39;t think like a programmer.
+  </para>  
+  </section>
+
+  <section id="next-learn">
+    <info>
+      <title>How to learn</title>
+    </info>
+
+    <para>
+      Of course, practice in principle is one thing, but actually
+      generating code that functions is another. Sometimes, you will
+      want to do something in code that you have no experience with,
+      and no reference point for where to begin.
+    </para>
+
+    <para>
+      The Lua and LÖVE functions you have learned from this book were
+      relatively easy for you to discover because this book presented
+      them to you and showed you how to use them.
+    </para>
+
+    <para>
+      A big part of learning a programming language is learning what
+      functions it has to offer you. Lua functions are documented in full
+      at <link
+      xlink:href="https://www.lua.org/manual/5.3/">lua.org&#47;manual&#47;5.3</link>,
+      in the Index section. Every function of Lua is listed and
+      documented. For LÖVE, see <link
+      xlink:href="https://love2d.org/wiki/love">love2d.org&#47;wiki&#47;love</link>.
+    </para>
+
+    <para>
+      The Lua site is highly technical and doesn&#39;t provide many
+      examples, so it can be difficult to understand. However, the latest
+      <citation>Programming in Lua</citation> book, by the principle
+      architect of Lua itself, is an excellent resource for both the
+      language and usage of its functions.
+    </para>
+
+    <bridgehead>How to read technical documentation</bridgehead>
+    
+    <para>
+      Any time you are about to use a new library &#40;like
+      <literal>inifile</literal> or
+      <literal>table_save.lua</literal>&#41; or even a new programming
+      language, you should go to its technical documentation or to the
+      source code itself and read it. You don&#39;t necessarily have
+      to read it like a novel, but you should have a passing
+      familiarity with what the library or language provides you so
+      that you know where to start and don&#39;t spend a day
+      implementing something that a library gives you for free.
+    </para>
+
+    <para>
+      As you&#39;ve probably started to notice from writing them
+      yourself, functions have two parts&#58; input and output. As
+      long as you keep that in mind, you can read technical
+      documentation easily and use any function you dig up.
+    </para>
+
+    <para>
+      For example, assume you are using Lua to program an interface to help
+      users create a password that is at least 15 characters
+      long. You need a way to count the letters in a
+      string &#40;the string <literal>foo</literal> contains 3 letters,
+      the string <literal>foobar</literal> has 6, and so
+      on&#41;. 
+    </para>
+
+    <para>
+      You already know some tricks that count items. For instance, you
+      can find the number of items in a table with
+      the <literal>#table</literal> notation, and you know how to
+      create loops with counters. You could probably spend some time
+      researching this problem and find a reasonable example online of
+      how to implement it. But what you&#39;d also find is that Lua
+      already has a function called <literal>string.len</literal> that
+      solves your problem.
+    </para>
+
+    <para>
+      You have never used the <literal>string.len</literal> function, so
+      it might be intimidating to understand how to use it. Here is
+      its online documentation&#58;
+    </para>
+
+<programlisting><![CDATA[
+string.len (s)
+Receives a string and returns its length. The empty string "" has length 0. Embedded zeros are counted, so "a\000bc\000" has length 5. 
+]]></programlisting>
+
+<para>
+  To read how to use this function, find out those two essential
+  components of every function&#58; input and output. The input to a
+  function is an argument, so <literal>(s)</literal> is its
+  input. The documentation says that <literal>s</literal> is a string.
+</para>
+
+<para>
+  The output of a function is what it
+  <emphasis>returns</emphasis>. Sometimes this is a literal
+  <literal>return</literal> statement in its code, while other times
+  it&#39;s variables that get set while the function runs. In this
+  example, the function returns the length of <literal>s</literal>, so
+  you can expect an integer.
+</para>
+
+<para>
+  Knowing the required input and expected output, you can guess how to
+  use the <literal>string.len</literal> function. Since Lua has an
+  interactive mode, you can even test it before adding it to your
+  actual code&#58;
+</para>
+
+<programlisting><![CDATA[
+$ lua
+> print( string.len("foo") )
+3
+> print( string.len("foobar") )
+6
+]]></programlisting>
+
+<para>
+  Use this learning method with all technical documentation for Lua,
+  LÖVE, and any other programming library or language you are using. 
+</para>
+
+<bridgehead>Leveraging open source</bridgehead>
+
+<para>
+  Finally, Lua is open source. It has a worldwide community of users
+  who openly communicate with one another about how the language is
+  used, how common problems are solved, how specific functions work,
+  and much more. If you&#39;re not used to the culture of open source,
+  then you&#39;re probably not accustomed to this kind of sharing of
+  knowledge. It&#39;s a conversation, so join in, be polite and
+  respectful, answer questions when you can, and ask well-researched
+  questions with lots of context and code samples when you need help.
+</para>
+</section>
+
+<section id="next-language">
+   <info>
+     <title>Learning other languages</title>
+   </info>
+
+   <para>
+     You should spend more time with Lua once you have finished this
+     book, at least until you are comfortable programming in the
+     language. Lua is a simple, efficient, and cohesive language, so
+     there are relatively few functions to learn. It&#39;s a
+     manageable language, especially when compared to bigger ones
+     like Python, Ruby, Java, and PHP. That&#39;s a feature that
+     you&#39;ll come to appreciate after trying more complex
+     languages.
+   </para>
+
+   <para>
+     On the other hand, Lua&#39;s minimalism renders a sparse
+     language, meaning that you have to create your own functions for
+     things that other languages have as built-in features. 
+   </para>
+
+   <para>
+     Some languages, like Python and Java, are so widely known that it
+     seems everything is already done for you&#59; all you have to do
+     is download a library, and most of the hard work is done. Of
+     course, this is not true in practice, because every program ends
+     up requiring customization, but the more popular a language, the
+     greater the choice you have between libraries and frameworks.
+   </para>
+
+   <para>
+     The good news is that once you&#39;re comfortable enough with Lua
+     to sit down and code something from scratch in an afternoon or
+     two &#40;or seven, depending on the size of the
+     project&#33;&#41;, you&#39;ll find that learning a new language
+     comes easy. Once you internalize the &#34;grammar&#34; of
+     programming, learning the vocabulary is easy, and often something
+     you can do as you code.
+   </para>
+
+   <para>
+     The question is&#58; do you need to learn another language?
+   </para>
+
+   <para>
+     Learning a second or third programming language can be useful
+     primarily for compatibility. For instance, if you want to write
+     a plugin for an application that only offers plugin support for
+     Python, then it&#39;s useful to know Python. If you want to
+     write native applications for Android, then you should learn
+     Java. If you want to get a job at a company that has built its
+     business on Ruby, then you should learn Ruby.
+   </para>
+
+   <para>
+     You might hear murmurings that one language isn&#39;t good for
+     one task, and that another language is better for other tasks, as
+     if though programming languages were built with a specific set of
+     applications in mind. While it&#39;s true that sometimes a
+     language is designed in such a way that its available functions
+     happen to favor one type of job or another, strictly speaking, a
+     programming language is just an interface to machine
+     instructions. Don&#39;t be confused by the melange of
+     choice. Learning additional programming languages add to your
+     perspective on code, your toolkit for getting things done
+     efficiently, and your <emphasis>curriculum vitae</emphasis> when
+     looking for work.
+   </para>
+
+   <para>
+     And learning a new language can be done <emphasis>with this
+     book</emphasis>. LÖVE is specific to Lua, but most major
+     languages have game engines. And even if your target language
+     lacks a game engine, you can still use the structure of these
+     lessons to learn. Start with simple programs, like a dice roller,
+     and then try something more ambitious, like a simple card
+     game. Explore arrays and other data constructs, learn the
+     to read data from disk and how to write it back out. Learn to
+     write your own libraries or modules and how to
+     <literal>require</literal> or <literal>include</literal>
+     them. And finally, try a bigger project like Battlejack or
+     Permadungeon to stretch your understanding of the language.
+   </para>
+</section>
+
+<section id="next-home">
+   <info>
+     <title>Homework</title>
+   </info>
+
+   <para>
+     As this book&#39;s final assignment, you are encouraged to sit
+     down with a pen and some paper, and to design the next game or
+     application you want to create with Lua. Spend some time on
+     it. Design something useful and slightly more ambitious than you
+     think you can manage.
+   </para>
+
+   <para>
+     Next, break the application down into learn-able components. You
+     haven&#39;t learned how to drag-and-drop GUI elements, for
+     example, and yet you know everything you need to make it work
+     &#40;hint&#58; <literal>mousepressed</literal> combined with a
+     custom <literal>collide</literal> function ought to
+     work&#41;. Look at your long-term goals and write small
+     applications that may not even serve a purpose other than to
+     teach you a new trick or two.
+   </para>
+
+   <para>
+     Once you have learned all the parts
+     of what you want to build, then it&#39;s just a matter of
+     implementing it all in one big code base. 
+   </para>
+
+   <para>
+     Whether or not you feel like you understand everything there is
+     to understand about Lua, programming, game design,
+     Linux, and software development in general, you
+     <emphasis>are</emphasis> a programmer now. So go program
+     something&#33;
+   </para>
+</section>
+</chapter>

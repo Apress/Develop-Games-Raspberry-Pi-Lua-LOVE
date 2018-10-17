@@ -1,0 +1,1154 @@
+<chapter xml:id="pic">
+  <!-- Ch06 -->
+    <title>Graphics</title>
+
+    <para>
+      Everyone knows graphics are important for games, but gamers
+      acknowledge that there&#39;s something even more important than
+      graphics&#58; the game. A good game is a game that&#39;s
+      challenging and fun. Graphics, while important, don&#39;t make a
+      game.
+    </para>
+
+    <para>
+      But most modern players expect graphics in their games, and
+      given that you&#39;re programming for a graphical game engine,
+      you do need graphics. And if you&#39;re going to have graphics
+      in your game, you want them to look as good as possible.
+    </para>
+
+    <para>
+      If you&#39;re not a natural illustrator and don&#39;t have
+      access to one, making your graphics look good seems like a tall
+      order. And if you&#39;re not familiar with graphic applications
+      on Linux, it seems impossible. This chapter teaches you the
+      basics of a few of the best Linux graphics applications, and
+      provides you with some tips and tricks to make great graphics
+      even if you think you have no artistic skill.
+    </para>
+    
+    <section xml:id="pic-genre">
+      <info>
+	<title>Design by Genre</title>
+      </info>
+
+      <para>
+	The word <emphasis>genre</emphasis> is an art term meaning a
+	category or style. It&#39;s a term meant to be broad and
+	nonspecific. If you&#39;re fortunate enough to be able to hire
+	an artist to do artwork for your game, then a genre is useful
+	to convey to the artist what they should be aiming for. When
+	it&#39;s entirely up to you to design the game&#39; graphics,
+	a genre gives you a target to aim for when gathering and
+	creating all the different artistic elements you need.
+      </para>
+      
+      <para>
+	When a the same person programming a game also has to
+	design the game&#39;s look and feel, one of the greatest
+	concerns is investment of time and effort. After all, you
+	can&#39;t afford to just spend your time on art when
+	there&#39;s still code to be written. To help you stay on track, keep in mind three basic tenants to successful graphics&#58;
+      </para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Genre&#58; limit yourself to elements within your
+	  declared genre.</para>
+	</listitem>
+	<listitem>
+	  <para>Consistency&#58; design once, and then duplicate. If
+	  you do anything consistently enough, it becomes your
+	  <emphasis>style</emphasis>.</para>
+	</listitem>
+	<listitem>
+	  <para>Minimalism&#58; convey only the most vital information
+	  and let your players read between the lines. The less you
+	  do, the less you can mess up.</para>
+	</listitem>
+      </orderedlist>
+
+      <para>
+	Before you sit down to create your game art, stop and think of
+	a genre to serve as your central design theme. Your theme can
+	be anything, just think about what appeals to you or to your
+	intended audience. Think in terms of a broad genre. The more
+	general your initial concept, the easier it is to hit your
+	mark in the end. Much of the frustration that non-artists
+	experience when they attempt to make art is because they see
+	clearly in their mind what they want, but lack the artistic
+	skills to make it happen. Protect yourself by avoiding
+	specifics.
+      </para>
+
+      <para>
+	Here are some examples of some broad themes&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Retro 8-bit video games</para>
+	</listitem>
+	<listitem>
+	  <para>Victorian England</para>
+	</listitem>
+	<listitem>
+	  <para>Horror</para>
+	</listitem>
+	<listitem>
+	  <para>Mysteries of the ancient world</para>
+	</listitem>
+	<listitem>
+	  <para>Saturday morning cartoons</para>
+	</listitem>
+	<listitem>
+	  <para>Anime or manga</para>
+	</listitem>
+	<listitem>
+	  <para>Comic book</para>
+	</listitem>
+	<listitem>
+	  <para>Fantasy</para>
+	</listitem>
+	<listitem>
+	  <para>Urban</para>
+	</listitem>
+	<listitem>
+	  <para>Cyberpunk</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	It can also be fun to mash up two different genres. Instead of
+	settling for just a fantasy game, why not make rock-a-billy
+	fantasy? or cyberpunk in the Old West? or a cartoon
+	horror game? Mix it up, force yourself to invent a rationale
+	for an unlikely combination, and see what happens.
+      </para>
+      
+      <bridgehead>Let the fonts do the talking</bridgehead>
+
+      <para>
+	Once you have thought of a genre &#40;or two&#41; for your
+	game, go on a font hunt. Fonts are a great way to convey a
+	theme quickly, and since there are so many open source fonts
+	out there, it&#39;s a one of the lowest investment of effort
+	on your part. There&#39;s a font out there for every genre, so
+	go find one and bring it into your project to kickstart your
+	thematic vision.
+      </para>
+
+      <note>
+	<para>
+	  Fonts are just like everything else you find online or on
+	  most computers. They&#39;re <emphasis>licensed</emphasis>
+	  for use, meaning that if you find a font you like on a
+	  Windows or Mac computer, it&#39;s only licensed for you to
+	  use on that one computer. You&#39;re not allowed to
+	  redistribute it with your game. So when looking for fonts,
+	  make sure its license permits it to be redistributed.
+	</para>
+      </note>
+      
+      <para>
+	Some of the best open or redistributable font websites
+	include&#58;
+      </para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <link xlink:href="https://fontlibrary.org/">fontlibrary.org</link>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <link
+	      xlink:href="http://slackermedia.info/sprints/">slackermedia.info&#47;sprints</link>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <link xlink:href="https://www.fontsquirrel.com/">fontsquirrel.com</link>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <link xlink:href="https://www.theleagueofmoveabletype.com/">theleagueofmoveabletype.com</link>
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <link xlink:href="https://www.dafont.com/">dafont.com</link> &#40;use the site&#39;s filters to view only free and open source fonts&#41;
+	  </para>
+	</listitem>
+      </itemizedlist>
+
+      <para>
+	If you choose a highly stylized font, then you might need two
+	fonts&#58; one for big titles consisting of only a few words
+	at a time, and one simpler font that&#39;s easier to read, for
+	text that users need to read often or quickly.
+      </para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Design by font</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/Ch06_skenlon/fontcollage.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    The important thing is that the font or fonts you choose speak
+    to your theme. It&#39;s alright if your fonts are a little
+    clich&#233; as long as they enforce your genre. If you&#39;re
+    not sure of what type of font to use, go look at some movie
+    posters or book covers to get an idea of how fonts are used to
+    convey the genre of story being told.
+  </para>
+
+  <para>
+    To install a font&#58;
+  </para>
+
+  <orderedlist>
+    <listitem>
+  <para>
+    Open a file manager window and navigate to your
+    <filename>Downloads</filename> directory. Most font downloads are
+    zipped, so you must unarchive them to install them.
+  </para>
+
+  <para>
+    If you prefer to work with GUI tools, install
+    <application>xarchiver</application> in
+    <application>Synaptic</application>.
+  </para>
+
+  <para>
+    If you prefer to work in a terminal, install
+    <application>p7zip-full</application> with
+    <command>apt</command>&#58;
+  </para>
+
+  <programlisting><![CDATA[
+  $ sudo apt install p7zip-full
+  ]]></programlisting>
+    </listitem>
+
+    <listitem>
+  <para>
+    Next, create a local font folder located at
+    <filename>~/.local/share/fonts</filename>.
+  </para>
+  
+  <programlisting><![CDATA[
+  $ mkdir -p ~/.local/share/fonts
+  ]]></programlisting>
+
+  <para>
+    To do this in the GUI, open a file manager by double-clicking the
+    Home icon on your desktop. Right-click in any blank space in the
+    file manager window. Select <guimenu>Options</guimenu> &#62;
+    <guimenuitem>Show Hidden Files</guimenuitem>, and then navigate to
+    <filename>.local&#47;share</filename>. In the
+    <filename>share</filename> directory, right-click any blank area
+    and select <guimenu>New</guimenu> &#62;
+    <guimenuitem>Directory</guimenuitem>. Name the new directory
+    <filename>fonts</filename>. 
+  </para>
+  </listitem>
+    
+  <listitem>
+    <para>
+      Create a subdirectory in
+      <filename>~/.local/share/fonts</filename> for the first letter
+      of each font you are installing, and then copy the
+      <filename>TTF</filename> or <filename>OTF</filename> files to
+      the appropriate place.
+    </para>
+    
+    <para>
+      To copy the files, you must first unarchive your font
+      downloads. Most font archives can be unarchived with
+      <application>p7zip</application> but you can also use other
+      unarchiver tools as needed.
+    </para>
+
+    <programlisting><![CDATA[
+    $ cd Downloads
+    $ 7z x arkhamfonts.zip
+    $ tar xvf nouveau.tar.bz2
+    ]]></programlisting>
+
+    <para>
+      Once unarchived, you can copy the files to their destination.
+    </para>
+    
+    <programlisting><![CDATA[
+    $ mkdir -p ~/.local/share/fonts/a
+    $ cp ~/Downloads/arkhamfonts/ark*ttf ~/.local/share/fonts/a
+    ]]></programlisting>
+
+    <para>
+      In the GUI, right-click a font archive and select <guimenu>Open
+      with</guimenu> &#62; <guimenuitem>xarchiver</guimenuitem>. Drag
+      and drop font files from the
+      <application>xarchiver</application> window to the directory
+      matching the first letter of the font name.
+    </para>
+  </listitem>
+  </orderedlist>
+  
+  <bridgehead>Color scheme</bridgehead>
+
+  <para>
+    The last thematic element you must decide upon is a color
+    scheme. While some genres sometimes do have specific colors
+    associated with them, there&#39;s a lot of freedom in this aspect
+    of design. While the Old West is often associated with browns and
+    yellows, and a technical future world often gets painted with
+    black and neon green, you can use your own color palette in any
+    genre as long as your colors are consistent and somehow relate to
+    one another in a pleasing way.
+  </para>
+
+  <para>
+    The problem for non-artists is finding colors that match.
+  </para>
+
+  <para>
+    To solve this problem, all you have to do is generate a color
+    palette from an existing image. Search the Internet or your own
+    hard drive for an image that you like. It doesn&#39;t have to be a
+    free-licensed photo and it doesn&#39;t have to match the genre for
+    your game, because the image is only going to be used to generate
+    colors. Just pick an image that you enjoy looking at.
+  </para>
+
+  <para>
+    To generate a color scheme from a photograph&#58;
+  </para>
+
+  <orderedlist>
+    <listitem>
+      <para>
+	Install Image Magick.
+      </para>
+
+      <programlisting><![CDATA[
+      $ sudo apt install imagemagick
+      ]]></programlisting>
+    </listitem>
+    <listitem>
+      <para>
+	Download the image to your Pi.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	Run this Image Magick command, adjusting
+	<filename>~/path/to/image.png</filename> to match whatever
+	photo you have downloaded&#58;
+      </para>
+      <programlisting><![CDATA[
+      $ convert ~/path/to/image.png -geometry 16x16 -colors 8 \
+      -unique-colors -scale 4000% ~/scheme.png
+      ]]></programlisting>
+    </listitem>
+    <listitem>
+      <para>
+	Take a look at the resulting color scheme.
+      </para>
+      <programlisting><![CDATA[
+      $ display ~/scheme.png
+      ]]></programlisting>      
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Color scheme</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/Ch06_skenlon/scheme.png"/>
+    </imageobject>
+    </mediaobject>
+        <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Source photo by Jess Weichler</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/Ch06_skenlon/scheme.png"/>
+    </imageobject>
+  </mediaobject>
+    </listitem>
+  </orderedlist>
+
+  <para>
+    The colors you get back as <filename>scheme.png</filename> are,
+    more or less, an average of dominant colors &#40;it&#39;s not
+    mathematically sound, but it&#39;s a rough approximation&#41;. Use
+    these colors to guide your design. 
+  </para>
+
+  <bridgehead>Graphics</bridgehead> 
+
+  <para>
+    When it comes to the actual graphics for a game, there are three
+    areas of interest you must consider&#58; the background, the
+    foreground, and widgets.
+  </para>
+
+  <para>
+    Widgets and menu screens are where the theme is most obvious,
+    because everything is largely static. You can use a thematic
+    background, some genre-appropriate buttons, and the stage is set.
+  </para>
+
+  <para>
+    The background of each level is a good place to set mood and
+    tone. It usually needs to be minimal so that it doesn&#39;t take
+    attention away from the elements that the player is interacting
+    with, but it&#39;s a good opportunity for you to convey elements
+    of your theme. For instance, if your game is set in Victorian
+    England, then decorating the corners of the background with a
+    damask print or a regal design can help convey the
+    setting. It&#39;s also a good opportunity to use some of the
+    colors of your primary scheme, which can also help set the
+    mood&#58; a bright and cheerful background sends a different
+    message than a dark one.
+  </para>
+  
+  <para>
+    The foreground consists of all the elements your player cares
+    about, such as their player character, their enemies, loot,
+    tutorial messages, and so on. These elements can also be themed to
+    match your color scheme and game theme.
+  </para>
+
+  <para>
+    Finding graphics can be difficult, but there are online
+    repositories of free game art, including&#58;
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+	<link xlink:href="https://itch.io/game-assets/free">Itch.io&#47;game-assets&#47;free</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	<link xlink:href="https://www.gameart2d.com/freebies.html">GameArt2d.com&#47;freebies.html</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	<link xlink:href="https://kenney.nl/assets">Kenney.nl&#47;assets</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	<link xlink:href="https://opengameart.org/">OpenGameArt.org</link>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	<link xlink:href="https://openclipart.org/">OpenClipArt.org</link>
+      </para>
+    </listitem>
+  </itemizedlist>
+
+  <para>
+    There&#39;s a lot of flexibility in the foreground elements. As
+    long as the game <emphasis>world</emphasis> matches your genre, you can drop whatever
+    characters, good or evil, into it and gamers won&#39;t think twice
+    about it. After all, one of the most famous games of all time is
+    ostensibly about the exciting world of plumbing, and yet the main
+    enemies are sentient toadstools and turtles. 
+  </para>
+
+  <para>
+    Even though you may gather game assets from the creative commons,
+    you&#39;re still probably going to find that you have to adapt or
+    modify them. The Raspberry Pi comes fully equipped for game
+    development, graphic design included.
+  </para>
+</section>
+
+<section xml:id="pic-gimp">
+  <info>
+    <title>Card Design with GIMP</title>
+  </info>
+
+  <para>
+    <application>GIMP</application> &#40;GNU Image Manipulation
+    Program&#41; is an all-purpose graphics creation application. You
+    can use it to modify photographs, textures, existing graphics, and
+    combine them all together to provide you with your game assets, or
+    you can just create graphics from nothing but your own idea.
+  </para>
+
+  <para>
+    The barrier to getting started with
+    <application>GIMP</application> isn&#39;t artistic skill so much
+    as comprehending and learning the many tools
+    <application>GIMP</application> has to offer. Entire books have
+    been written about it, there are tutorial websites dedicated to
+    it, and it has thorough documentation, so this section steps you
+    through the process of using the tools that apply to the current
+    goal&#58; creating playing cards for Battlejack. Stepping through
+    this won&#39;t teach you everything about
+    <application>GIMP</application> but it will demonstrate the
+    general process and some of the common tools.
+  </para>
+
+  <bridgehead>Install</bridgehead>
+
+  <para>
+    There are a few different ways to install
+    <application>GIMP</application>. The easiest way gets you an old
+    version of <application>GIMP</application>, and while there&#39;s
+    nothing wrong with that under normal circumstances, you&#39;re a
+    software developer now so there&#39;s no reason to settle for
+    second best. Instead of installing using
+    <application>Synaptic</application> application installer or the
+    <command>apt</command> command in a terminal, you can install the
+    latest version as described on <link
+    xlink:href="https://www.gimp.org/downloads/">gimp.org&#47;downloads</link>.
+  </para>
+
+  <para>
+    The latest build of <application>GIMP</application> is delivered
+    using <application>Flatpak</application>, a software installer
+    method similar in spirit to <command>apt</command>. To use
+    <application>Flatpak</application>, it must be installed&#58;
+  </para>
+    
+<programlisting><![CDATA[
+$ sudo apt install flatpak
+]]></programlisting>
+
+<para>
+  Once <application>Flatpak</application> has been installed, use it
+  to install <application>GIMP</application>&#58;
+</para>
+
+<programlisting><![CDATA[
+$ sudo flatpak install https://flathub.org/repo/appstream/org.gimp.GIMP.flatpakref
+]]></programlisting>
+
+<para>  
+  Once <application>GIMP</application> and all of its dependencies
+  have been installed, you must log out of the Enlightenment desktop,
+  and then log back in so it recognizes updates from
+  <application>Flatpak</application>. If you don&#39;t want to do that
+  just now, you can launch <application>GIMP</application> manually
+  for now, as described on the <link
+  xlink:href="http://gimp.org">gimp.org</link> download
+  instructions&#58;
+</para>
+
+<programlisting><![CDATA[
+$ flatpak run org.gimp.GIMP//stable
+]]></programlisting>
+
+<para>
+  In the future, you can find <application>GIMP</application> in your
+  application menu.
+</para>
+
+<para>
+  The <application>GIMP</application> interface consists of three main
+  regions&#58; the toolbox is full of all the tools you use to compose
+  graphics, the main window containing any graphics you are working
+  on, and contextual docks provides extra options based on what
+  you&#39;re doing.
+</para>
+
+<para>
+  In the first part of this chapter, you defined a theme or a
+  combination of themes, and collected suitable assets, such as fonts
+  and clip art. <application>GIMP</application> allows you to
+  <firstterm>composite</firstterm> them together.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>New document</term>
+    <listitem>
+      <para>
+	In the <application>GIMP</application> window, click
+	<guimenu>File</guimenu> &#62; <guimenuitem>New</guimenuitem>.
+      </para>
+      <para>
+	In the <guilabel>Create a New Image</guilabel> dialog box that
+	appears, set the unit of measure to <literal>mm</literal>. Set
+	the image width to <literal>63.5mm</literal> and
+	the height to <literal>88.9mm</literal>. These measurements
+	are those of a standard US Poker playing card. However, screen
+	size and printed size are different, so click the
+	<guilabel>Advanced Options</guilabel> link at the bottom of
+	the window and set the resolution of your image to
+	<literal>100</literal> DPI. Any lower, and your image may look
+	too small or pixelated on standard displays. Any higher, and
+	your image will be too large to fit on screen.
+      </para>
+
+      <note>
+	<para>
+	  For serious design work, it&#39;s not uncommon to design at
+	  a higher resolution just in case you want to also print the
+	  designs you create for onscreen display, or to account for
+	  the eventual increase in graphic resolution. For instance,
+	  as of this writing, it&#39;s common for gamers to own 100
+	  DPI monitors sized 1920x1080, but in a few years, 4k
+	  monitors, and greater, will be the default. If you design in
+	  higher resolutions, you safeguard against increasing
+	  resolution, but if you do that during this chapter, you will
+	  have to scale the image down in LÖVE.
+	</para>
+      </note>      
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Color scheme</term>
+    <listitem>
+      <para>
+	So that you have it handy, open the
+	<filename>scheme.png</filename> color scheme file you created
+	earlier. If you didn&#39;t create a colour scheme file,
+	that&#39;s alright, just keep your color scheme in mind.
+      </para>
+
+      <para>
+	Color selection in a graphics application is a lot like
+	variables in programming. It&#39;s something you end up doing
+	a lot more often that you think you should have to, although
+	<application>GIMP</application> makes it
+	easy. <application>GIMP</application> is smart enough to map a
+	color scheme to a <emphasis>palette</emphasis>. To see your
+	<application>GIMP</application> palettes, go to the
+	<guimenu>Window</guimenu> menu &#62; <guisubmenu>Dockable
+	Dialogs</guisubmenu> &#62;
+	<guimenuitem>Palettes</guimenuitem>. This embeds a new panel
+	displaying color palettes, including one called
+	<guilabel>Colormap of Image</guilabel>, which is your color
+	scheme imported as a palette. 
+      </para>
+    
+      <para>
+	Right-click on your palette and select <guimenuitem>Duplicate
+	Palette</guimenuitem> to create an editable copy.
+      </para>
+
+      <para>
+	Double-click the duplicate and give it a name, such as
+	<literal>cardscheme</literal>. A named palette becomes
+	permanent.
+      </para>
+
+      <para>
+	You may now close the color scheme file so that only your
+	blank card appears in your workspace. Your named color scheme
+	remains. Right-click on it and select <guimenuitem>Edit
+	Palette</guimenuitem> to open the <guilabel>Palette
+	Editor</guilabel> tab to the top. This displays your color
+	scheme so you can use it as a reference later, when choosing
+	colors in your design.
+      </para>
+      
+      <mediaobject>
+	<info>
+	  <othercredit>
+	    <orgname>Slackermedia</orgname>
+	  </othercredit>
+	</info>
+	<alt>Palette dockable dialogs</alt>
+	<imageobject>
+	  <imagedata align="left" width="2in" format="JPG"
+		     fileref="img/Ch06_skenlon/palette.jpg"/>
+	</imageobject>
+      </mediaobject>
+      
+      <para>
+	<application>GIMP</application> uses a tabbed interface to
+	manage open files, so to get back to your card design,
+	click the appropriate tab at the top of the window.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>Text elements</term>
+    <listitem>
+      <para>
+	Eventually you must create cards for each card listed in
+	the <filename>deck.ini</filename> file, but this example
+	creates a wizard card with a value of 10 to ensure that the
+	initial design accounts for a long title and a double-digit
+	value.
+      </para>
+
+      <para>
+	Select the text tool from the tool panel, or press <keycombo><keycap>t</keycap></keycombo> on your keyboard, on the left and click near the top left corner of your card, but don&#39;t start typing anything yet. When you click, a contextual tool-based panel appears below your toolbox. Since the text tool is active, you see options for text. Pick a font within your theme, and set the size to 60 or so.
+      </para>
+
+      <para>
+	To set the color of your text, click the box labelled <guilabel>Color</guilabel>. A color picker window appears. Its default view is the <application>GIMP</application> color picker, but there are tabs along the top of window. Click the right-most tab to view your custom palette and choose a color for your text. Click the <guibutton>OK</guibutton> button.
+      </para>
+
+      <mediaobject>
+	<info>
+	  <othercredit>
+	    <orgname>Slackermedia</orgname>
+	  </othercredit>
+	</info>
+	<alt>Color picker</alt>
+	<imageobject>
+	  <imagedata align="left" width="4.2in" format="JPG"
+		     fileref="img/Ch06_skenlon/picker.jpg"/>
+	</imageobject>
+      </mediaobject>
+      
+      <para>
+	Now that you have your tool configured, type out the title of
+	the card&#58; Wizard. Don&#39; worry if you positioned your
+	text too far to the right such that the whole word can&#39;t
+	fit&#59; you can fix that afterwards. Press the
+	<keycombo><keycap>Esc</keycap></keycombo> key to exit text
+	mode.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+  <varlistentry>
+    <term>Time to save</term>
+    <listitem>
+      <para>
+	It&#39;s never too early to start saving your work. To save your document, go to the <guimenu>File</guimenu> menu and select <guimenuitem>Save</guimenuitem>. You can save the document anywhere you please, but it&#39;s best to keep project work together, so saving it into your <filename>battlejack</filename> directory is best. However, <application>GIMP</application> files are a special <filename>.xcf</filename> format intended as an uncompressed master copy, not as a file for everyday use, so in the end you&#39;ll export to <filename>.png</filename> or <filename>.jpg</filename>. Intermediate files that are necessary to create assets but that do not ship with a game are generically called <emphasis>source</emphasis> files. It&#39;s not uncommon to place them in a directory all their own, and then to exclude that directory from your final <filename>.love</filename> package.
+      </para>
+
+      <para>
+	Using the <application>GIMP</application> save dialog, create a new directory, called <filename>src</filename>, in your <filename>battlejack</filename> project. In <filename>src</filename>, create another directory called <filename>img</filename>, and save your file into it with the name <filename>red-10-wizard.xcf</filename>.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>Moving layer</term>
+    <listitem>
+      <para>
+	When you typed text onto your card, you created a new
+	<firstterm>layer</firstterm>. If you don&#39;t see a
+	<guilabel>Layers</guilabel> docker in your
+	<application>GIMP</application> window, go to the
+	<guimenu>Window</guimenu> &#62; <guisubmenu>Dockable
+	Dialogs</guisubmenu> menu and select
+	<guimenuitem>Layers</guimenuitem> to open it or bring it to
+	the top of a docking panel.
+      </para>
+      
+      <para>
+	Layers are like sheets of cellophane placed on top of a
+	canvas. They&#39;re transparent until you &#34;paint&#34;
+	something on them, and even then you can always move or remove
+	the layer entirely because you haven&#39;t painted on your
+	canvas, but on a transparent layer above it.
+      </para>
+
+      <para>
+	As long as the text layer is selected &#40;and it is, by
+	default, because it was the most recent one you created&#41;,
+	you can see its bounding box as a yellow and black
+	dotted-line. By default, a layer uses up only as much space as
+	it needs, but if you need to make a layer bigger, go to the
+	<guimenu>Layer</guimenu> menu and select <guimenuitem>Layer to
+	Image Size</guimenuitem>.
+      </para>
+
+      <para>
+	To move a layer, select the move tool in the tool panel, or press <keycombo><keycap>m</keycap></keycombo>. As always, the tool options panel displays configuration choices for that tool. Click the <guilabel>Move the active layer</guilabel>.  
+      </para>
+
+      <para>
+	Click on your card and drag your mouse to move the active layer. Position your text where you think the title of each card looks best.
+      </para>
+     
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Backdrops</term>
+    <listitem>
+      <para>
+	To help the player focus on what&#39;s important, it often
+	helps to add backdrops. A backdrop separates important
+	information, especially text, from the background image.
+      </para>
+
+      <para>
+	To add a layer between the background and a foreground layer,
+	right-click the background layer and select <guimenuitem>New
+	Layer</guimenuitem>. In the <guilabel>New Layer</guilabel>
+	window that appears, name the layer
+	<literal>backdrop</literal> and set the <guilabel>Fill
+	with</guilabel> field to <literal>Transparency</literal> so
+	that the layer is filled with an transparent alpha channel.
+      </para>
+
+      <para>
+	Select the Rectangle Select Tool from the tool panel, or press
+	<keycombo><keycap>r</keycap></keycombo> on your
+	keyboard. Using this selection tools, select an area around
+	the title. It might be hard to tell, but you&#39;re not
+	selecting either the title text or the white background behind
+	it. You&#39;re selecting a portion of the invisible layer
+	between them.
+      </para>
+
+      <para>
+	Click the top color swatch under the toolbox. In the color
+	picker that appears, select the palette tab and select a color
+	within your color scheme.
+      </para>
+
+      <para>
+	Click the <guimenu>Edit</guimenu> menu at the top of the <application>GIMP</application> window and select <guimenuitem>Fill with FG Color</guimenuitem> &#40;FG stands for <emphasis>foreground</emphasis>&#41;.
+      </para>
+
+      <para>
+	To exit selection mode, press the <keycombo><keycap>Esc</keycap></keycombo> key on your keyboard.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Color code and value</term>
+    <listitem>
+      <para>
+	The card still needs a value. According to
+	<filename>deck.ini</filename>, its value is 10. Repeat the
+	previous process to create a value indicator.
+      </para>
+
+      <para>
+	Since Battlejack's opposing sides are differentiated by color
+	&#40;red against black&#41;, use red as the backdrop color. If
+	you don&#39;t have red in your color scheme, you must
+	adapt. You can still use your color scheme as a guide,
+	though. RGB colors are defined by three numbers&#58; one
+	number, 0 to 255, for red, another for green, and a third for
+	blue. These values are visible in the right column of the
+	<application>GIMP</application> color picker window. Look at a
+	color in your palette and shift its numbers such that the
+	highest number is in the color you want to create within the
+	same color scheme.
+      </para>
+
+      <para>
+	For instance, assume you have a green defined in your palette
+	with these values&#58; Red 11, Green 14, Blue 8. To produce a
+	red similar in &#34;feel&#34;, shift each number one position
+	to the left so that the number in the Blue slot now goes to
+	Green, the number in the Green slot goes to Red, and the
+	number in Red wraps around to Blue&#58; Red 14, Green 8, Blue
+	11.
+      </para>
+
+      <para>
+	The resulting red shade may not be exactly what you want, but
+	this trick produces something in the same mood as the rest of
+	your color scheme, and you can adjust it manually with one of
+	the color wheels in the color picker tabs.
+      </para>
+        
+    <mediaobject>
+	<info>
+	  <othercredit>
+	    <orgname>Slackermedia</orgname>
+	  </othercredit>
+	</info>
+	<alt>Card with text and backdrops</alt>
+	<imageobject>
+	  <imagedata align="left" width="5in" format="PNG"
+		     fileref="img/Ch06_skenlon/cardtext.png"/>
+	</imageobject>
+    </mediaobject>
+
+      </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>Background image</term>
+    <listitem>
+      <para>
+	The card design is basically finished. It has the requisite
+	information on it, so all it needs now is an image. Find an
+	image that you feel might represent a wizard. Think
+	abstractly. It&#39;s easier to find an image that suggests
+	wizardry than to find a free image of exactly what you see in
+	your mind&#39;s eye when you think of a wizard.
+      </para>
+
+      <para>
+	For example, you might be able to find a series of icons for
+	fantasy roles consisting of wands, swords, battle axes, and so
+	on. Even if you only find five or six icons, you could reuse
+	those depending on the broad category of each card &#40;a wand
+	for each magic user, a sword for generic fighters, an axe for
+	particularly powerful fighters, and so on.
+      </para>
+
+      <para>
+	Alternately, you can borrow from <productname>Magic&#58; the
+	Gathering</productname>, which bases all player abilities on
+	five different types of land. Backgrounds for video games or
+	even landscape photography is easy to find. Add some
+	&#34;flavor text&#34; on the card to explain how the land
+	depicted has influenced the wizard that the card represents.
+      </para>
+
+      <para>
+	The possibilities are endless, so use your imagination. If you
+	can&#39;t find suitable images for this project, you can use
+	images provided along with the source code for this book. The
+	images are from the tabletop game
+	<productname>Petition</productname>, designed by the author,
+	and illustrated by Nikolai Mamashev in Krita on Linux. All
+	assets are provided under the Creative Commons Attribution-ShareAlike license.
+      </para>
+
+      <para>
+	To bring in an image, click the layer named
+	<guilabel>Background</guilabel>. This layer is the base layer
+	of your <application>GIMP</application> document. Click the
+	<guimenu>File</guimenu> menu and select <guimenuitem>Open as
+	layers</guimenuitem>.
+      </para>
+
+      <para>
+	The image you choose from the file chooser is imported into
+	your document above the <guilabel>Background</guilabel> layer
+	but below your backdrops and text. The image may be too large,
+	but you can fix that with the scale tool.
+      </para>
+
+      <para>
+	As needed, select the scale tool from the toolbox, or press
+	<keycombo><keycap>Shift</keycap> <keycap>s</keycap></keycombo>
+	on your keyboard. Click on the image that you want to resize
+	and use the selection bounding box or the dialog box to scale
+	the image to better fit into your card design. Press the
+	<keycombo><keycap>Return</keycap></keycombo> key or click the
+	<guibutton>Scale</guibutton> button to accept the change.
+      </para>
+
+      <para>
+	Other tools you can use to fit an image into your design
+	include the rotate and flip tools. Try them out and see what looks best.
+      </para>
+      </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Integration</term>
+    <listitem>
+      <para>
+	To bring elements of the card design together, and as an
+	excuse to learn more <application>GIMP</application> tricks,
+	the final step is to make the card look more like an
+	intentional design and less like something cobbled together
+	from disparate sources. You can try one or none of these
+	techniques, depending on what you like in card design.
+      </para>
+
+      <para>
+	The first technique is to add a subtle drop shadow to the
+	backdrop to suggest that the &#34;meta&#34; game information
+	is not, itself, part of the wizard. In other words, you&#39;re
+	acknowledging that in real life, people don&#39;t walk around
+	with banners and titles and a number value assigned to them.
+      </para>
+
+      <para>
+	To add a drop shadow, select a backdrop layer and then click
+	<guimenu>Filters</guimenu> &#62; <guisubmenu>Light and
+	Shadow</guisubmenu>. There are currently two different drop
+	shadow filters&#58; one is permanent and the other
+	&#40;&#34;legacy&#34;&#41; creates a new layer just for the
+	drop shadow. Use either one, but remember&#58; less is more. A
+	subtle shadow says more than a big, bold shadow that draws
+	attention to itself.
+      </para>
+
+      <para>
+	Another integration technique is to merge the meta information
+	of the card with the &#34;flavor&#34; &#40;graphic&#41;. You
+	can do that by blending text into the image. First,
+	right-click the <literal>10</literal> layer in the <guilabel>Layers</guilabel>
+	docker and select <guimenuitem>Text to Path</guimenuitem>.
+      </para>
+
+      <para>
+	Locate the <guilabel>Paths</guilabel> docker by clicking the
+	<guimenu>Windows</guimenu> menu and selecting
+	<guisubmenu>Dockable Dialogs</guisubmenu> &#62;
+	<guimenuitem>Paths</guimenuitem>. In the
+	<guilabel>Paths</guilabel> palette, there is now an outline of
+	the text element <literal>10</literal>. The outline is a
+	vector path, a mathematical formula that
+	<application>GIMP</application> doesn&#39;t see as a graphic
+	but as a guide for graphical manipulation. Right-click on the
+	path and select <guimenuitem>Path to
+	Selection</guimenuitem>. The text on the card is now selected.
+      </para>
+
+      <para>
+	Navigate back to the <guilabel>Layers</guilabel> docker. Click
+	the eye icon to the left of the <literal>10</literal> layer to
+	hide the text, and then select the red backdrop layer.
+      </para>
+
+      <para>
+	With the shape of the <literal>10</literal> still selected,
+	press the <keycombo><keycap>Delete</keycap></keycombo> key of
+	your keyboard, or go to the <guimenu>Edit</guimenu> menu and
+	select <guimenuitem>Clear</guimenuitem>. This erases red from
+	your backdrop in the exact shape of a number
+	<literal>10</literal>. You can see right through the backdrop
+	to the image below.
+      </para>
+
+      <para>
+	To remove the active selection, go to
+	<guimenu>Select</guimenu> and choose
+	<guimenuitem>None</guimenuitem> or press
+	<keycombo><keycap>Shift</keycap> <keycap>Ctrl</keycap>
+	<keycap>a</keycap></keycombo> on your keyboard.
+      </para>
+      </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+  There&#39;s a lot more you can do in
+  <application>GIMP</application>, so try out some subtle effects,
+  brushes, and composite modes. Work in layers so that anything you do
+  can&#39;t be undone as needed. <application>GIMP</application> is a
+  powerful tool, so investing in a good tutorial book or spending time
+  on some tutorial sites is effort well spent.
+</para>
+
+<para>
+  Of course, you don&#39;t have to use this example as a blueprint for
+  your design. Come up with your own ideas, tap into what appeals to
+  you, and create it.
+</para>
+
+    <mediaobject>
+	<info>
+	  <othercredit>
+	    <orgname>Slackermedia</orgname>
+	  </othercredit>
+	</info>
+	<alt>Card ideas</alt>
+	<imageobject>
+	  <imagedata align="left" width="5in" format="PNG"
+		     fileref="img/Ch06_skenlon/triptych.png"/>
+	</imageobject>
+    </mediaobject>
+</section>
+
+<section xml:id="pic-save">
+  <info>
+    <title>Exporting from GIMP</title>
+  </info>
+
+  <para>
+    The native format of <application>GIMP</application> files is a
+    multi-layered and uncompressed <filename>.xcf</filename>
+    file. It&#39;s intended as a project file for use within
+    <application>GIMP</application>. It wouldn&#39;t make sense to use
+    it anywhere else, especially not in a LÖVE game. After completing
+    each card, you must export it to a common graphic format like PNG
+    or JPEG.
+  </para>
+
+  <para>
+    To export an image from <application>GIMP</application>, go to the
+    <guimenu>File</guimenu> menu and select <guimenuitem>Export
+    as</guimenuitem>.
+  </para>
+
+  <para>
+    In the file chooser that appears, navigate to your
+    <filename>battlejack</filename> project directory, name the file
+    in a standard format, such as
+    <filename>red-10-wizard.png</filename>, and then export the image
+    to the <filename>img</filename> directory.
+  </para>
+</section>
+
+<section xml:id="pic-work">
+  <info>
+    <title>Homework</title>
+  </info>
+
+  <para>
+    Getting to know <application>GIMP</application> is important if
+    you plan on doing graphics work, whether you anticipate creating
+    promotional web banners or all the graphics in your game. Spend
+    some time getting to understand how
+    <application>GIMP</application> works, and enjoy the freedom of
+    doing complex graphical work without having to pay a
+    &#34;rental&#34; fee each month, the way designers tied down to
+    big-name competitors do.
+  </para>
+
+  <para>
+    There are several other excellent graphic applications on
+    Linux. <application>GIMP</application> is good at collage
+    &#40;known as <firstterm>compositing</firstterm>,
+    professionally&#41;, and can be used for digital painting if you
+    download a good set of brushes.
+  </para>
+
+  <para>
+    Others include&#58;
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para><application>Inkscape</application> is a vector drawing application, good for precision illustration, layout, and graphics that scale infinitely.
+      </para>
+    </listitem>
+    <listitem>
+      <para><application>mtPaint</application> is a bitmap drawing application good for pixel art. It&#39;s a small application that runs very well on the Raspberry Pi. 
+      </para>
+    </listitem>
+    <listitem>
+      <para><application>Krita</application> is a digital painting application. It&#39;s a big application and doesn&#39;t run well on the current Raspberry Pi.
+      </para>
+    </listitem>
+    <listitem>
+      <para><application>MyPaint</application> is another digital painting application. For small drawings, it runs on the latest Pi.
+      </para>
+    </listitem>
+  </itemizedlist>  
+</section>
+</chapter>

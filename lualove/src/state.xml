@@ -1,0 +1,1138 @@
+<chapter xml:id="state">
+  <!-- Ch10 -->
+  <title>Save Files and Game States</title>
+
+  <para>
+    The Battlejack game is fully functional, but there are still
+    convenience functions to add, including saving and loading game
+    progress, and switching between fullscreen and windowed mode.
+  </para>
+
+  <para>
+    Realistically, Battlejack doesn&#39;t exactly demand a fullscreen
+    mode, since it's a relatively simple game. But for more complex
+    games with a complex story, you might want to encourage
+    immersion, and one way to help the player focus on the game and
+    only the game is to give them the option for the game to take over
+    their entire screen.
+  </para>
+
+  <para>
+    The problem with switching between fullscreen and windowed mode is
+    that the graphic sizes must be re-calculated. You may even
+    see, in some games, that changing the resolution of the game
+    requires the game to be relaunched before it can re-draw. LÖVE can
+    change dimension dynamically, as long as your code adjusts for
+    the change.
+  </para>
+
+  <section xml:id="state-fs">
+  <info>
+    <title>Fullscreen</title>
+  </info>
+
+  <para>
+    In its current state, your Battlejack code requires some changes
+    to account for a sudden change in game window size. If you&#39;re
+    not a fan of math, many of the changes will seem a little
+    mysterious, but the most important concept is the use of relative
+    measurements. You must base the size of game elements on the width
+    and height of the user&#39;s current window size, but in order to
+    do that you must ask the user's system what that size is. In
+    practice, this often means that you have to adjust the location of
+    elements to account for a potential change in empty &#40;or
+    &#34;negative&#34;&#41; space.
+  </para>
+
+  <para>
+    The first file that needs an update is the place where fullscreen
+    mode is toggled on and off&#58; the menu screen. There are a few
+    LÖVE functions that deal with window sizes&#58;
+  </para>
+
+  <variablelist>
+    <varlistentry>
+      <term><function>love.window.getFullscreen()</function></term>
+      <listitem>
+	<para>
+	  Whether or not the current window is in fullscreen
+	  mode. This function returns a Boolean value&#58; true or false. 
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term><function>love.window.setFullscreen()</function></term>
+      <listitem>
+	<para>
+	  Activates fullscreen mode.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term><function>love.window.getMode()</function></term>
+      <listitem>
+	<para>
+	  Returns the mode of the window.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term><function>love.window.setMode()</function></term>
+      <listitem>
+	<para>
+	  Sets the window dimensions.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term><function>love.window.updateMode()</function></term>
+      <listitem>
+	<para>
+	  Forces the window to update its mode settings.
+	</para>
+      </listitem>
+    </varlistentry>   
+  </variablelist>
+
+  <para>
+    With these functions, you can always determine whether your game
+    screen is fullscreen or windowed, and extract the dimensions of
+    the space you have available.
+  </para>
+
+  <para>
+    The fullscreen toggle selection in <filename>menu.lua</filename>
+    is option 3 &#40;it&#39;s the third selection in the menu
+    <literal>entries</literal> array&#41;. Currently, there&#39;s a
+    placeholder there&#58; it returns <literal>true</literal>, which
+    in this context is Lua shorthand for <emphasis>not an
+    error</emphasis>.
+  </para>
+
+  <para>
+    Erase the placeholder and fill in some useful
+    logic to determine whether the window is currently in fullscreen
+    mode. If it is not in fullscreen, place it in fullscreen mode and
+    get the dimensions of the screen so that the variables
+    <varname>WIDE</varname> and <varname>HIGH</varname> have accurate
+    numbers in them for use by calculations in the game code. If the
+    window is currently in fullscreen mode, set the width and height
+    back to the default size. In either case, update the mode to make
+    sure that LÖVE forces a redraw of the entire window.
+  </para>
+
+<programlisting><![CDATA[
+elseif selection == 3 then
+   if not love.window.getFullscreen() then
+      love.window.setFullscreen(true, "desktop")
+      WIDE,HIGH = love.window.getMode()
+   else
+      WIDE,HIGH = 960,720
+      love.window.setMode(WIDE,HIGH)
+   end
+   love.window.updateMode(WIDE,HIGH,{resizable=true,vsync=false,minwidth=WIDE,minheight=HIGH})
+   fsupdated = 1
+]]></programlisting>
+
+<para>
+  At the end of this code, a new variable called
+  <varname>fsupdated</varname> is created and set to
+  <literal>1</literal>. This variable serves as a flag signaling that
+  the window mode has been changed, which in turn lets you write code
+  in <filename>game.lua</filename> that only runs when a window mode
+  change is made.
+</para>
+
+<para>
+  For the game to resize, several adjustments are required. Some game
+  elements in Battlejack have been purposefully misconfigured in
+  earlier chapters so that you can see the difference between a
+  reasonable first attempt and, ultimately, the correct code. The
+  important thing to understand is that when scaling a game, you must
+  think about many different factors, and these factors may be unique
+  to your game, depending on the assets you use. The examples in this
+  section are specific to Battlejack, but the principles of using
+  variables for calculations, detecting changes in screen settings,
+  and knowing what can and cannot scale, are broadly applicable no
+  matter what your game is like.
+</para>
+
+<para>
+  Open <filename>game.lua</filename> for editing. The various states
+  of the game are defined by the variable
+  <varname>STATE</varname>. Any time a user enters game mode, it is by
+  triggering the <literal>game.activate</literal> function, whether by
+  selecting <literal>New game</literal> or pressing
+  <keycap>Esc</keycap>. That means that any time a user is in the menu
+  screen, the <literal>game.activate</literal> function is the entry
+  point to the game, and the ideal place to detect whether the screen
+  size has changed.
+</para>
+
+<para>
+  Change <literal>game.activate()</literal> function to match this code&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.activate()
+   -- switch to game screen
+   STATE = game
+   ground = love.graphics.newQuad(0,0,WIDE,HIGH,150,150)
+   font = love.graphics.setNewFont("font/Arkham_reg.TTF",72)
+   
+   if fsupdated == 1 then
+      scale = game.scaler(WIDE,790)
+
+      local arr = {hand,horde,back,grab}
+      for i,tbl in ipairs(arr) do
+	 for n,obj in pairs(tbl) do
+	    obj.wide = obj.img:getWidth()*scale
+	    obj.high = obj.img:getHeight()*scale
+	 end
+      end
+      fsupdated = 0
+   end
+end
+]]></programlisting> 
+
+<para>
+  If the <varname>fsupdated</varname> variable is
+  <literal>1</literal>, this function now your
+  <literal>game.scaler</literal> function to recalculate a new scale
+  for each card relative to the size of the screen.
+</para>
+
+<para>
+  Additionally, the function cycles through each of the <varname>hand</varname>, <varname>horde</varname>,
+  <varname>back</varname>, and <varname>grab</varname> decks and
+  applies the new size to the cards in play. 
+</para>
+
+<para>
+  Finally, it sets the <varname>fsupdated</varname> to
+  <literal>0</literal> so that no further size updates are triggered
+  until the user changes the screen settings again. 
+</para>
+
+<para>
+  Launch the game and change the screen setting now. Take note of what
+  scales properly and what does not. Spend some time thinking about
+  the problems you see, and try to predict what function contains the
+  problem code.
+</para>
+
+<section id="state-fs-usability">
+<info>
+  <title>Usability</title>
+</info>
+
+<para>
+  One point of confusion you might detect after testing is that
+  there&#39;s no explicit way to return to the game from the menu
+  screen. On one hand, it&#39;s reasonable to expect that since the
+  user had to press <keycap>Esc</keycap> to get to the menu screen in
+  the first place, the user can probably guess that pressing
+  <keycap>Esc</keycap> again returns to the game. On the other hand,
+  making the user think too hard about an interface can get
+  frustrating, so there&#39;s no reason to leave it up to chance.
+</para>
+
+<para>
+  Add a menu option to return to a game already in progress. Phrases
+  like &#34;Exit menu&#34; and &#34;Resume game&#34; can be taken many
+  different ways&#58; exiting the menu could also mean exiting the
+  application, and resuming a game could mean loading a previously saved
+  game. A good interface uses the clearest possible language, which in
+  this case is simply &#34;Return to game&#34;.
+</para>
+
+<para>
+  First add the new option to the menu entry array in
+  <filename>menu.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+local entries = { "New game", "Load saved",
+      "Window mode", "Save", "Return to game", "Quit" }
+]]></programlisting>
+
+<para>
+  Change the menu maximum value, which is used by the
+  <literal>wrap</literal> function to move the selection marker from
+  the bottom of the menu back to the top, to match the number of menu
+  entries. Previously, the <varname>menmax</varname> value was
+  hard coded to <literal>5</literal>, but by now you are familiar with
+  some new array shortcuts, so it makes sense to make the
+  <varname>menmax</varname> a dynamic value that sets itself to
+  whatever number of items in the <varname>entry</varname> array&#58;
+</para>
+
+<programlisting><![CDATA[
+local menmax = #entries
+]]></programlisting>
+
+<para>
+  In the <literal>menu.draw</literal> function, change the
+  <literal>for</literal> loop to repeat itself from 1 to whatever
+  value is contained in the <literal>menmax</literal> variable. The
+  first and last line in this code block are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+love.graphics.setBackgroundColor(0.1,0.1,0.1) --for context
+for i=1,menmax do
+   if i == selection then --for context
+]]></programlisting>
+
+<para>
+  The addition of a new entry has pushed the <literal>Quit</literal> option back to item 6, so
+  adjust the menu code&#58;
+</para>
+
+<programlisting><![CDATA[
+elseif selection == 5 then
+    game.activate()
+elseif selection == 6 then
+    love.event.quit()
+end
+]]></programlisting>
+</section>
+
+<section id="state-fs-adjust">
+<info>
+<title>Scaling adjustments</title>
+</info>
+
+<para>
+  Generally, measurements that need to change dynamically are more
+  predictable when they are based on a single point of authority. All
+  the scaling problems you are witnessing in your test are bugs in the
+  <literal>game.draw</literal> function, where there is heavy reliance
+  on <varname>card.x</varname> and <varname>card.y</varname>
+  values. Since there are several arrays defining cards, the values
+  stored in various <varname>card</varname> values are
+  unpredictable. There is also some dependence on the
+  <varname>pad</varname> value, which defines a margin around the
+  edges of the screen, but it changes depending on the screen
+  size. And finally, while the <varname>slot</varname> variable
+  provides the width of the cards, there&#39;s no value at all for the
+  height of cards in relation to the screen size.
+</para>
+
+<para>
+  In summary, the layout of a dynamically resizable game must be based
+  on the size of its parent window.
+</para>
+
+<para>
+  To fix your scaling bugs, first determine the aspect ratio &#40;width divided by height&#41; of your
+  cards. This value will help determine the relative height of cards
+  regardless of size. Create a global variable for this value at the
+  top of <filename>game.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+ratio = 1.37
+]]></programlisting>
+
+<para>
+  Next, change the values for the player&#39;s draw deck &#40;the card
+  back&#41;. The first and last lines are for context&#58;
+</para>
+
+<programlisting><![CDATA[
+card = back[1] --for context
+love.graphics.draw(glow,pad,HIGH-slot-(slot*ratio),0,scale,scale,0,0)
+love.graphics.draw(card.img,pad,HIGH-(slot*ratio)-pad,0,scale,scale,0,0)
+love.graphics.setColor(0,0,0) --for context
+]]></programlisting>
+
+<para>
+  Notice that the new method of placing the glow and the deck relies
+  exclusively on values derived from the screen size, and not at all
+  on card-specific variables. As usual in programming, there are
+  actually several different ways to arrive at the same solution, but
+  this is the most efficient&#59; an alternative is to leave the code
+  unchanged, and use screen size calculations to update the important
+  <varname>card</varname> variables, but that requires updating values
+  in several places, whereas the screen size calculations are made
+  once and then can be used many times. Any time you have the
+  opportunity to require the computer to do less work, you are
+  <emphasis>optimizing</emphasis> your code, and that&#39;s always a
+  good thing.
+</para>
+
+<para>
+  The same principles apply to the AI&#39;s deck&#58;
+</para>
+
+<programlisting><![CDATA[
+card = back[2] --for context
+love.graphics.draw(shadow,WIDE-(slot)-pad,slot+(slot/4),0,scale,scale,0,0)
+love.graphics.draw(card.img,WIDE-pad,slot+pad+slot/4,0,-1*scale,-1*scale,0,0)
+]]></programlisting>
+
+<para>
+  The running score for the player&#39;s hand also needs an
+  update&#58;
+</para>
+
+<programlisting><![CDATA[
+love.graphics.printf(tostring(handval),(slot)-slot/2,HIGH-(slot*ratio)-pad-pad,slot/2,'center')
+]]></programlisting>
+
+<para>
+  And for the running score for the AI&#58;
+</para>
+
+<programlisting><![CDATA[
+love.graphics.printf(tostring(hordeval),WIDE-(slot/2)-pad*2,(slot*ratio)+pad,slot/2,'center')
+]]></programlisting>
+
+<para>
+  The screen text announcing the winner and loser requires the same
+  adjustment, because the screen size ratio is not necessarily the
+  same between its windowed mode and its fullscreen mode
+  &#40;depending on the resolution the user&#39;s physical
+  monitor is&#41;. Still in the <literal>game.draw</literal> function,
+  update the <literal>printf</literal> statements to match this
+  code block&#58;
+</para>
+
+<programlisting><![CDATA[
+if progress < 2 then
+   love.graphics.printf("Level " .. level,0,HIGH-(slot*ratio)-(pad*ratio)-72,WIDE,'center')
+end
+   
+if winner == "hand" then
+   lastwon = 1
+   love.graphics.printf("You have won!",0,(slot*ratio)+(pad*ratio)-72,WIDE,'center') 
+elseif winner == "horde" then
+   lastwon = 0
+   love.graphics.printf("You have lost.",0,(slot*ratio)+(pad*ratio)-72,WIDE,'center')
+elseif winner == "tie" then
+   lastwon = 0
+   love.graphics.printf("Tied game.",0,(slot*ratio)+(pad*ratio)-72,WIDE,'center')      
+end
+
+]]></programlisting>
+
+<para>
+  The <literal>72</literal> in each line is the font size of the
+  onscreen text. By now, you&#39;re hopefully suspicious of
+  <emphasis>any</emphasis> hard coded value, so you&#39;re probably
+  wondering whether even this value ought to become relative. In fact,
+  you could make the font size more dynamic by either using some
+  calculation to determine the optimal size depending on screen size,
+  or you could create an array of font sizes for specific ranges of
+  screen sizes. As screen sizes vary wildly in sizes, from mobile
+  phones to 4k monitors, this is a worthwhile exercise, but one left
+  for you to manage on your own.
+</para>
+
+<para>
+  All of these changes have affected the <varname>grab</varname>
+  code. When a player selects a card, it&#39;s added to the
+  <varname>grab</varname> array, but it&#39;s also moved up the screen
+  and given a particle effect, very precisely placed just under its
+  top border.
+</para>
+
+<para>
+  In this case, changing the values of one or two or even three
+  grabbed cards is manageable, so for each card in the
+  <varname>grab</varname> array, adjust the Y position and then use
+  that value to calculate the position of the particle effect. Since
+  all values are relative to the screen size, the particle effect
+  is anchored to the card size even when the card size has changed to fit a
+  new screen size. Find and update this code block in your
+  <literal>game.draw</literal> function&#58;
+</para>
+  
+<programlisting><![CDATA[
+for i,obj in pairs(grab) do --for context
+   local count = 1          --for context
+   while count < obj.wide/mana:getWidth() do --for context
+      obj.y=HIGH-(slot*ratio)-pad*2
+      love.graphics.draw(parti,obj.x+(mana:getWidth()*count+1),obj.y+32/2)
+      count = count+1 --for context
+   end                 --for context
+end -- for context
+]]></programlisting>
+
+<para>
+  Notice that the particle effect line uses <literal>32/2</literal>
+  instead of the old <literal>pad/3</literal> calculation to position
+  the particle image below the card&#39;s top border. This is
+  dependent on the particle image, so if you have changed or plan on
+  changing the particle seed image, you must adjust the value
+  <literal>32</literal> to match the height of your custom image. To
+  make this kind of change even easier, you could create a variable at
+  the top of the file to define the height of the particle image, and
+  then use that variable in this code. That way, all the values you
+  need to change are easily found at the very top of your file, saving
+  you from having to search through your code for all the hard coded
+  values requiring updates. Again, this exercise is left to you to do
+  on your own time.
+</para>
+
+<para>
+  When the player&#39;s hand is drawn, you must change the code so
+  that items in the <varname>grab</varname> table are moved up to
+  their new Y position, and items in the <varname>hand</varname> table
+  stay in position&#58;
+</para>
+
+<programlisting><![CDATA[
+   for i,obj in pairs(hand) do --for context
+      if game.isselected(obj,grab) then
+         love.graphics.draw(obj.img,obj.x,obj.y,0,scale,scale,0,0)
+      else 
+	 obj.x = pad+(slot*i)
+	 obj.y = HIGH-(slot*ratio)-pad
+	 love.graphics.draw(obj.img,obj.x,obj.y,obj.r,scale,scale,0,0)
+      end
+   end --for context
+]]></programlisting>
+
+<para>
+  Try playing the game again to experience dynamic switching of screen
+  sizes. Make adjustments and changes as required, and remember to
+  commit your changes to Git once satisfied.
+</para>
+
+</section> <!-- state-fs-adjust -->
+</section> <!-- state-fs -->
+
+<section id="state-save">
+  <info>
+    <title>Save states</title>
+  </info>
+
+  <para>
+    Save states for games are a nice convenience for users, and generally
+    expected in modern gaming. Luckily, there&#39;s a wide range in
+    what users accept for save states. Some games save every last
+    detail of a game so that when you resume a saved game, it&#39;s as
+    if you had only paused the game. Others save less information,
+    placing you back at a waypoint or checkpoint. Still others only
+    save your level and nothing else.
+  </para>
+
+  <para>
+    Considering that Battlejack falls within the puzzle or card game
+    genre, saving just the player&#39;s level would probably be
+    acceptable by most users. However, Lua&#39;s heavy use of tables
+    makes saving and restoring complex data easy, so Battlejack can
+    have full save state support.
+  </para>
+
+  <para>
+    There are two bundles of information that need to be saved&#58;
+    there&#39;s the player information and the game state. Player
+    information is anything that remains true regardless of a game
+    round, such as whether or not the game is in fullscreen mode, and
+    what level the player has reached. Game information is anything
+    specific to the current round, such as the contents of the draw
+    decks and the players&#39;s hands.
+  </para>
+
+  <para>
+    You will use two different methods of saving this information, and
+    the information gets saved to two separate locations on the
+    user&#39;s drive. Player information is generally referred to as
+    the user <emphasis>configuration</emphasis> and the game
+    information is <emphasis>game data</emphasis> or just
+    <emphasis>data</emphasis>.
+  </para>
+
+  <para>
+    Create a new file called <filename>saver.lua</filename> in your
+    project directory. Open it and add a <literal>package.path</literal>
+    and a requirement of the <literal>inifile</literal> module. Also,
+    establish a table to hold the functions you will create for it&#58;
+  </para>
+
+<programlisting><![CDATA[
+package.path = package.path .. ';local/share/lua/5.3/?.lua'
+inifile = require('inifile')
+
+saver = {}
+]]></programlisting>
+
+<para>
+  One of the most common errors when saving and loading data in an
+  application&#39;s code are missing files or directories. For
+  instance, if you write Lua code to save a the file
+  <filename>bar.conf</filename> in a directory called
+  <filename>foo</filename>, if Lua can&#39;t find the
+  <filename>foo</filename> directory, then Lua crashes.    
+</para>
+
+<para>
+  Lua has no way of knowing whether a file or a directory exists, so
+  you must write a function for this. This is a low level
+  operation that is usually the domain of the operating system, and as
+  such Lua&#39;s <literal>os</literal> function has some tools that
+  can help solve this puzzle. Lua functions are documented on the Lua
+  website at <link
+  xlink:href="https://www.lua.org/manual">lua.org&#47;manual</link>
+  and also in the book <citation><citetitle>Programming in
+  Lua</citetitle></citation>, an official guide to Lua from the
+  language creators.
+</para>
+
+<para>
+  While there is no function to determine whether a file or directory
+  exists, the <literal>os.rename</literal> function requires that a
+  file or directory <emphasis>exists</emphasis> in order to
+  successfully rename it. It&#39;s a little bit of a hack, but by
+  invoking <literal>os.rename</literal> on a file path, you can parse
+  its output to determine whether it was able to find a file or not.
+</para>
+
+<para>
+  For example, here&#39;s what a successful
+  <literal>os.rename</literal> action looks like&#58;
+</para>
+
+<programlisting><![CDATA[
+$ touch foo
+$ lua
+> os.rename("foo","bar")
+true
+]]></programlisting>
+
+<para>
+  An unsuccessful   <literal>os.rename</literal> action&#58;
+</para>
+
+<programlisting><![CDATA[
+> os.rename("foo","baz")
+nil	No such file or directory	2
+]]></programlisting>
+
+<para>
+  And finally, here is an edge case in which
+  <literal>os.rename</literal> finds a file but is unable to rename
+  it&#58;
+</para>
+
+<programlisting><![CDATA[
+> os.rename("foo","bar")
+nil	Permission denied	13
+]]></programlisting>
+
+<para>
+  By assigning each part of the output to a variable, you can
+  determine whether or not a file path exists. Add this code to your
+  <filename>saver.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+function saver.exists(path)
+   local success, err, num = os.rename(path, path)
+   if not success and num == 13 then
+      return true
+   end
+   --returns true or false	 
+   return success
+end
+]]></programlisting>
+
+<bridgehead>User configuration</bridgehead>
+
+<para>
+  To save user configuration, you must create a global table in
+  <filename>game.lua</filename> called <varname>conf</varname>, and
+  establish a default location for where the configuration file is to
+  be saved. Add the last line from this code block&#58;
+</para>
+
+<programlisting><![CDATA[
+grab  = {} --for context
+up    = {} --for context
+earn  = {} --for context
+conf  = {} --user config
+]]></programlisting>
+
+<para>
+  This default location is not arbitrary. In the computer world,
+  everyone benefits from <firstterm>standards</firstterm>. Standards
+  are conventions that programmers mutually agree to follow in order
+  to ensure compatibility. Most modern low-level computing standards
+  are defined by the open source <link
+  xlink:href="http://pubs.opengroup.org/onlinepubs/9699919799/">POSIX
+  specification</link>, while user-level specifications for Linux are
+  defined by freedesktop.org. Operating systems that are not open
+  source often follow a combination of open standards and their own
+  standards. You have the option of following one or the other, but
+  since the open standards are available to all, this book follows those. 
+</para>
+
+<para>
+  Freedesktop.org defines two hidden directories in a user&#39;s home
+  for configuration and application data. The
+  <filename>.config</filename> directory contains configuration data
+  and <filename>.local&#47;share</filename> contains
+  application-specific data files.
+</para>
+
+<para>
+  Enter these new variables near the top of the <filename>game.lua</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+home = os.getenv('HOME')       --for context
+d    = package.config:sub(1,1) --for context
+confdir = home .. d .. '.config' .. d .. 'battlejack' .. d
+datadir = home .. d .. '.local'  .. d .. 'share' .. d
+]]></programlisting>
+
+<para>
+  Use these variables to build a table containing user configuration
+  options, and write those options to the drive in a new
+  <literal>userdata</literal> function in <literal>saver.lua</literal>.
+</para>
+
+<programlisting><![CDATA[
+function saver.userdata()
+   conf.user = {}
+   conf.user.level = tostring(level)
+   conf.user.fullscreen,fstype = love.window.getFullscreen()
+
+   -- does config directory exist?
+   if not saver.exists(confdir) then
+      os.execute("mkdir " .. confdir)
+   end
+   
+   inifile.save( confdir .. d .. 'battlejack.ini', conf, "io" )
+end
+]]></programlisting>
+
+<para>
+  The <literal>if</literal> statement that invokes
+  <literal>saver.exists</literal> is a subroutine that ensures the
+  destination for the save file exists. If it does not exist, the
+  <literal>os.execute</literal> function runs the
+  <command>mkdir</command> command on the operating system to create
+  the directory. The <command>mkdir</command> command
+  works on Linux, MacOS, BSD, and Windows.
+</para>
+
+<para>
+  The last line of the code block uses the <literal>inifile</literal>
+  library to save the <varname>conf</varname> table to a file. It uses
+  the <literal>io</literal> Lua module to create the file.
+</para>
+
+<para>
+  Now modify <filename>menu.lua</filename> so that it uses your new
+  <literal>saver</literal> library. Place the requirement at the top
+  of the file&#58;
+</para>
+
+<programlisting><![CDATA[
+require("saver")
+]]></programlisting>
+
+<para>
+  When you originally created the menu, you used a placeholder for
+  selection <literal>4</literal>. Erase it and put in a call to the
+  function you have just created&#58;
+</para>
+
+<programlisting><![CDATA[
+elseif selection == 4 then
+   saver.userdata()
+]]></programlisting>
+
+<bridgehead>Game data</bridgehead>
+
+<para>
+  Saving the game data is theoretically a simple matter of taking all
+  the tables that contain game information and dumping their contents
+  into a file. That&#39;s a lot of code to write, and also potentially
+  prone to error if a table is very complex. It&#39;s also a common
+  task, however, so a user on the Lua-users.org website created a
+  handy script to save and load tables. This is the sort of script you
+  might usually find with Luarocks, but it just happens that this
+  script has never been entered into the Luarocks repository, so it
+  just exists on the Internet.
+</para>
+
+<para>
+  Download the script from <link
+  xlink:href="http://lua-users.org/wiki/SaveTableToFile">lua-users.org&#47;wiki&#47;SaveTableToFile</link>
+  or get it from the code included with this book. However you
+  obtain it, save it in your project directory, in the
+  <filename>local&#47;share&#47;lua&#47;5.3&#47;</filename> folder,
+  as <filename>table_save.lua</filename>.
+</para>
+
+<important>
+  <para>
+    You must rename the file from its default
+    <filename>table.save-1.0.lua</filename> to
+    <filename>table_save.lua</filename> to avoid Lua from
+    interpreting the file name as a table.
+  </para>
+</important>
+
+<para>
+  The functions from <filename>table_save.lua</filename> are going to
+  be used by both <filename>saver.lua</filename> and
+  <filename>game.lua</filename>, since the former needs to save table
+  to files and the latter needs to load those files back into
+  tables. To keep with the convention of keeping global variables all
+  in one place, add <filename>table_save.lua</filename> as a requirement for
+  <filename>game.lua</filename> &#40;the functions will be available
+  to <filename>saver.lua</filename> because the functions become part
+  of the application&#39;s global namespace&#41;&#58;
+</para>
+
+<programlisting><![CDATA[
+require("card")
+require("msg")
+require("table_save")
+]]></programlisting>
+
+<para>
+  In <filename>saver.lua</filename>, create a new function to process
+  the game data, and make sure the appropriate directory structure
+  exists, using the variable for your <varname>datadir</varname> you
+  created in <filename>game.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+function saver.gamedata()
+   if not saver.exists(datadir .. 'battlejack') then
+      os.execute("mkdir " .. datadir .. 'battlejack')
+   end
+]]></programlisting>
+
+<para>
+  Next, add the code to save the card decks to files. The syntax of
+  the <literal>save</literal> function provided by
+  <filename>table_save.lua</filename> are given in comments at the top
+  of the file&#58; 
+</para>
+
+<programlisting><![CDATA[
+table.save( table , filename )
+   
+on failure: returns an error msg
+]]></programlisting>
+
+<para>
+  Of course, if you only provide a filename, Lua would do exactly as it is
+  told and save the files into your current directory, so you must
+  interpret <literal>filename</literal> broadly to mean the
+  <emphasis>path</emphasis> to the file you want to create.
+</para>
+
+<para>
+  Add this to the <literal>saver.gamedata</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+   --current hand
+   table.save(hand,datadir .. 'battlejack' .. d .. 'hand.tbl')
+   --current horde
+   table.save(horde,datadir .. 'battlejack' .. d .. 'horde.tbl')
+
+   --current masterdecks
+   table.save(deck,datadir .. 'battlejack' .. d .. 'deck.tbl')
+   table.save(ai,datadir .. 'battlejack' .. d .. 'ai.tbl')
+end
+]]></programlisting>
+
+<para>
+  Launch the game and start a round. Once you have drawn one or two
+  cards, go to the menu screen. Save the game and then quit.
+</para>
+
+<para>
+  In a terminal, view the user config file that has been created&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ls  ~/.config/battlejack
+battlejack.ini
+# cat ~/.config/battlejack/battlejack.ini
+[user]
+level=0
+fullscreen=false
+]]></programlisting>
+
+<para>
+  Confirm that the decks have also been created&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ls ~/.local/share/battlejack/
+ai.tbl  deck.tbl  hand.tbl  horde.tbl
+]]></programlisting>
+
+<section id="state-save">
+  <info>
+    <title>Loading a save file</title>
+  </info>
+
+<para>
+  The inverse of saving a game is loading a game. This is a little
+  more complex than the save process, because there is so much setup
+  when starting a new game, which is &#34;clobbered&#34; by loading in
+  existing data. Because loading a game replaces the
+  <literal>game.new</literal> and <literal>game.setup</literal>
+  functions when invoked, the loading process happens in the
+  <filename>game.lua</filename> file.
+</para>
+
+<para>
+  First of all, you want to ensure that you&#39;re facing a clean
+  workspace when loading a saved game. Currently, the slate is cleaned
+  by <literal>game.new</literal>, but if you move the cleanup code to
+  its own function, then you can use it again in your loading code.
+</para>
+
+<para>
+  Take these lines from <literal>game.new</literal> and place them
+  into a new function called <literal>game.cleanup</literal>&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.cleanup()
+   collectgarbage()
+   game.blast(deck)
+   game.blast(ai)
+   game.blast(hand)
+   game.blast(horde)
+   game.blast(back)
+   game.blast(grab)
+   winner   = nil
+   progress = 0
+   game.scaler(WIDE,790)   
+end
+]]></programlisting>
+
+<para>
+  Call the <literal>game.cleanup</literal> function at the top of the
+  <literal>game.new</literal> funciton&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.new()
+   game.cleanup()
+]]></programlisting>
+
+<para>
+  Create a new function called <literal>game.load</literal> for
+  loading in user and game data. Call the
+  <literal>game.cleanup</literal> function at the top, and load the
+  user configuration in using the <literal>inifile</literal>
+  library&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.load()
+   game.cleanup()
+   if saver.exists( confdir .. 'battlejack.ini' ) then
+      local userconf = inifile.parse( confdir .. 'battlejack.ini', "io" )
+      level = userconf['user']['level']
+   else
+      print("no user INI found")
+   end
+]]></programlisting>
+
+<para>
+  The next logical step would seem to be loading the game data, but
+  first there&#39;s another bit of code that usually only happens in
+  <literal>game.new</literal>&#58; generating a background.
+</para>
+
+<para>
+  Any time you can, you generally should reuse code. Move the
+  following lines of code from the <literal>game.new</literal>
+  function into a new <literal>game.background</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.background()
+   ground = love.graphics.newQuad(0,0,WIDE,HIGH,150,150)
+   tile   = love.graphics.newImage('img' .. d .. 'tile.jpg')
+   tile:setWrap('repeat','repeat')
+end
+]]></programlisting>
+
+<para>
+  Similarly, the draw decks &#40;the card backs&#41; are generated
+  in the <literal>game.setup</literal> function. You can&#39;t call
+  <literal>game.setup</literal> because it clobbers several settings
+  that <literal>game.load</literal> performs, such as building the
+  decks, shuffling the decks, adding a Joker card, and so on. Move
+  this code from <literal>game.setup</literal> into a new function
+  called <literal>game.backs</literal>&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.backs()
+   -- create GUI decks
+   -- hand back
+   card = Card.init("c","v","back",pad,HIGH-(slot*ratio)-pad) --HIGH-slot-(pad*2))
+   back[#back+1] = card
+
+   -- horde back
+   card = Card.init("c","v","back",WIDE-(slot/2)-pad,slot-(pad))
+   back[#back+1] = card
+end
+]]></programlisting>
+
+<para>
+  Call the function at the top of <literal>game.setup</literal>&#58;
+</para>
+
+
+<programlisting><![CDATA[
+function game.setup()
+   game.backs()
+   deck = game.setsplit("card",1,deck,2) --for context
+]]></programlisting>
+
+<para>
+  Call both of your new functions in your <literal>game.load</literal>
+  routine&#58;
+</para>
+
+<programlisting><![CDATA[
+   else --for context 
+      print("no user INI found") --context
+   end --for context
+
+   game.background()
+   game.backs()
+]]></programlisting>
+
+<para>
+  Loading tables back into Lua is explained in the comments at the top
+  of the <literal>table_save.lua</literal> file&#58;
+</para>
+
+<programlisting><![CDATA[
+table.load( filename or stringtable )
+
+Loads a table that has been saved via the table.save function
+
+on success: returns a previously saved table
+on failure: returns as second argument an error msg
+]]></programlisting>
+
+<para>
+  The tricky thing about Battlejack&#39;s tables are that some contain
+  card <emphasis>descriptions</emphasis> and others contain cards
+  saved as tables. Luckily, you have a card building library that
+  converts card descriptions to drawable cards, so reconstructing
+  <varname>hand</varname> and <varname>horde</varname> is a trivial
+  <literal>for</literal> loop. Enter this code at the bottom of your
+  <literal>game.load</literal> function&#58;
+</para>
+
+<programlisting><![CDATA[
+   game.background() --for context
+   game.backs()      --for context
+
+   --get deck states
+   if saver.exists( datadir .. d .. 'battlejack' .. d .. 'hand.tbl' ) then
+      tbl = table.load( datadir .. d .. 'battlejack' .. d .. 'hand.tbl' )
+   end
+
+   --build decks
+   for i,obj in pairs(tbl) do
+      card = Card.init(obj['color'],obj['value'],obj['face'],obj['x'],obj['y'])
+      hand[#hand+1] = card
+   end
+   
+   if saver.exists( datadir .. d .. 'battlejack' .. d .. 'horde.tbl' ) then
+      tbl = table.load( datadir .. d .. 'battlejack' .. d .. 'horde.tbl' )
+   end
+
+   for i,obj in pairs(tbl) do
+      card = Card.init(obj['color'],obj['value'],obj['face'],obj['x'],obj['y'])
+      horde[#horde+1] = card
+   end
+
+      --get deck states
+   if saver.exists( datadir .. d .. 'battlejack' .. d .. 'deck.tbl' ) then
+      deck = table.load( datadir .. d .. 'battlejack' .. d .. 'deck.tbl' )
+   end
+   if saver.exists( datadir .. d .. 'battlejack' .. d .. 'ai.tbl' ) then
+      ai = table.load( datadir .. d .. 'battlejack' .. d .. 'ai.tbl' )
+   end
+      
+   game.activate()
+end
+]]></programlisting>
+
+<para>
+  Once the load process is finished, it calls
+  <literal>game.activate</literal> to put the user back in the game.
+</para>
+
+<para>
+  Launch the game and load your saved game. Try this process a few
+  times, and play through a few games. Take note of any errors or
+  glitches you encounter.
+</para>
+</section> <!-- state-load -->
+</section> <!-- state-save -->
+
+<section id="state-home">
+  <info>
+    <title>Homework</title>
+  </info>
+
+  <para>
+    The next chapter makes no further changes to the game code aside
+    from adding sounds to the experience. That means the game is
+    basically feature-complete, so any glitches or
+    unoptimized code you find are permanent unless you change it.
+  </para>
+
+  <para>
+    Here are some examples, but don&#39;t limit yourself to this list&#58;
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+	Only one save is supported. Program a method to permit
+	different save slots.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+	If a user forgets to save their game before quitting, they
+	lose their progress. Devise a system to avoid this. 
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+	The text of the message screen isn&#39;t always positioned
+	correctly for all screen sized. Change the code of
+	<literal>msg.lua</literal> to fix this problem.
+      </para>
+    </listitem>
+  </itemizedlist>
+
+  <para>
+    Remember to commit your changes to Git to preserve snapshots
+    of your progress.
+  </para>
+</section>  
+</chapter>

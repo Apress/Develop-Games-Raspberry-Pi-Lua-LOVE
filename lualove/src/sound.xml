@@ -1,0 +1,645 @@
+<chapter xml:id="sound">
+  <!-- Ch11 -->
+  <title>Sound</title>
+
+  <para>
+    Real video games have sound effects. Everyone knows that, so if
+    you deliver a game to someone without sound, they immediately
+    notice that it&#39;s missing the audio. This chapter introduces
+    the most important <literal>love.audio</literal> functions to you,
+    and integrates sound into Battlejack.
+  </para>
+
+  <section id="sound-find">
+    <info>
+      <title>Finding audio</title>
+    </info>
+
+    <para>
+      As with any game asset, the first problem with adding sound effects to
+      your game is that you need sound effects. Of course, open
+      culture on the Internet has a few potential solutions, and so
+      does your Raspberry Pi, if you&#39;re up for some manual labor.
+    </para>
+
+    <para>
+      Before continuing, create a folder in your project directory for
+      your sounds. To save on typing, name the directory
+      <filename>snd</filename>.
+    </para>
+
+    <programlisting><![CDATA[
+    $ cd ~/battlejack
+    $ mkdir snd
+    ]]></programlisting>
+    
+    <para>
+      The website <link
+      xlink:href="http://freesound.org">freesound.org</link> is a
+      treasure trove of sound effects. Search for terms like
+      <literal>level up</literal>, <literal>power up</literal>,
+      <literal>ambient music</literal>, <literal>game</literal>, and
+      so on to rummage through thousands of professional sound effects
+      that are free to use. The licensing of each sound can differ, so
+      look at the requirements set by the creator&#59; some require
+      attribution, some forbid using their work in commercial
+      products, and others require nothing.
+    </para>
+
+    <para>
+      There are other websites loaded with sounds, but you don&#39;t
+      have to limit yourself to reusing other people&#39;s work. You
+      can create your own high-quality sounds on your Raspberry Pi
+      with Linux Multimedia Studio, better known as
+      <application>LMMS</application>.
+    </para>
+
+  <section id="sound-find-lmms">
+    <info>
+      <title>LMMS</title>
+    </info>
+
+    <para>
+      LMMS is a music production suite available for free on your
+      Raspberry Pi. Whether or not you call yourself a musician,
+      <application>LMMS</application> makes it easy to lay down a
+      beat, synthesize new sounds, sample, loop, distort, enhance, and
+      mix. <application>LMMS</application> comes with ready-to-use
+      instruments, presets, and samples, making it one of the easiest
+      music applications on any platform to get started on.
+    </para>
+
+    <para>
+      Install <application>LMMS</application> as usual&#58;
+    </para>
+
+    <programlisting><![CDATA[
+    $ sudo dnf install lmms
+    ]]></programlisting>
+
+    <para>
+      It takes a while for the full package to install, since there
+      are so many synths and effects bundled with it, so be
+      patient. Once installed, launch <application>LMMS</application>
+      from the application menu.
+    </para>
+
+    <para>
+      Whatever you make in <application>LMMS</application> will end up in the <guilabel>Song Editor</guilabel> window. This is where
+      you <emphasis>sequence</emphasis>, or schedule, sounds to
+      happen. If you are using <application>LMMS</application> to
+      create sound effects, then everything you sequence should happen
+      immediately, in the left-most block. If you are using
+      <application>LMMS</application> to make background music for
+      your game, then the sounds will happen gradually, over several
+      blocks from left to right.
+    </para>
+
+    <para>
+      By default, the <guilabel>Song editor</guilabel> has four
+      channels &#40;<guilabel>Triple Oscillator</guilabel>,
+      <guilabel>Sample Track</guilabel>,
+      <guilabel>Beat/Bassline</guilabel>,
+      <guilabel>Automation</guilabel>&#41; already populated, but
+      these are only example tracks. As you create sounds, you will
+      add your own.
+    </para>
+    
+    <mediaobject>
+      <info>
+	<othercredit>
+	  <orgname>Slackermedia</orgname>
+	</othercredit>
+      </info>
+      <alt>Song editor</alt>
+      <imageobject>
+	<imagedata align="right" width="6in" format="PNG"
+		   fileref="../img/Ch11_skenlon/lmms_editor.png"/>
+    </imageobject>
+    </mediaobject>
+
+  <para>
+    On the far left of the <application>LMMS</application> window are
+    vertical tabs. When clicked, each tab opens a
+    panel. Click the star icon tab for a <guilabel>Presets</guilabel>
+    panel containing sounds and
+    synthesizers you can use to create your sound effects and music
+    bed. More can be found in the musical note tab.
+  </para>
+
+  <para>
+    Click and hold on some sounds to get a feel for what&#39;s
+    available.
+  </para>
+  
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Song editor</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_presets.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <section id="sound-find-lmms-effect">
+    <info>
+      <title>Building a sound effect</title>
+    </info>
+  
+  <para>
+    Once you find a sound you like, drag the sound into the left panel
+    of the <guilabel>Song editor</guilabel>. This creates a new track
+    in the <guilabel>Song editor</guilabel>, and this is the track you
+    will work in to create your sound effect.
+  </para>
+
+  <para>
+    This example uses
+    <guilabel>Presets</guilabel> &#62;
+    <filename>ZynAddSubFX</filename> &#62;
+    <filename>Fantasy</filename> &#62;
+    <filename>0037-ImpossibleDream5.xlz</filename>.
+  </para>
+
+  <para>
+    In the <guilabel>Song editor</guilabel>, double-click the first
+    black square in the <guilabel>ImpossibleDream5</guilabel>
+    track. This opens the <guilabel>Piano roll</guilabel>. This, as
+    the name implies, is the digital equivalent to the rolls used in
+    old-time player pianos. Notes are entered into the matrix of the
+    roll so that they are triggered automatically as your song plays.  
+  </para>
+
+  <para>
+    Since you&#39;re only designing a sound effect, keep your
+    &#34;song&#34; &#40;such as it is&#41; under 2 or 3
+    seconds. This example creates a sound effect for messages
+    announcing that new cards have been added to the player&#39;s
+    deck, so the mood is happy and empowering.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Power chord</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_powerup.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    The important buttons in the <guilabel>Piano roll</guilabel>
+    editor are the pencil and the eraser. The pencil enters new notes
+    into the matrix, while the eraser removes them. You can hear
+    &#40;but not enter&#41; notes by pressing the keys of the keyboard
+    along the left side of the window.
+  </para>
+
+  <para>
+    If you&#39;re unfamiliar with making music, don&#39;t be afraid to
+    experiment. Discover the wonders of a well-constructed arpeggio,
+    or the raw thrill of a power chord. There&#39;s no wrong way to
+    design sound effects. If something sounds good to you, then use
+    it.
+  </para>
+
+  <para>
+    When you&#39;re happy with your first sound effect, go to the
+    <guimenu>File</guimenu> menu and select
+    <guimenuitem>Export</guimenuitem>.
+  </para>
+
+  <para>
+    In the <guilabel>Export</guilabel> window, navigate to the
+    <filename>snd</filename> folder in your project directory. At the
+    bottom of the <guilabel>Export</guilabel> window, set
+    <guilabel>Files of type</guilabel> to <guimenuitem>Compressed
+    OGG-File &#40;*.ogg&#41;</guimenuitem>. This format is common in
+    the game industry because it is an open source format that renders
+    a very small file size, meaning your sound files don&#39; result
+    in an impossibly large game package once you&#39;re ready to
+    distribute. Name the file <filename>powerup.ogg</filename> and
+    click <guibutton>Save</guibutton>.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Export</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_export.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    In the <guilabel>Export project</guilabel> window that appears,
+    keep the default settings and click the
+    <guibutton>Start</guibutton> button.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Export settings</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_start.png"/>
+    </imageobject>
+  </mediaobject>  
+  
+  <para>
+    Repeat this process for each sound effect you want to create. So
+    that you only have one <application>LMMS</application> file per
+    project, you can use the same <guilabel>Song editor</guilabel> for
+    each sound effect. Just <firstterm>mute</firstterm> tracks
+    you&#39;re finished with as you go&#59; the mute button for each
+    track is the green light on the left end of the <guilabel>Song
+    editor</guilabel> track label.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Muted track</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_mute.png"/>
+    </imageobject>
+  </mediaobject>
+  
+  <para>
+    As you work, be sure to save your <application>LMMS</application>
+    project. By default, you are prompted to save into a
+    <filename>lmms</filename> folder in your home directory. This is
+    acceptable, since you won&#39;t be distributing the
+    <application>LMMS</application> project along with your game. The
+    sound effect exports, however, must always be saved into the
+    <filename>snd</filename> folder in your
+    Battlejack project directory.
+  </para>
+
+<bridgehead>Listening to your effects</bridgehead>
+
+  <para>
+    To hear your sound effects as they will play in your game, navigate to your <filename>snd</filename> directory on your desktop and click the <filename>.ogg</filename> file you want to hear. The default music player, called <application>Sayonara</application>, opens with that file as the sole item in a playlist in the left panel.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Sayonara music player</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_sayonara.png"/>
+    </imageobject>
+  </mediaobject>
+    
+  <bridgehead>Adjusting export length</bridgehead>
+
+  <para>
+    Depending on your aesthetic, some sounds you use may have a long
+    &#34;tail&#34;, meaning that they echo for a few seconds after the
+    notes themselves have ended. The synth preset
+    <guilabel>ImpossibleDream5</guilabel> is an example of such an
+    effect, and if you listen to the file in
+    <application>Sayonara</application>, you can hear that the file
+    ends before the sounds fade.
+  </para>
+  
+  <para>
+    To fix this, return to <application>LMMS</application>. Mute any
+    of the tracks you don&#39;t need, and unmute the one that you
+    do. Play the track and watch the timer in the top left of the
+    <application>LMMS</application> window while listening for the
+    sound to fade. It doesn&#39;t need to fade out completely,
+    especially if you intend to play background music during the
+    game. When the sound is mostly faded, take mental note of how many
+    seconds have elapsed.
+  </para>
+
+  <para>
+    Stop playback and move the playhead in the <guilabel>Song editor</guilabel> to the position, in seconds, when the sound faded. With a sound clip using  <guilabel>ImpossibleDream5</guilabel> notes that last about 2.5 seconds, you might position the playhead at 10 seconds.
+  </para>
+
+  <para>
+    Finally, click on the black grid boxes between the sound clip and
+    the playhead. This marks those squares as occupied with sound,
+    even though there are no notes being played.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Extending the export range</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_extend.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    Export the track again and play it in
+    <application>Sayonara</application> for quality assurance.
+  </para>
+</section>    <!-- sound-find-lmms-fx -->
+
+<section xml:id="sound-find-lmms-music">
+  <info>
+    <title>Creating music</title>
+  </info>
+
+  <para>
+    Making music for your game is basically the same process as making
+    sound effects, only longer. There&#39;s plenty of Creative Commons
+    and royalty-free music online, so you don&#39;t have to compose
+    your own game music. However, creating your own music for your
+    game can be fun and rewarding.
+  </para>
+
+  <para>
+    Since Battlejack is just a battle card game, the music doesn&#39;t
+    need to be much more than a background soundscape, without too
+    much activity or complexity to distract the player from the actual
+    game. In fact, regardless of what kind of game you are composing
+    for, the music you use must be capable of looping, since you can
+    never predict just how long it will be needed.
+  </para>
+
+  <para>
+    Unlike most simple sound effects, music composition will probably
+    require more than one track in your <guilabel>Song
+    editor</guilabel>. The sample code included with this book
+    includes two <application>LMMS</application> project files so you
+    can see how tracks and sound clips in a song fit together.
+  </para>
+
+  <para>
+    When you&#39;re ready to export your music, use the same settings
+    as you did for your sound effects, with one exception. In the
+    <guilabel>Export project</guilabel> window, select
+    <guilabel>Export as loop &#40;remove end silente&#41;</guilabel>
+    so that your music can be looped in
+    LÖVE.
+  </para>
+
+  <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Enable looping</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="../img/Ch11_skenlon/lmms_music.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    <application>LMMS</application> can&#39;t guarantee that
+    your music will loop seamlessly&#59; designing seamless loop
+    points is an art all its own, but you can experiment with ways to
+    disguise loops that don&#39;t work, or you can just incorporate a
+    fade-out and fade-in so that the loop, while noticeable, is at
+    least innocuous.
+  </para>
+</section><!-- sound-find-lmms-music -->
+  </section>  <!-- sound-find-lmms -->
+  </section> <!-- sound-find -->
+
+  <section xml:id="sound-code">
+    <info>
+      <title>Sound code</title>
+    </info>
+
+    <para>
+      To add sounds to your game, you must create a variable for each
+      sound file you want to play, classifying it as either a
+      <firstterm>static</firstterm> file for sound effects or a
+      <firstterm>stream</firstterm> for background music. You use this
+      variable to trigger the sound as needed.
+    </para>
+
+    <para>
+      For instance, for the powerup message alert, first create a variable at the top of the <filename>game.lua</filename> file&#58;
+    </para>
+
+<programlisting><![CDATA[
+fxp = love.audio.newSource("snd" .. d .. "powerup.ogg", "static")
+
+function game.load() --for context
+game.cleanup()    --for context
+]]></programlisting>
+
+<para>
+  Trigger the sound when the message screen loads to announce a new powerup. Add this code to the <literal>msg.activate</literal> function of <filename>msg.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+if earncard ~= nil then
+   love.audio.play(fxp)
+else -- only one card to display
+   return true
+end
+]]></programlisting>
+
+<para>
+  The <literal>if</literal> statement establishes whether the message screen is being displayed to announce a powerup or because a black card was drawn. If a black card was drawn, nothing is done for now, but if a powerup has been earned, then the powerup sound effect plays. Of course, if you have a sound effect for a traitor card, then you can trigger that sound in the <literal>else</literal> clause.
+</para>
+
+<para>
+  Background music is established in <filename>main.lua</filename>. It&#39;s up to you whether you create separate music for the menu screen and the game, but in this example the same music plays behind the music and the game.
+</para>
+
+<para>
+  Since the music is both instantiated and played immediately, everything happens in the <literal>love.load</literal> funciton of <filename>main.lua</filename>&#58;
+</para>
+
+<programlisting><![CDATA[
+   music = love.audio.newSource("snd" .. d .. "darkbattle.ogg", "stream")
+   music:setLooping(true)
+   love.audio.play(music)
+]]></programlisting>
+
+<para>
+  For sound files greater than a few seconds, set the file type to
+  <literal>stream</literal> so that the entire file isn&#39;t loaded
+  into memory.
+</para>
+
+<para>
+  Since the background music is meant to loop, the variable is also set to loop with the LÖVE function <literal>:setLooping(true)</literal>.
+</para>
+
+<para>
+Go through the code of your game and add background music, and sound effects for important events.
+</para>
+
+<para>
+  If you try to play your game, you may notice that all of your audio
+  is badly distorted. This is a known issue and is easy to fix. Fix it
+  in the next section.
+</para>
+  
+</section> <!-- sound-code -->
+
+<section xml:id="sound-fix">
+  <info>
+    <title>Fixing the Raspberry Pi sound settings</title>
+  </info>
+
+  <para>
+    LÖVE uses a technology called OpenAL to play sound. OpenAL is a
+    powerful audio driver providing <firstterm>Head-related transfer
+    function</firstterm> &#40;HRTF&#41;, more commonly known as
+    <emphasis>3d audio</emphasis>. For this reason, it&#39;s very
+    popular for gaming. As you know, the Raspberry Pi is a low-powered
+    computer, and not exactly known being a &#34;gaming rig&#34;. So
+    when you attempt to play high-powered specialized OpenAL audio
+    through a mini computer designed for everyday computer tasks, you
+    experience distortion.
+  </para>
+
+  <note>
+  <para>
+    This audio issue is specific to OpenAL on a Raspberry Pi or other
+    low-powered computers. If you &#39;re using this book on something
+    more powerful than a Pi, then you do not need to complete this
+    section, unless you&#39;re experiencing distorted audio in LÖVE.
+  </para>
+  </note>
+  
+  <para>
+    OpenAL can be configured to be gentler with its host
+    system. By default, global configuration files on Linux are stored
+    in the directory <filename>&#47;etc</filename> &#40;no one&#39;s
+    quite sure any more what that stands for, but there&#39;s some
+    evidence that it does indeed mean <literal>et cetera</literal>,
+    which is an oddly imprecise name for such an important
+    folder&#41;. Since this directory exists outside of your home directory, it&#39;s only accessible by the <literal>root</literal> user, which you invoke with the command <command>sudo</command>. Edit the OpenAL configuration file using the <command>sudo</command> command to open it in <application>Geany</application>&#58;
+  </para>
+
+  <programlisting><![CDATA[
+  $ sudo geany /etc/openal/alsoft.conf
+  ]]></programlisting>
+
+  <para>
+    You must change two lines in the file. First, you need to edit how many audio frames occur between audio mixing updates. This is something that usually OpenAL determines on its own, but in the case of the Raspberry Pi, OpenAL is being overly optimistic in what its host system is capable of achieving. Find this line&#58;
+  </para>
+
+  <programlisting><![CDATA[
+  #period_size = 1024
+  ]]></programlisting>
+
+  <para>
+    The hash &#40;&#35;&#41; character means this line is &#34;commented out&#34;, meaning that OpenAL is currently ignoring the line entirely. Delete the hash character &#40;or as programmers usually say, &#34;uncomment&#34;&#41;. Change the number of frames in each update period to <literal>2048</literal>. The line should now match this&#58;
+  </para>
+
+  <programlisting><![CDATA[
+  period_size = 2048
+  ]]></programlisting>
+
+  <para>
+    Next, find this line&#58;
+  </para>
+
+  <programlisting><![CDATA[
+  #periods = 0
+  ]]></programlisting>
+
+  <para>
+    This line is also commented out, so uncomment it by deleting the
+    hash character. A low number here, it is explained in the comments
+    of the configuration file, means faster response from the computer
+    when playing sounds. That&#39;s the <emphasis>ideal</emphasis> but
+    obviously the Raspberry Pi isn&#39;t up to the challenge, so set
+    this value to <literal>8</literal>. This tells OpenAL to mix audio
+    in advance so they&#39;re prepared for playback when needed,
+    rather than trying to mix all the audio on demand.
+  </para>
+
+  <programlisting><![CDATA[
+  periods = 8
+  ]]></programlisting>
+  
+  <para>
+    Save the file and close <application>Geany</application>.
+  </para>
+
+  <para>
+    Try playing the game now and you will find that all of your audio problems are solved.
+  </para>
+
+  <para>
+    Since this is a known issue that you have now solved, create a
+    <filename>README</filename> file in your project directory,
+    documenting the problem and its solution, in the event that you
+    distribute the game to other Pi users.
+  </para>
+
+  <programlisting><![CDATA[
+  # Audio issues 
+
+  If you experience audio distortion when playing
+  this game, edit /etc/openal/alsoft.conf and set these
+  values:
+
+  period_size = 2048
+  periods = 8
+  ]]></programlisting>
+
+  <para>
+    This is good practice, since you can&#39;t possibly predict what
+    platform any given user will use to play your game.
+  </para>
+
+</section>
+
+  <section xml:id="sound-work">
+  <info>
+    <title>Homework</title>
+  </info>
+  
+  <para>
+    Many games provide some control over sound settings. You
+    could add sound options to your menu screen, such as&#58;
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+	Allow the background music to be silenced, leaving only sound effects.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	Allow all sound to be muted.
+      </para>
+    </listitem>
+  </itemizedlist>
+</section>
+</chapter>

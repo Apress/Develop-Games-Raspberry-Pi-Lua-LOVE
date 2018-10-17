@@ -1,0 +1,833 @@
+<chapter xml:id="battle">
+  <!-- Ch07 -->
+    <title>Battling it out</title>
+
+    <para>
+      With all of your designs and assets ready, it&#39;s finally
+      time to start coding Battlejack. When you sit down to write code,
+      it&#39;s essential to have the design specs on hand. Here&#39;s a
+      review of how Battlejack works&#58;
+    </para>
+
+    <para>
+      When the game launches, the player is greeted with a menu screen
+      allowing the user to start a new game, resume a saved game,
+      adjust settings for fullscreen and windowed display, or return
+      to a game already in session.
+    </para>
+
+    <para>
+      During game play, the user clicks their own deck to draw a
+      card. During their turn, the player clicks and drags cards to
+      either the dealer&#39;s stash to cancel out a card in play, or to
+      their own score box to add their card to their own stash. Onscreen
+      prompts alert the player of their choices.
+    </para>
+
+    <para>
+      If a player attempts to cancel a dealer card out with a less
+      powerful card &#40;trying to cancel a 5-strength card with a
+      3-strength card, for example&#41;, nothing happens. The player may
+      add powerups or additional cards to complete the action, or click
+      and drag the card back into their hand to continue.
+    </para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Design spec for Battlejack</alt>
+    <imageobject>
+      <imagedata align="right" width="6in" format="PNG"
+		 fileref="img/Ch04_skenlon/ch4_spec.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    The first task for this chapter is to build a basic menu screen
+    that successfully proceeds to an empty game screen, with an option
+    to return to the menu screen so a player can save or quit.
+  </para>
+
+  <section xml:id="battle-main">
+    <info>
+      <title>Main Framework</title>
+    </info>
+    
+    <para>
+      Launch <application>Geany</application> and navigate to your
+      <filename>battlejack</filename> project directory.
+    </para>
+
+  <para>
+    Create three new files&#58; <filename>main.lua</filename>,
+    <filename>menu.lua</filename>, and
+    <filename>game.lua</filename>. Since LÖVE always launches a file
+    called <filename>main.lua</filename>, you must use that as the a
+    kind of control center for the different parts of your game. The
+    <filename>main.lua</filename> file will serve as engine keeping
+    the game open, invoking the <literal>menu</literal> and
+    <literal>game</literal> states.  
+  </para>
+
+  <para>
+    The files <filename>menu.lua</filename> and
+    <filename>game.lua</filename> are the game states, so you must
+    require them in the main file. In the
+    <filename>main.lua</filename> file, enter the usual setup code&#58;
+  </para>
+
+<programlisting><![CDATA[
+require("menu")
+require("game")
+
+WIDE, HIGH = 960,720
+
+function love.load()
+  love.window.setTitle(' Battlejack ')
+  love.window.setMode( WIDE, HIGH )
+end
+
+function love.draw()
+end
+]]></programlisting>
+
+<para>
+  Your application can only be in one state at a time. A player cannot
+  be in the menu and also be playing the game. So whenever a game
+  state is activated, it will create a token to designate that it is
+  the current active state.
+</para>
+
+<para>
+  The token be called anything, but for clarity, call it
+  <varname>STATE</varname> and set it, initially, to nothing. Place it
+  near the top of the <filename>main.lua</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+WIDE, HIGH = 960,720
+STATE      = nil
+]]></programlisting>
+
+<para>
+  The main loop&#39;s job is relatively simple&#58; draw on screen
+  whatever happens to be the active <literal>STATE</literal>.
+</para>
+
+<programlisting><![CDATA[
+function love.draw()
+    STATE.draw()
+end
+]]></programlisting>
+
+<para>
+  The first thing you want your player to see is the menu, so for the
+  first action upon launch, make a call to your &#40;currently
+  empty&#41; menu code. Since your menu is devoid of code, invent a
+  function name to designate the act of switching to the menu&#59; the
+  term <literal>activate</literal> seems logical, so use that&#58;
+</para>
+
+<programlisting><![CDATA[
+function love.load()
+   love.window.setTitle(' Battlejack ')
+   love.window.setMode( WIDE, HIGH )
+   menu.activate()
+end
+]]></programlisting>
+
+<para>
+  Your game won&#39;t launch yet, because you&#39;re referencing two
+  empty files and you call functions that don&#39;t yet exist and use
+  variables that never get set. Fix that in the next section.
+</para>
+  </section>
+
+  <section xml:id="battle-menu">
+    <info>
+      <title>Switching modes</title>
+    </info>
+  
+    <para>
+      A menu screen needs, at the very least, a few menu
+      selections. It also needs to set the <literal>STATE</literal>
+      token so that the main loop knows the current game state.
+    </para>
+
+    <para>
+      In previous exercises, you have treated all variables equally,
+      but in fact there are, broadly, two different kinds of
+      variables. There are local variables and global variables. A
+      local variable only needs to be used within one Lua file
+      &#40;or, in other languages, a <emphasis>class</emphasis>&#41;,
+      but a global variable can be used across files.
+    </para>
+
+    <para>
+      In context of this project, the <literal>STATE</literal>
+      variable must be a global variable because it gets set by either
+      the menu or game, and then gets sent back to main for
+      use. Something local to just the menu, though, can be a local
+      variable because no other file in this project ever draws a
+      menu.
+    </para>
+
+    <para>
+      Pragmatically, all variables can be global. However, it&#39;s
+      better to differentiate when possible so that your application
+      can manage its memory more effectively.
+    </para>
+
+    <para>
+      Start your <filename>menu.lua</filename> file with this code&#58;
+    </para>
+    
+<programlisting><![CDATA[
+menu = {}
+
+local entries = { "New game", "Load saved",
+      "Window mode", "Save", "Quit" }
+
+function menu.activate()
+    STATE = menu
+end
+]]></programlisting>
+
+<para>
+  This code includes a few vital elements&#58; it sets the
+  <literal>STATE</literal> global variable so that
+  <filename>main.lua</filename> knows the game state, and it creates
+  the <literal>.activate</literal> function as a gateway into the menu
+  from the main loop. It also sets up the menu entries. 
+</para>
+
+<para>
+  To print the menu entries onscreen, use a <literal>.draw</literal>
+  function specific to the <literal>menu</literal> file. Your
+  <filename>main.lua</filename> file will call this function as long
+  as <literal>menu</literal> is the active state, because in
+  <literal>love.draw()</literal> you call
+  <literal>STATE.draw()</literal>.
+</para>
+
+<programlisting><![CDATA[
+function menu.draw()
+    love.graphics.setBackgroundColor(0.1,0.1,0.1)
+    for i=1,5 do
+	-- menu text                    x   y
+	love.graphics.print(entries[i], 45, 10+i*16)
+    end
+end
+]]></programlisting>
+
+<para>
+  In this code, you use a <literal>for</literal> loop to cycle through
+  the number of entries in the menu. For each iteration of the loop,
+  LÖVE prints the corresponding menu entry as defined at the top of
+  the file.
+</para>
+
+<para>
+  Since the menu is the first and only thing invoked by
+  <filename>main.lua</filename>, you can now launch your application
+  now to see what you have so far. 
+</para>
+
+<para>
+  The first problem you are likely to notice is that there&#39;s no
+  way to select any of the menu entries. One of the many benefits of
+  LÖVE is its <literal>keypressed</literal> function, which is perfect
+  for game and menu navigation, and is discussed in the next section.
+</para>
+
+<para>
+  First, though, you may as well put in some basic code for the game
+  screen, just so that once the menu is operational, you can tell the
+  difference between the menu screen and the game world.
+</para>
+
+<para>
+  The bare minimum is sufficient&#58;
+</para>
+
+<programlisting><![CDATA[
+game = {}
+
+function game.activate()
+    STATE = game
+end
+
+function game.draw()
+    love.graphics.setBackgroundColor(0.2,0.3,0.5)
+end
+]]></programlisting>
+
+<para>
+  You can&#39;t get there yet, but at least it exists, and with a
+  background color set, you&#39;ll know it when you see it.
+</para>
+
+</section>
+
+<section xml:id="battle-select">
+  <info>
+    <title>Menu selection</title>
+  </info>
+
+  <para>
+    There are two aspects of menu selection&#58; the code that drives
+    the actual selection, and the representation of that selection
+    onscreen so that the player knows what&#39; selected.
+  </para>
+
+  <para>
+    Both need a designator, so create a variable to keep track which
+    menu entry is the current selection&#58;
+  </para>
+  
+<programlisting><![CDATA[
+function menu.activate()
+    STATE = menu
+    selection = 1
+end
+]]></programlisting>
+
+<para>
+  For the player, a visual cue is useful. There are several ways to
+  implement a selection marker for a text menu, but for now just draw
+  a simple character next to the active entry by checking the value of
+  the <varname>selection</varname> variable. Of course, at this point
+  <varname>selection</varname> can only ever be <literal>1</literal>
+  because nothing changes it yet in your code, but that won&#39;t be
+  true for much longer.
+</para>
+
+<para>
+  Update your <literal>menu.draw()</literal> function so it matches
+  this&#58;
+</para>
+
+<programlisting><![CDATA[
+function menu.draw()
+    love.graphics.setBackgroundColor(0.1,0.1,0.1)
+
+    for i=1,5 do
+	if i == selection then
+            love.graphics.print(">", 30, 10+i*16)
+	end
+	-- menu text
+	love.graphics.print(entries[i], 45, 10+i*16)
+    end
+end
+]]></programlisting>
+
+<para>
+  You can launch the game to see the &#62; marker on the first selection.
+</para>
+
+<para>
+  When a user presses a key on the keyboard, the computer receives a
+  keycode signal. This is known as an input
+  <emphasis>event</emphasis>. Depending on your language and keyboard
+  layout, your operating system translates keycodes to specific
+  letters or numbers or characters. That&#39;s built into any
+  operating system, and it&#39;s why you can interact with your
+  computer.
+</para>
+
+<para>
+  The only reason a specific application reacts to a number or
+  character or symbol, however, is because it is programmed to do
+  something when an keypress event is received. LÖVE features the
+  <literal>keypressed()</literal> function, which listens for keypress
+  events and lets you define what should happen with each key press
+  event.
+</para>
+
+<para>
+  For menu navigation, you must define what the menu must do when it
+  receives an <keycombo><keycap>Up</keycap></keycombo> arrow or
+  <keycombo><keycap>Down</keycap></keycombo> arrow event. These events
+  both toggle the active selection, which is currently set to
+  <literal>1</literal> by default. Since the
+  <varname>selection</varname> variable gets set to
+  <literal>1</literal> when the application starts, the active
+  selection is the first in the list. To make the active selection the
+  second on the list, the <varname>selection</varname> variable must
+  be incremented when the <keycombo><keycap>Down</keycap></keycombo>
+  arrow is pressed, and decremented when the
+  <keycombo><keycap>Up</keycap></keycombo> arrow. If you&#39;re good
+  with maths, you might detect an exception to this rule already; if
+  not, you&#39;ll discover it soon.
+</para>
+
+<para>
+  In addition to moving the selection designator around, the menu
+  should respond when the <keycombo><keycap>Return</keycap></keycombo>
+  key is pressed.
+</para>
+
+<para>
+  A keypress event sends LÖVE three pieces of information&#58; the key
+  that was pressed, the <firstterm>scancode</firstterm> of the key
+  &#40;layout-independent code of a key&#41;, and whether or not the
+  key was pressed once or pressed repeatedly &#40;the definition of a
+  <emphasis>repeat</emphasis> depends on the user&#39;s system
+  settings&#41;. For this menu screen, all you need to process is
+  which key has been pressed. Detecting the key and taking action upon
+  it is achieved with an <literal>if</literal> loop&#58;
+</para>
+
+<programlisting><![CDATA[
+function menu.keypressed(k)
+    if k == "down" then
+	selection = selection+1
+    elseif k == "up" then
+ 	selection = selection-1
+    elseif k == "return" or k == " " then
+	if selection == 1 then
+            game.new()
+	elseif selection == 2 then
+            game.load()
+        elseif selection == 3 then
+	    return true
+	elseif selection == 4 then
+            save()
+	elseif selection == 5 then
+	    love.event.quit()
+	end
+    elseif k == "escape" then
+    	game.activate()
+    end
+end
+]]></programlisting>
+
+<para>
+  It&#39;s a common convention in games to use the
+  <keycombo><keycap>Esc</keycap></keycombo> key to call and dismiss a
+  menu screen, so pressing the
+  <keycombo><keycap>Esc</keycap></keycombo> goes back to the game
+  screen.
+</para>
+
+<para>
+  The third selection &#40;Window mode&#41; uses a placeholder to keep
+  the application from crashing in the event of choosing a nonexistent
+  option. If selected, your code returns the Boolean value of
+  <literal>true</literal>, which is meaningless, but at least
+  <literal>true</literal> exists.
+</para>
+
+<para>
+  To differentiate when a user is starting a new game and resuming a
+  saved game, the above code sample invents some nonexistent
+  functions, such as <literal>game.new()</literal> and
+  <literal>game.load()</literal>. It&#39;s alright that these
+  don&#39;t work yet, because you&#39;ll create them later.
+</para>
+
+<para>
+  If you test out the application, you will probably notice that the
+  application crashes if you try to move up from the top selection or
+  down from the bottom selection. If you&#39;re not new to
+  programming, you probably predicted this issue, but if you&#39;re
+  new to all of this, then it&#39;s useful to witness the crash and
+  then to follow the logic and math that causes it.
+</para>
+
+<para>
+  The <varname>selection</varname> starts out as
+  <literal>1</literal>. Pressing the
+  <keycombo><keycap>Down</keycap></keycombo> arrow increments
+  <varname>selection</varname> to <literal>2</literal>, then
+  <literal>3</literal>, <literal>4</literal>, and
+  <literal>5</literal>. All of these numbers correspond to the
+  existing five menu entries. If <varname>selection</varname> gets
+  incremented once more to <varname>6</varname>, however, LÖVE
+  doesn&#39;t know what to do because there is no sixth menu entry
+  next to which it can draw the &#62; selection symbol.
+</para>
+
+<para>
+  To solve this bug, you must catch when <varname>selection</varname>
+  would normally become either <literal>0</literal> or
+  <literal>6</literal> and impose an existing number. A user would
+  expect a menu selection to &#34;wrap&#34;&#58; when you scroll past
+  the bottom of a list, the active selection becomes the top of the
+  list. First, define in one place how many menu entries there are by
+  adding this line near the top of your code, near your other local
+  variable&#58;
+</para>
+
+<programlisting><![CDATA[
+local menmax = 5
+]]></programlisting>
+
+<para>
+  To do the maths to fix a <varname>selection</varname> that goes out
+  of bounds, create a new function called <literal>wrap</literal>,
+  requiring one argument&#58; the value of
+  <varname>selection</varname> plus or minus 1, depending on which key
+  was pressed. If that value would result in something less than
+  <literal>1</literal> or higher than <varname>menmax</varname>, then
+  reset <varname>selection</varname> to the lowest or highest value,
+  as appropriate, and hand it back to the process that called the
+  function. To save lazy programmers from too much typing,
+  <varname>selection</varname> is renamed <varname>sel</varname> for
+  use within this function.
+</para>
+
+<para>
+  As always, you can place this function any where in your code file.
+</para>
+
+<programlisting><![CDATA[
+function wrap(sel)
+    if sel > menmax then
+        sel = 1
+    end
+    
+    if sel < 1 then
+        sel = menmax
+    end
+
+    return sel
+end
+]]></programlisting>
+
+<para>
+  And finally, you must use this function when the arrow keys are
+  pressed. Change the arrow key lines of your
+  <literal>keypressed</literal> code&#58;
+</para>
+
+<programlisting><![CDATA[
+function menu.keypressed(k)
+    if k == "down" then
+	selection = wrap(selection+1)
+    elseif k == "up" then
+ 	selection = wrap(selection-1)
+]]></programlisting>
+
+<para>
+  Try your game now. You&#39;re able to select different menu items,
+  and some even work&#59; you can start a new game, and you can quit
+  the application. You might notice that there&#39;s no way to get
+  back to the menu once you&#39;ve started a new game, though, but
+  that&#39;s an easy fix. Add this code to you 
+  <filename>game.lua</filename> file&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.keypressed(k, uni)
+    if k == "escape" then
+        menu.activate()
+    end
+end
+]]></programlisting>
+
+<para>
+  Try your application once more. Scroll through the menu, start a new
+  game, return to the menu, and then quit. The first milestone has
+  been reached&#58; you have the framework you need for a game and a
+  menu system. 
+</para>
+</section>
+
+  <section xml:id="battle-git">
+    <info>
+      <title>Git</title>
+    </info>
+
+    <para>
+      As you have seen by now, there are some times during development
+      when an application just can&#39;t be launched, even for
+      testing. Sometimes your code is incomplete, or sometimes you
+      make some choices that render your project unusable. These are
+      all important stages of development, and since it&#39;s through
+      experimentation that most of the really good stuff gets done,
+      it&#39;s not something you ever want to discourage in
+      yourself. And yet, there&#39;s something significant about
+      reaching an important milestone like the one you have just
+      reached. Your project is in a pretty good state right now. Even
+      though there&#39;s really not much to it, your current codebase
+      serves as a solid foundation upon which the rest of the project
+      can be built.
+    </para>
+
+    <para>
+      Furthermore, your project is divided into three files at the
+      moment. If you had an assistant, you could save a lot of time by
+      working on the game part and letting your assistant programmer
+      work on the menu part. You&#39;d probably both need access to
+      <filename>main.lua</filename>, though, so eventually you&#39;d
+      have to come together and figure out what you each added or
+      changed in each file, and then merge your combined work
+      together.
+    </para>
+    
+    <para>
+      In the world of professional software development, this is known
+      as <firstterm>version control</firstterm>, and the most popular
+      version control system right now is Git.
+    </para>
+
+    <para>
+      Git was developed when Linus Torvalds and his fellow Linux
+      kernel developers were ejected from a proprietary version
+      control system, and suddenly found that they needed a a way to
+      manage lots of changes to hundreds of files between hundreds of
+      developers. The lesson was clear&#58; open source gives the
+      users control of their own data and their own destiny, so
+      Torvalds developed his own system for managing code. Since then,
+      Git is synonymous with software development. It&#39;s used by
+      Linux, a huge portion of open source projects, and even by
+      Microsoft and Apple, movie studios like Weta Digital, Sony, and
+      Industrial Light &#38; Magic, and it&#39;s the backbone for
+      popular coding sites like Gitlab and Github.
+    </para>
+
+    <para>
+      Git has no effect on your application itself, it&#39;s purely a
+      tracking tool to enable you to maintain fluid backups and
+      different development paths in one place. With Git, you get a
+      running history of your project, with snapshots &#40;called
+      <firstterm>commits</firstterm> in Git terminology&#41; of
+      important moments in each file&#39;s life. This gives you the
+      ability to &#91;figuratively&#93; go back in time, reversing 
+      mistakes you make along the way.
+    </para>
+    
+    <para>
+      Learning Git is more a journey than a destination, but the
+      sooner you start, the better. You already installed Git back
+      when you installed <application>Geany</application> and several
+      other tools, so it&#39;s ready to use.
+    </para>
+
+    <bridgehead>Tracking</bridgehead>
+    
+    <para>
+      First, mark your code directory as a place you want Git to keep
+      track of. You can do this in a terminal&#59; first, change
+      directory to your project folder, and then run the <command>git
+      init</command> command&#58;
+    </para>
+
+<programlisting><![CDATA[
+$ cd ~/battlejack
+$ git init .
+]]></programlisting>
+
+<para>
+  Alternately, you can use a Git GUI called
+  <application>git-cola</application>. This application is available
+  from <application>dnfdragora</application>, but the latest version
+  available at the time of this writing is included with the this
+  book&#39;s source code. Install the latest version available from
+  these two choices.
+</para>
+
+<para>
+  After you have installed <application>git-cola</application>, launch
+  it from the applications menu or from a terminal&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git-cola &
+]]></programlisting>
+
+<para>
+  The first window is prompts you to select a directory that is either
+  being tracked by Git, or &#41;as in this case&#41; a directory where
+  you want to enable Git tracking. Click the
+  <guibutton>New</guibutton> button and select your project folder. By
+  selecting an untracked directory, you allow
+  <application>git-cola</application> to enable Git tracking of that
+  location.
+</para>
+
+<para>
+  In both cases, you can tell that Git tracking is enabled in a
+  directory by listing the directory along with hidden files&#58;
+</para>
+
+<programlisting><![CDATA[
+$ ls --all
+./  ../  deck.ini  font/  game.lua  .git/  img/  main.lua  menu.lua
+]]></programlisting>
+
+<para>
+  A directory being tracked by Git is usually called a &#34;Git
+  repository&#34;, or a &#34;Git repo&#34; for short. 
+</para>
+
+<bridgehead>Adding files</bridgehead>
+
+<para>
+  Git tracking is enabled for your project now, but Git only tracks what you tell
+  it to track. See what files are and are not being tracked&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git status
+On branch master
+Initial commit
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        deck.ini
+        font/
+        game.lua
+        img/
+        main.lua
+        menu.lua
+nothing added to commit but untracked files present (use "git add" to track)
+]]></programlisting>
+
+<para>
+  In <application>git-cola</application>, untracked files are listed in the <guilabel>Status</guilabel> pane.
+</para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Git status</alt>
+    <imageobject>
+      <imagedata align="left" width="5in" format="PNG"
+		 fileref="img/Ch07_skenlon/untracked.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    All files in the directory are currently untracked. Since
+    they&#39;re all in a healthy state &#40;your game launches, you
+    have code you want to keep&#41;, add them all to Git using the
+    wildcard character <literal>*</literal> as shorthand for
+    <emphasis>everything here</emphasis>&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git add *
+$ git status
+On branch master
+Initial commit
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   deck.ini
+        new file:   font/arkham.ttf
+        new file:   game.lua
+        new file:   img/red-10-wizard.png
+        new file:   main.lua
+        new file:   menu.lua
+]]></programlisting>
+
+<para>
+  Now the files have been added to a special staging area. They&#39;ve
+  been marked for tracking, but you have yet to actually commit
+  them. You can think of a Git commit as a sort of snapshot of the
+  current state of a file. Commit everything in your staging area now&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git commit --message "game can switch between menu and game screens"
+[master (root-commit) 99dd051] game launches and switches betwe[...]
+ 6 files changed, 46 insertions(+)
+ create mode 100644 deck.ini
+ create mode 100644 font/arkham.ttf
+ create mode 100644 game.lua
+ create mode 100644 img/red-10-wizard.png
+ [...]
+]]></programlisting>
+
+<para>
+  If you prefer to work within <application>git-cola</application>, add files by selecting them in the <guilabel>Status</guilabel> pane, and then right-click and select <guimenuitem>Stage Selected</guimenuitem>. This stages those files to be committed.
+</para>
+
+<para>
+  To commit all staged files, enter a commit message in the <guilabel>Commit</guilabel> pane, and then click the <guibutton>Commit</guibutton> button&#58;
+</para>
+
+    <mediaobject>
+    <info>
+      <othercredit>
+	<orgname>Slackermedia</orgname>
+      </othercredit>
+    </info>
+    <alt>Git commit</alt>
+    <imageobject>
+      <imagedata align="left" width="5in" format="PNG"
+		 fileref="img/Ch07_skenlon/commit.png"/>
+    </imageobject>
+  </mediaobject>
+
+  <para>
+    With your files committed, you can continue to develop with peace of mind, knowing that if you ever get too far off track, you can always return to this point in your project&#39;s history.
+  </para>
+
+  <bridgehead>Restoring</bridgehead>
+
+  <para>
+    With everything safely committed to your Git repository, try
+    breaking your project and then restoring from a previous commit.
+  </para>
+
+  <para>
+    First, change something arbitrary in <filename>game.lua</filename> to simulate some bad coding
+    choices. Change this line&#58;
+  </para>
+
+<programlisting><![CDATA[
+function game.new()
+]]></programlisting>
+
+<para>
+  To this&#58;
+</para>
+
+<programlisting><![CDATA[
+function game.run()
+]]></programlisting>
+
+<para>
+  Now launch the game and try to start a new game. Previously,
+  starting a new game shows a new screen, but now that you&#39;ve made
+  a bad edit, it crashes LÖVE.
+</para>
+
+<para>
+  Of course, in this example, the error is very small and easy to fix, but in the future these kinds of problems will arise unintentionally, and after extensive changes made to several different files. To revert back to the most recent commit of a file in Git&#58;  
+</para>  
+
+<programlisting><![CDATA[
+$ git checkout game.lua
+]]></programlisting>
+
+<para>
+  Run your game now and start a new game. The game is back in working order.
+</para>
+
+<para>
+  If it&#39;s not just one file you need to revert, then you can
+  reset your entire workspace back to the state of the most recent
+  commit&#58;
+</para>
+
+<programlisting><![CDATA[
+$ git reset --hard HEAD
+]]></programlisting>
+
+<para>
+  To revert a file to the most recent commit using <application>git-cola</application>, find the changed file in the <guilabel>Modified</guilabel> section of the  <guilabel>Status</guilabel> pane. Right-click on it and select <guimenuitem>Revert Unstaged Edits</guimenuitem>.
+</para>
+
+<para>
+  You&#39;ll get a chance to do more with Git as you continue to work. The next logical step in your game&#39;s development is to focus on the part of the game that really matters&#58; the game&#33;
+</para>
+</section>
+</chapter>

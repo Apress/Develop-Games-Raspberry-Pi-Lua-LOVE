@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg10061"
+    sodipodi:docname="New document 42"
+    viewBox="0 0 95.272 95.272"
+    version="1.1"
+    inkscape:version="0.48.0 r9654"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#666666"
+      inkscape:pageshadow="2"
+      inkscape:window-y="53"
+      fit-margin-left="0"
+      pagecolor="#ffffff"
+      fit-margin-top="0"
+      inkscape:window-maximized="0"
+      inkscape:zoom="0.35"
+      inkscape:window-x="0"
+      inkscape:window-height="459"
+      showgrid="false"
+      borderopacity="1.0"
+      inkscape:current-layer="layer1"
+      inkscape:cx="59.77903"
+      inkscape:cy="50.493307"
+      fit-margin-right="0"
+      fit-margin-bottom="0"
+      inkscape:window-width="515"
+      inkscape:pageopacity="0.0"
+      inkscape:document-units="px"
+  />
+  <g
+      id="layer1"
+      inkscape:label="Layer 1"
+      inkscape:groupmode="layer"
+      transform="translate(-315.22 -487.58)"
+    >
+    <path
+        id="rect8812-1-3-7-0"
+        style="fill-opacity:.19492;fill:#000000"
+        inkscape:connector-curvature="0"
+        d="m385.25 577.31c-6.2216 3.3137-13.266 5.2945-20.752 5.5475v-29.638c2.1014-0.19029 4.0938-0.74206 5.9276-1.5923zm-24.039-24.09v29.638c-7.4852-0.253-14.53-2.2338-20.752-5.5475l14.824-25.683c1.8338 0.85027 3.8262 1.402 5.9276 1.5923zm42.089 7.2425c-3.8428 6.1469-9.0472 11.351-15.194 15.194l-14.824-25.683c1.6777-1.1896 3.1467-2.6567 4.3352-4.3352zm-50.872-10.489-14.824 25.683c-6.1467-3.8432-11.351-9.0469-15.194-15.194l25.683-14.824c1.1886 1.6785 2.6575 3.1456 4.3352 4.3352zm58.063-13.108c-0.25405 7.4854-2.2326 14.53-5.5474 20.752l-25.683-14.824c0.84909-1.8313 1.4013-3.8294 1.5923-5.9276zm-65.635 0c0.19103 2.0982 0.74323 4.0963 1.5923 5.9276l-25.683 14.824c-3.3149-6.2214-5.2934-13.266-5.5474-20.752zm32.792-1.6437c0 8.1895-6.6037 14.793-14.793 14.793-8.1895 0-14.793-6.6037-14.793-14.793 0-8.1895 6.6037-14.793 14.793-14.793 8.1895 0 14.793 6.6037 14.793 14.793zm32.843-1.6437h-29.628c-0.19007-2.1022-0.75198-4.1034-1.6026-5.9378l25.683-14.824c3.3159 6.2233 5.2944 13.274 5.5474 20.762zm-64.042-5.9378c-0.85058 1.8345-1.4125 3.8356-1.6026 5.9378h-29.628c0.25309-7.4879 2.2316-14.539 5.5474-20.762zm56.851-17.67-25.683 14.824c-1.1908-1.6816-2.6638-3.1444-4.3455-4.3352l14.84-25.68c6.1467 3.8432 11.351 9.0469 15.194 15.194zm-50.862 10.489c-1.6816 1.1908-3.1547 2.6536-4.3455 4.3352l-25.683-14.824c3.8428-6.1469 9.0472-11.351 15.194-15.194zm32.822-27.337-14.834 25.683c-1.8338-0.85027-3.8262-1.402-5.9276-1.5923v-29.627c7.4883 0.25313 14.538 2.221 20.762 5.5372zm-24.049 24.09c-2.1014 0.19029-4.0938 0.74205-5.9276 1.5923l-14.83-25.68c6.2235-3.3162 13.274-5.284 20.762-5.5372z"
+    />
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >Digital Die 0</dc:title
+        >
+        <dc:date
+          >2011-02-07T05:24:51</dc:date
+        >
+        <dc:description
+          >Reimagined a six sided die for an LCD-like display. Different than your usual dice, displays digital pips around a circle.</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/117277/digital-die-0-by-orsonj</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >orsonj</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >dice</rdf:li
+            >
+            <rdf:li
+              >die</rdf:li
+            >
+            <rdf:li
+              >digital</rdf:li
+            >
+            <rdf:li
+              >game</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>
