@@ -68,6 +68,8 @@ end
 
 function game.scaler(WIDE,card)
    slot = WIDE/6
+   -- for better performance, scale DECREASE the graphic 
+   -- files and INCREASE the slot size
    scale = slot/card
    return scale
 end
